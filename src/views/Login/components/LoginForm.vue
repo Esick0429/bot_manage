@@ -1,8 +1,8 @@
 <script setup lang="tsx">
-import { reactive, ref, watch, onMounted, unref } from 'vue'
+import { reactive, ref, watch, onMounted, unref, computed } from 'vue'
 import { Form, FormSchema } from '@/components/Form'
 import { useI18n } from '@/hooks/web/useI18n'
-import { ElCheckbox, ElLink } from 'element-plus'
+import { ElCheckbox, ElLink, ElTabs, ElTabPane, ElInput, ElButton } from 'element-plus'
 import { useForm } from '@/hooks/web/useForm'
 import { loginApi, getTestRoleApi, getAdminRoleApi } from '@/api/login'
 import { useAppStore } from '@/store/modules/app'
@@ -25,25 +25,86 @@ const userStore = useUserStore()
 
 const permissionStore = usePermissionStore()
 
-const { currentRoute, addRoute, push } = useRouter()
+const { currentRoute, addRoute, push, replace } = useRouter()
 
 const { t } = useI18n()
 
-const rules = {
-  username: [required()],
-  password: [required()]
+// 添加登录类型切换
+const loginType = ref('account') // 'account' 或 'phone'
+
+// 根据登录类型使用不同的验证规则
+const rules = computed(() => {
+  return loginType.value === 'account'
+    ? {
+        username: [required()],
+        password: [required()]
+      }
+    : {
+        phone: [required()],
+        code: [required()]
+      }
+})
+
+// 倒计时相关
+const countdown = ref(0)
+const isCounting = computed(() => countdown.value > 0)
+let timer: number | null = null
+
+// 开始倒计时
+const startCountdown = () => {
+  countdown.value = 60
+  timer = window.setInterval(() => {
+    countdown.value--
+    if (countdown.value <= 0) {
+      clearInterval(timer!)
+      timer = null
+    }
+  }, 1000)
 }
 
-const schema = reactive<FormSchema[]>([
+// 发送验证码
+const sendCode = async () => {
+  // TODO:这里添加发送验证码的 API 调用
+  // const formData = await getFormData()
+  // await sendSmsCodeApi(formData.phone)
+  // 启动倒计时
+  startCountdown()
+}
+
+// 修改 schema 使用计算属性，根据当前登录类型返回对应表单
+const schema = computed(() => {
+  return loginType.value === 'account' ? accountSchema : phoneSchema
+})
+const handleTabChange = (tab: string) => {
+  // loginType.value = tab
+  clearForm()
+}
+
+const clearForm = () => {
+  formMethods.setValues({
+    username: '',
+    password: '',
+    phone: '',
+    code: ''
+  })
+}
+
+// 账号密码登录表单
+const accountSchema = reactive<FormSchema[]>([
   {
     field: 'title',
-    colProps: {
-      span: 24
-    },
+    colProps: { span: 24 },
     formItemProps: {
       slots: {
         default: () => {
-          return <h2 class="text-2xl font-bold text-center w-[100%]">{t('login.login')}</h2>
+          return (
+            <>
+              <ElTabs v-model={loginType.value} class="w-[100%]" onTabChange={handleTabChange}>
+                <ElTabPane label={t('login.accountLogin')} name="account"></ElTabPane>
+                <ElTabPane label={t('login.phoneLogin')} name="phone"></ElTabPane>
+              </ElTabs>
+            </>
+          )
         }
       }
     }
@@ -51,32 +112,23 @@ const schema = reactive<FormSchema[]>([
   {
     field: 'username',
     label: t('login.username'),
-    // value: 'admin',
     component: 'Input',
-    colProps: {
-      span: 24
-    },
+    colProps: { span: 24 },
     componentProps: {
-      placeholder: 'admin or test'
+      placeholder: '支持手机号/邮箱登录'
     }
   },
   {
     field: 'password',
     label: t('login.password'),
-    // value: 'admin',
     component: 'InputPassword',
-    colProps: {
-      span: 24
-    },
+    colProps: { span: 24 },
     componentProps: {
-      style: {
-        width: '100%'
-      },
-      placeholder: 'admin or test',
-      // 按下enter键触发登录
+      style: { width: '100%' },
+      placeholder: '请输入密码',
       onKeydown: (_e: any) => {
         if (_e.key === 'Enter') {
-          _e.stopPropagation() // 阻止事件冒泡
+          _e.stopPropagation()
           signIn()
         }
       }
@@ -84,9 +136,7 @@ const schema = reactive<FormSchema[]>([
   },
   {
     field: 'tool',
-    colProps: {
-      span: 24
-    },
+    colProps: { span: 24 },
     formItemProps: {
       slots: {
         default: () => {
@@ -94,7 +144,7 @@ const schema = reactive<FormSchema[]>([
             <>
               <div class="flex justify-between items-center w-[100%]">
                 <ElCheckbox v-model={remember.value} label={t('login.remember')} size="small" />
-                <ElLink type="primary" underline={false}>
+                <ElLink type="primary" underline={false} onClick={toResetPassword}>
                   {t('login.forgetPassword')}
                 </ElLink>
               </div>
@@ -106,9 +156,7 @@ const schema = reactive<FormSchema[]>([
   },
   {
     field: 'login',
-    colProps: {
-      span: 24
-    },
+    colProps: { span: 24 },
     formItemProps: {
       slots: {
         default: () => {
@@ -134,54 +182,108 @@ const schema = reactive<FormSchema[]>([
         }
       }
     }
-  },
+  }
+])
+
+// 手机验证码登录表单
+const phoneSchema = reactive<FormSchema[]>([
   {
-    field: 'other',
-    component: 'Divider',
-    label: t('login.otherLogin'),
-    componentProps: {
-      contentPosition: 'center'
-    }
-  },
-  {
-    field: 'otherIcon',
-    colProps: {
-      span: 24
-    },
+    field: 'title',
+    colProps: { span: 24 },
     formItemProps: {
       slots: {
         default: () => {
           return (
             <>
-              <div class="flex justify-between w-[100%]">
-                <Icon
-                  icon="vi-ant-design:github-filled"
-                  size={iconSize}
-                  class="cursor-pointer ant-icon"
-                  color={iconColor}
-                  hoverColor={hoverColor}
-                />
-                <Icon
-                  icon="vi-ant-design:wechat-filled"
-                  size={iconSize}
-                  class="cursor-pointer ant-icon"
-                  color={iconColor}
-                  hoverColor={hoverColor}
-                />
-                <Icon
-                  icon="vi-ant-design:alipay-circle-filled"
-                  size={iconSize}
-                  color={iconColor}
-                  hoverColor={hoverColor}
-                  class="cursor-pointer ant-icon"
-                />
-                <Icon
-                  icon="vi-ant-design:weibo-circle-filled"
-                  size={iconSize}
-                  color={iconColor}
-                  hoverColor={hoverColor}
-                  class="cursor-pointer ant-icon"
-                />
+              <ElTabs v-model={loginType.value} class="w-[100%]" onTabChange={handleTabChange}>
+                <ElTabPane label={t('login.accountLogin')} name="account"></ElTabPane>
+                <ElTabPane label={t('login.phoneLogin')} name="phone"></ElTabPane>
+              </ElTabs>
+            </>
+          )
+        }
+      }
+    }
+  },
+  {
+    field: 'phone',
+    label: t('login.phoneNumber'),
+    component: 'Input',
+    colProps: { span: 24 },
+    componentProps: {
+      placeholder: t('login.inputPhoneNumber')
+    }
+  },
+  {
+    field: 'code',
+    label: t('login.code'),
+    component: 'Input',
+    colProps: { span: 24 },
+    componentProps: {
+      style: { width: '100%' },
+      placeholder: t('login.codePlaceholder'),
+      onKeydown: (_e: any) => {
+        if (_e.key === 'Enter') {
+          _e.stopPropagation()
+          signIn()
+        }
+      },
+      slots: {
+        append: () => (
+          <BaseButton
+            type="primary"
+            class="send-code-btn"
+            disabled={isCounting.value}
+            onClick={sendCode}
+          >
+            {isCounting.value ? `${countdown.value}秒` : t('login.getCode')}
+          </BaseButton>
+        )
+      }
+    }
+  },
+  {
+    field: 'tool',
+    colProps: { span: 24 },
+    formItemProps: {
+      slots: {
+        default: () => {
+          return (
+            <>
+              <div class="flex justify-between items-center w-[100%]">
+                <ElCheckbox v-model={remember.value} label={t('login.remember')} size="small" />
+                <ElLink type="primary" underline={false} onClick={toResetPassword}>
+                  {t('login.forgetPassword')}
+                </ElLink>
+              </div>
+            </>
+          )
+        }
+      }
+    }
+  },
+  {
+    field: 'login',
+    colProps: { span: 24 },
+    formItemProps: {
+      slots: {
+        default: () => {
+          return (
+            <>
+              <div class="w-[100%]">
+                <BaseButton
+                  loading={loading.value}
+                  type="primary"
+                  class="w-[100%]"
+                  onClick={signIn}
+                >
+                  {t('login.login')}
+                </BaseButton>
+              </div>
+              <div class="w-[100%] mt-15px">
+                <BaseButton class="w-[100%]" onClick={toRegister}>
+                  {t('login.register')}
+                </BaseButton>
               </div>
             </>
           )
@@ -233,10 +335,21 @@ const signIn = async () => {
   await formRef?.validate(async (isValid) => {
     if (isValid) {
       loading.value = true
-      const formData = await getFormData<UserType>()
+      const formData = await getFormData()
 
       try {
-        const res = await loginApi(formData)
+        // 根据登录类型调用不同的登录接口或传递不同参数
+        let res
+        if (loginType.value === 'account') {
+          res = await loginApi(formData as UserType)
+        } else {
+          // 手机验证码登录
+          // 假设使用同一个API但传递不同参数
+          res = await loginApi({
+            ...formData,
+            loginType: 'phone'
+          })
+        }
 
         if (res) {
           // 是否记住我
@@ -271,9 +384,9 @@ const signIn = async () => {
 
 // 获取角色信息
 const getRole = async () => {
-  const formData = await getFormData<UserType>()
+  const formData = await getFormData()
   const params = {
-    roleName: formData.username
+    roleName: loginType.value === 'account' ? formData.username : formData.phone
   }
   const res =
     appStore.getDynamicRouter && appStore.getServerDynamicRouter
@@ -298,6 +411,12 @@ const getRole = async () => {
 const toRegister = () => {
   emit('to-register')
 }
+
+// 跳转到重置密码页面
+const toResetPassword = () => {
+  console.log('跳转到重置密码页面')
+  push('/reset-password')
+}
 </script>
 
 <template>
@@ -311,3 +430,9 @@ const toRegister = () => {
     @register="formRegister"
   />
 </template>
+
+<style scoped>
+.send-code-btn {
+  width: 120px;
+}
+</style>

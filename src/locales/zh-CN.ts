@@ -113,14 +113,40 @@ export default {
     checkPassword: '确认密码',
     login: '登录',
     otherLogin: '其它登录方式',
-    remember: '记住我',
+    remember: '记住密码',
     hasUser: '已有账号？去登录',
     forgetPassword: '忘记密码',
     usernamePlaceholder: '请输入用户名',
     passwordPlaceholder: '请输入密码',
     code: '验证码',
     codePlaceholder: '请输入验证码',
-    getCode: '获取验证码'
+    getCode: '获取验证码',
+    accountLogin: '账号密码登录',
+    phoneLogin: '手机号登录',
+    phoneNumber: '手机号',
+    inputPhoneNumber: '请输入手机号',
+    inputCode: '请输入验证码',
+    phoneRegister: '手机号注册',
+    emailRegister: '邮箱注册'
+  },
+  resetPassword: {
+    resetPassword: '重置密码',
+    phoneReset: '手机号重置',
+    emailReset: '邮箱重置',
+    phoneNumber: '手机号',
+    inputPhoneNumber: '请输入手机号',
+    inputVerificationCode: '请输入验证码',
+    newPassword: '新密码',
+    confirmPassword: '确认密码',
+    inputNewPassword: '请输入新密码',
+    inputConfirmPassword: '请再次输入新密码',
+    confirmReset: '确认重置',
+    backToLogin: '返回登录',
+    email: '邮箱',
+    inputEmail: '请输入邮箱',
+    getCode: '获取验证码',
+    verificationCode: '验证码',
+    codeSent: '验证码已发送'
   },
   router: {
     login: '登录',
@@ -187,7 +213,8 @@ export default {
     personal: '个人',
     avatars: '头像列表',
     iAgree: '我同意',
-    tree: 'Tree 树形控件'
+    tree: 'Tree 树形控件',
+    resetPassword: '重置密码'
   },
   permission: {
     hasPermission: '请设置操作权限值'

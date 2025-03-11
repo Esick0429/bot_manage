@@ -35,7 +35,7 @@ const toLogin = () => {
   >
     <ElScrollbar class="h-full">
       <div class="relative flex mx-auto min-h-100vh">
-        <div
+        <!-- <div
           :class="`${prefixCls}__left flex-1 bg-gray-500 bg-opacity-20 relative p-30px lt-xl:hidden`"
         >
           <div class="flex items-center relative text-white">
@@ -55,7 +55,7 @@ const toLogin = () => {
               </div>
             </TransitionGroup>
           </div>
-        </div>
+        </div> -->
         <div class="flex-1 p-30px lt-sm:p-10px dark:bg-[var(--login-bg-color)] relative">
           <div
             class="flex justify-between items-center text-white at-2xl:justify-end at-xl:justify-end"
@@ -65,10 +65,10 @@ const toLogin = () => {
               <span class="text-20px font-bold">{{ underlineToHump(appStore.getTitle) }}</span>
             </div>
 
-            <div class="flex justify-end items-center space-x-10px">
+            <!-- <div class="flex justify-end items-center space-x-10px">
               <ThemeSwitch />
               <LocaleDropdown class="lt-xl:text-white dark:text-white" />
-            </div>
+            </div> -->
           </div>
           <Transition appear enter-active-class="animate__animated animate__bounceInRight">
             <div

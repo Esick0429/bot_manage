@@ -45,6 +45,16 @@ export const constantRouterMap: AppRouteRecordRaw[] = [
     }
   },
   {
+    path: '/reset-password',
+    component: () => import('@/views/Login/ResetPassword.vue'),
+    name: 'ResetPassword',
+    meta: {
+      hidden: true,
+      title: t('router.resetPassword'),
+      noTagsView: true
+    }
+  },
+  {
     path: '/personal',
     component: Layout,
     redirect: '/personal/personal-center',
