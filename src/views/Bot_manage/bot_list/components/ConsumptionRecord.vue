@@ -38,7 +38,7 @@ const total = ref(0)
 const columns = [
   { field: 'botId', label: '机器人ID', width: 120 },
   { field: 'botNickname', label: '机器人昵称' },
-  { 
+  {
     field: 'type',
     label: '类型',
     formatter: (row) => {
@@ -50,8 +50,8 @@ const columns = [
       return typeMap[row.type] || '-'
     }
   },
-  { 
-    field: 'amount', 
+  {
+    field: 'amount',
     label: '费用',
     formatter: (row) => `￥${row.amount?.toFixed(2) || '0.00'}`
   },
@@ -89,4 +89,3 @@ defineExpose({
   open
 })
 </script>
-

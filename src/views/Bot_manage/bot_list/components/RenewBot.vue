@@ -1,8 +1,6 @@
 <template>
   <Dialog v-model="dialogVisible" title="机器人续费" maxHeight="150px">
-    <div class="text-lg font-bold mb-4">
-      机器人费用：{{ fee }} PRX/月
-    </div>
+    <div class="text-lg font-bold mb-4"> 机器人费用：{{ fee }} PRX/月 </div>
     <Form :schema="formSchema" @register="formRegister" />
     <template #footer>
       <div class="flex justify-end">
@@ -57,7 +55,7 @@ const formSchema = reactive<FormSchema[]>([
 const open = (botInfo: Record<string, any>) => {
   currentBot.value = botInfo
   dialogVisible.value = true
-  
+
   // 设置表单数据
   formMethods.setValues({
     fee: botInfo.fee || 0,
@@ -79,7 +77,7 @@ const submit = async () => {
     if (!valid) return
 
     const formData = await formMethods.getFormData()
-    
+
     try {
       // 这里应该调用真实的续费API
       console.log('提交的续费数据:', {
@@ -87,10 +85,10 @@ const submit = async () => {
         botId: currentBot.value.botId,
         botUsername: currentBot.value.botUsername
       })
-      
+
       // 模拟API调用
-      await new Promise(resolve => setTimeout(resolve, 500))
-      
+      await new Promise((resolve) => setTimeout(resolve, 500))
+
       ElMessage.success('续费成功')
       dialogVisible.value = false
       emit('success')

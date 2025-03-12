@@ -27,7 +27,6 @@
             {{ row.botUsername || '未命名' }}
           </ElLink>
         </template>
-
       </SearchTable>
 
       <!-- 详情弹窗 -->
@@ -38,9 +37,7 @@
             <ElButton @click="dialogVisible = false">
               {{ t('common.cancel') }}
             </ElButton>
-            <ElButton type="primary" @click="handleSubmit">
-              提交
-            </ElButton>
+            <ElButton type="primary" @click="handleSubmit"> 提交 </ElButton>
           </div>
         </template>
       </Dialog>
