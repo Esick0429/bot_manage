@@ -156,6 +156,27 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
     ]
   },
   {
+    path: '/bot_manage',
+    component: Layout,
+    name: 'BotManage',
+    meta: {
+      title: '机器人管理',
+      icon: 'vi-bx:bxs-component',
+      alwaysShow: true
+    },
+    children: [
+      {
+        path: 'bot_list',
+        component: () => import('@/views/Bot_manage/bot_list/index.vue'),
+        name: 'BotList',
+        meta: {
+          title: '机器人列表',
+          icon: 'vi-bx:bxs-component'
+        }
+      }
+    ]
+  },
+  {
     path: '/components',
     component: Layout,
     name: 'ComponentsDemo',

@@ -72,6 +72,27 @@ const adminList = [
     ]
   },
   {
+    path: '/bot_manage',
+    component: '#',
+    name: 'BotManage',
+    meta: {
+      title: '机器人管理',
+      icon: 'vi-bx:bxs-component',
+      alwaysShow: true
+    },
+    children: [
+      {
+        path: 'bot_list',
+        component: 'views/Bot_manage/bot_list/index',
+        name: 'BotList',
+        meta: {
+          title: '机器人列表',
+          icon: 'vi-bx:bxs-component'
+        }
+      }
+    ]
+  },
+  {
     path: '/components',
     component: '#',
     redirect: '/components/form/default-form',

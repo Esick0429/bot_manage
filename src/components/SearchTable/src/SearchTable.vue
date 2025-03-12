@@ -11,20 +11,38 @@
     />
 
     <!-- 工具栏 -->
-    <div class="mb-10px" v-if="$slots.toolbar || showAddButton">
+    <div class="mb-10px">
       <slot name="toolbar">
+        <slot name="leftToolbar"></slot>
         <BaseButton v-if="showAddButton" type="primary" @click="$emit('add')">
-          {{ t('common.add') }}
+          新增
         </BaseButton>
+        <slot name="rightToolbar"></slot>
       </slot>
     </div>
+
+    <!-- 错误提示 -->
+    <el-alert
+      v-if="hasError"
+      title="加载数据失败"
+      type="error"
+      show-icon
+      closable
+      @close="hasError = false"
+      class="mb-10px"
+    >
+      <template #default>
+        <span>请检查网络连接或稍后再试</span>
+        <el-button type="primary" link @click="reload" class="ml-10px">重试</el-button>
+      </template>
+    </el-alert>
 
     <!-- 表格 -->
     <Table
       v-model:pageSize="tableState.pageSize"
       v-model:currentPage="tableState.currentPage"
-      :data="tableState.dataList"
-      :loading="tableState.loading"
+      :data="dataList"
+      :loading="loading"
       :pagination="pagination"
       @register="tableRegister"
       v-bind="tableProps"
@@ -45,6 +63,7 @@ import { Table } from '@/components/Table'
 import { BaseButton } from '@/components/Button'
 import { FormSchema } from '@/components/Form'
 import { TableColumn } from '@/components/Table'
+import { ElAlert, ElEmpty, ElButton } from 'element-plus'
 
 const { t } = useI18n()
 const slots = useSlots()
@@ -112,7 +131,15 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['add', 'search', 'reset', 'delete', 'update:searchParams'])
+const emit = defineEmits([
+  'add',
+  'search',
+  'reset',
+  'delete',
+  'update:searchParams',
+  'error',
+  'loaded'
+])
 
 // 使用hook
 const {
@@ -126,7 +153,11 @@ const {
   currentRow,
   handleDelete,
   searchParams,
-  setSearchParams
+  setSearchParams,
+  hasError,
+  loading,
+  dataList,
+  total
 } = useSearchTable({
   searchSchema: props.searchSchema,
   tableColumns: props.columns,
@@ -136,6 +167,7 @@ const {
   defaultParams: props.defaultParams,
   actionColumn: props.actionColumn
 })
+console.log('tableState', tableState)
 
 // 搜索
 const handleSearch = async () => {
@@ -158,22 +190,43 @@ const doDelete = async (row: Recordable) => {
   return result
 }
 
+// 重新加载
+const reload = async () => {
+  hasError.value = false
+  await tableMethods.getList()
+}
+
 // 计算所有插槽名
 const slotKeys = computed(() => {
-  return Object.keys(slots).filter((key) => key !== 'toolbar')
+  const slotNames = Object.keys(slots)
+  const excludeSlots = ['toolbar', 'empty']
+  return slotNames.filter((key) => !excludeSlots.includes(key))
 })
 
+// 监听加载完成
 watch(
-  () => tableState.dataList,
-  (val) => {
-    if (val && !Array.isArray(val)) {
-      console.warn('表格数据不是数组，修复中...')
-      tableState.dataList = []
+  () => loading.value,
+  (newVal, oldVal) => {
+    console.log('safeTableData', dataList)
+    if (oldVal === true && newVal === false) {
+      emit('loaded', {
+        data: dataList,
+        total: total,
+        success: !hasError.value
+      })
     }
-  },
-  { immediate: true, deep: true }
+  }
 )
 
+// 监听错误状态
+watch(
+  () => hasError.value,
+  (val) => {
+    if (val) {
+      emit('error')
+    }
+  }
+)
 
 // 暴露方法
 defineExpose({
@@ -186,6 +239,18 @@ defineExpose({
   searchMethods,
   tableState,
   searchParams,
-  setSearchParams
+  setSearchParams,
+  hasError
 })
 </script>
+
+<style scoped>
+.search-table-container {
+  width: 100%;
+}
+.empty-data {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+</style>
