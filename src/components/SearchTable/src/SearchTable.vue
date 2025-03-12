@@ -8,7 +8,12 @@
       @reset="handleReset"
       @register="searchRegister"
       v-bind="searchProps"
-    />
+    >
+      <!-- 添加自定义按钮插槽 -->
+      <template #actionButtons>
+        <slot name="searchButtons"></slot>
+      </template>
+    </Search>
 
     <!-- 工具栏 -->
     <div class="mb-10px">
@@ -37,8 +42,10 @@
 
     <!-- 表格 -->
     <Table
-      v-model:pageSize="tableState.pageSize"
-      v-model:currentPage="tableState.currentPage"
+      :pageSize="unref(tableState.pageSize)"
+      :currentPage="unref(tableState.currentPage)"
+      @update:pageSize="tableState.pageSize = $event"
+      @update:currentPage="tableState.currentPage = $event"
       :data="dataList"
       :loading="loading"
       :pagination="pagination"
@@ -53,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, useSlots, PropType, watch } from 'vue'
+import { ref, computed, onMounted, useSlots, PropType, watch, unref } from 'vue'
 import { useSearchTable } from '@/hooks/web/useSearchTable'
 import { useI18n } from '@/hooks/web/useI18n'
 import { Search } from '@/components/Search'
