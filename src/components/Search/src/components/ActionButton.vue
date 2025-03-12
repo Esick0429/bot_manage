@@ -57,7 +57,7 @@ const onExpand = () => {
     >
       {{ t(visible ? 'common.shrink' : 'common.expand') }}
     </BaseButton>
-    
+
     <!-- 自定义按钮插槽 -->
     <slot></slot>
   </div>

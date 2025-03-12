@@ -41,7 +41,7 @@ export const syncTgStatusApi = (botId: string) => {
 }
 
 // 机器人续费
-export const renewBotApi = (data: { botId: string, months: number }) => {
+export const renewBotApi = (data: { botId: string; months: number }) => {
   return request.post({ url: '/bot/renew', data })
 }
 
