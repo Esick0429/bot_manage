@@ -141,7 +141,7 @@ export const newRouterMap: AppRouteRecordRaw[] = [
         }
       }
     ]
-  },
+  }
   // {
   //   path: '/user_group',
   //   component: Layout,
@@ -937,7 +937,6 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
   },
   ...newRouterMap
 ]
-
 
 const router = createRouter({
   history: createWebHashHistory(),

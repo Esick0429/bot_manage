@@ -19,7 +19,7 @@
         @error="handleLoadError"
         :search-props="{
           layout: 'inline',
-          buttonPosition: 'center',
+          buttonPosition: 'center'
         }"
       >
         <template #searchButtons>
@@ -55,9 +55,9 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, reactive, computed, onMounted, watch, h } from 'vue'
-import { ElButton, ElLink, ElMessage, ElMessageBox, ElEmpty } from 'element-plus'
+<script setup lang="tsx">
+import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { ElButton, ElLink, ElMessage, ElMessageBox, ElEmpty, ElTooltip } from 'element-plus'
 import { ContentWrap } from '@/components/ContentWrap'
 import { Dialog } from '@/components/Dialog'
 import { Form, FormSchema } from '@/components/Form'
@@ -70,6 +70,7 @@ import ConsumptionRecord from './components/ConsumptionRecord.vue'
 import RenewBot from './components/RenewBot.vue'
 import BotConfig from './components/BotConfig.vue'
 import { getBotListApi } from '@/api/botlist'
+import { Icon } from '@/components/Icon'
 
 const { t } = useI18n()
 const { required } = useValidator()
@@ -86,7 +87,13 @@ const columns = [
     label: '机器人用户名',
     slots: {
       default: (data: any) => {
-        return data.row.botUsername
+        return (
+          <>
+            <ElLink type="primary" href={`https://t.me/${data.row.botUsername}`} target="_blank">
+              {data.row.botUsername}
+            </ElLink>
+          </>
+        )
       }
     }
   },
@@ -107,24 +114,16 @@ const actionColumn = {
   slots: {
     default: (data: any) => {
       const row = data.row
-      return h('div', [
-        h(
-          BaseButton,
-          {
-            type: 'primary',
-            onClick: () => handleEdit(row)
-          },
-          '配置'
-        ),
-        h(
-          BaseButton,
-          {
-            type: 'success',
-            onClick: () => handleRenew(row)
-          },
-          '续费'
-        )
-      ])
+      return (
+        <>
+          <BaseButton type="primary" onClick={() => handleEdit(row)}>
+            配置
+          </BaseButton>
+          <BaseButton type="success" onClick={() => handleRenew(row)}>
+            续费
+          </BaseButton>
+        </>
+      )
     }
   }
 }
@@ -156,20 +155,56 @@ const formSchema = reactive<FormSchema[]>([
   {
     field: 'fee',
     component: 'Input' as const,
-    label: '机器人费用：',
+    // label: '机器人费用：',
     componentProps: {
       placeholder: '请输入机器人费用'
+    },
+    formItemProps: {
+      slots: {
+        label: () => {
+          return (
+            <div>
+              机器人费用
+              <ElTooltip
+                content="将会从您的trongas账号扣费，请确保您的trongas账户余额充足"
+                placement="top"
+                effect="light"
+              >
+                <Icon icon="vi-ep:question-filled" size={12} />
+              </ElTooltip>
+              ：
+            </div>
+          )
+        }
+      }
     }
   },
   {
     field: 'botToken',
     component: 'Input' as const,
-    label: '机器人token：',
+    // label: '机器人token：',
     componentProps: {
       placeholder: '请输入机器人token'
     },
     formItemProps: {
-      rules: [required()]
+      rules: [required()],
+      slots: {
+        label: () => {
+          return (
+            <div>
+              机器人token
+              <ElTooltip
+                content="将会从您的账号扣费，请确保您的账户余额充足"
+                placement="top"
+                effect="light"
+              >
+                <Icon icon="vi-ep:question-filled" size={12} />
+              </ElTooltip>
+              ：
+            </div>
+          )
+        }
+      }
     }
   },
   {
