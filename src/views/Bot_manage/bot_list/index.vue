@@ -31,7 +31,7 @@
       </SearchTable>
 
       <!-- 详情弹窗 -->
-      <Dialog v-model="dialogVisible" title="新增机器人">
+      <Dialog v-model="dialogVisible" title="添加机器人">
         <Form :schema="formSchema" @register="formRegister" />
         <template #footer>
           <div class="flex justify-end">
@@ -49,6 +49,8 @@
     <ConsumptionRecord ref="consumptionRecordRef" />
     <!-- 添加续费组件 -->
     <RenewBot ref="renewBotRef" @success="handleRenewSuccess" />
+    <!-- 添加机器人配置组件 -->
+    <BotConfig ref="botConfigRef" @success="handleConfigSuccess" />
   </div>
 </template>
 
@@ -65,12 +67,15 @@ import { useValidator } from '@/hooks/web/useValidator'
 import { BaseButton } from '@/components/Button'
 import ConsumptionRecord from './components/ConsumptionRecord.vue'
 import RenewBot from './components/RenewBot.vue'
+import BotConfig from './components/BotConfig.vue'
+import { getBotListApi } from '@/api/botlist'
 
 const { t } = useI18n()
 const { required } = useValidator()
 const searchTableRef = ref(null)
 const consumptionRecordRef = ref()
 const renewBotRef = ref()
+const botConfigRef = ref()
 
 // 表格列配置
 const columns = [
@@ -128,7 +133,7 @@ const searchSchema = [
   {
     field: 'botId',
     component: 'Input',
-    label: '机器人ID',
+    label: '机器人ID：',
     componentProps: {
       placeholder: '请输入机器人ID',
       clearable: true
@@ -137,7 +142,7 @@ const searchSchema = [
   {
     field: 'botUsername',
     component: 'Input',
-    label: '机器人用户名',
+    label: '机器人用户名：',
     componentProps: {
       placeholder: '请输入机器人用户名',
       clearable: true
@@ -150,7 +155,7 @@ const formSchema = reactive<FormSchema[]>([
   {
     field: 'fee',
     component: 'Input' as const,
-    label: '机器人费用',
+    label: '机器人费用：',
     componentProps: {
       placeholder: '请输入机器人费用'
     }
@@ -158,7 +163,7 @@ const formSchema = reactive<FormSchema[]>([
   {
     field: 'botToken',
     component: 'Input' as const,
-    label: '机器人token',
+    label: '机器人token：',
     componentProps: {
       placeholder: '请输入机器人token'
     },
@@ -169,7 +174,7 @@ const formSchema = reactive<FormSchema[]>([
   {
     field: 'apiKey',
     component: 'Input' as const,
-    label: 'API秘钥',
+    label: 'API秘钥：',
     componentProps: {
       placeholder: '请输入API秘钥'
     },
@@ -180,7 +185,7 @@ const formSchema = reactive<FormSchema[]>([
   {
     field: 'adminTgAccount',
     component: 'Input' as const,
-    label: '管理员TG账号',
+    label: '管理员TG账号：',
     componentProps: {
       placeholder: '请输入管理员TG账号'
     },
@@ -191,7 +196,7 @@ const formSchema = reactive<FormSchema[]>([
   {
     field: 'remark',
     component: 'Input' as const,
-    label: '备注',
+    label: '备注：',
     componentProps: {
       placeholder: '请输入备注',
       type: 'textarea',
@@ -201,7 +206,7 @@ const formSchema = reactive<FormSchema[]>([
   {
     field: 'status',
     component: 'Switch' as const,
-    label: '状态',
+    label: '状态：',
     value: true
   }
 ]) as FormSchema[]
@@ -230,25 +235,18 @@ const handleAdd = () => {
 
 // 编辑
 const handleEdit = (row) => {
-  dialogType.value = 'edit'
-  dialogVisible.value = true
-  // 设置表单数据
-  formMethods.setValues({
-    ...row,
-    fee: row.fee || '',
-    botToken: row.botToken || '',
-    apiKey: row.apiKey || '',
-    adminTgAccount: row.adminTgAccount || '',
-    remark: row.remark || '',
-    status: row.status || true
-  })
+  if (botConfigRef.value) {
+    botConfigRef.value.open(row)
+  }
 }
+
 // 续费
 const handleRenew = (row) => {
   if (renewBotRef.value) {
     renewBotRef.value.open(row)
   }
 }
+
 // 提交表单
 const handleSubmit = async () => {
   const elForm = await formMethods.getElFormExpose()
@@ -375,6 +373,13 @@ const openConsumptionRecord = () => {
 
 // 续费成功回调
 const handleRenewSuccess = () => {
+  if (searchTableRef.value) {
+    searchTableRef.value.reload()
+  }
+}
+
+// 配置成功回调
+const handleConfigSuccess = () => {
   if (searchTableRef.value) {
     searchTableRef.value.reload()
   }
