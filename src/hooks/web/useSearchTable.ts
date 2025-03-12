@@ -55,6 +55,7 @@ export const useSearchTable = (config: UseSearchTableConfig) => {
           total: result.total
         }
       } catch (error) {
+        console.error('搜索操作失败:', error)
       } finally {
         isLoading.value = false
       }
