@@ -3,7 +3,6 @@
     <div v-loading="loading">
       <ElTabs v-model="activeTab">
         <ElTabPane label="机器人信息" name="botInfo">
-          
           <!-- 机器人基本信息表单 -->
           <Form :schema="botInfoSchema" @register="botInfoRegister" />
           <div class="tg-status-row mb-4">
@@ -13,15 +12,37 @@
               </ElCol>
               <ElCol :span="18">
                 <div class="flex items-center">
-                  <ElTag 
-                    :type="tgStatus === 'success' ? 'success' : tgStatus === 'error' ? 'danger' : 'info'" 
+                  <ElTag
+                    :type="
+                      tgStatus === 'success' ? 'success' : tgStatus === 'error' ? 'danger' : 'info'
+                    "
                     effect="plain"
                   >
-                    {{ tgStatus === 'success' ? '已同步' : tgStatus === 'error' ? '同步失败' : '未同步' }}
+                    {{
+                      tgStatus === 'success'
+                        ? '已同步'
+                        : tgStatus === 'error'
+                          ? '同步失败'
+                          : '未同步'
+                    }}
                   </ElTag>
-                  <div class="flex items-center ml-2 cursor-pointer" style="color: #007bff;" @click="syncTgStatus">
-                    <div :class="{'syncing': syncing}">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M20.5 5.835A10.49 10.49 0 0 0 12 1.5c-5.427 0-9.89 4.115-10.443 9.396l-.104.994l1.99.209l.103-.995A8.501 8.501 0 0 1 19.213 7.5H15.5v2h7v-7h-2zm.057 6.066l-.104.995A8.501 8.501 0 0 1 4.787 16.5H8.5v-2h-7v7h2v-3.335A10.49 10.49 0 0 0 12 22.5c5.426 0 9.89-4.115 10.442-9.396l.104-.994z"/></svg>
+                  <div
+                    class="flex items-center ml-2 cursor-pointer"
+                    style="color: #007bff"
+                    @click="syncTgStatus"
+                  >
+                    <div :class="{ syncing: syncing }">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          fill="currentColor"
+                          d="M20.5 5.835A10.49 10.49 0 0 0 12 1.5c-5.427 0-9.89 4.115-10.443 9.396l-.104.994l1.99.209l.103-.995A8.501 8.501 0 0 1 19.213 7.5H15.5v2h7v-7h-2zm.057 6.066l-.104.995A8.501 8.501 0 0 1 4.787 16.5H8.5v-2h-7v7h2v-3.335A10.49 10.49 0 0 0 12 22.5c5.426 0 9.89-4.115 10.442-9.396l.104-.994z"
+                        />
+                      </svg>
                     </div>
                     <span class="ml-1">{{ syncing ? '同步中...' : '点我同步' }}</span>
                   </div>
@@ -30,33 +51,33 @@
             </ElRow>
           </div>
         </ElTabPane>
-        
+
         <ElTabPane label="收款配置" name="payment">
           <Form :schema="paymentSchema" @register="paymentRegister" />
         </ElTabPane>
-        
+
         <ElTabPane label="时间能量价格" name="timeEnergy">
           <Form :schema="timeEnergySchema" @register="timeEnergyRegister" />
         </ElTabPane>
-        
+
         <ElTabPane label="笔数能量价格" name="countEnergy">
           <Form :schema="countEnergySchema" @register="countEnergyRegister" />
         </ElTabPane>
-        
+
         <ElTabPane label="托管模式价格" name="managedMode">
           <Form :schema="managedModeSchema" @register="managedModeRegister" />
         </ElTabPane>
-        
+
         <ElTabPane label="批量下单价格" name="batchOrder">
           <Form :schema="batchOrderSchema" @register="batchOrderRegister" />
         </ElTabPane>
-        
+
         <ElTabPane label="闪兑配置" name="flashExchange">
           <Form :schema="flashExchangeSchema" @register="flashExchangeRegister" />
         </ElTabPane>
       </ElTabs>
     </div>
-    
+
     <template #footer>
       <div class="flex justify-end">
         <ElButton @click="close" :disabled="submitting">取消</ElButton>
@@ -68,14 +89,24 @@
 
 <script setup lang="ts">
 import { reactive, ref, onMounted } from 'vue'
-import { ElButton, ElMessage, ElTabs, ElTabPane, ElTag, ElFormItem, ElRow, ElCol, ElLoading } from 'element-plus'
+import {
+  ElButton,
+  ElMessage,
+  ElTabs,
+  ElTabPane,
+  ElTag,
+  ElFormItem,
+  ElRow,
+  ElCol,
+  ElLoading
+} from 'element-plus'
 import { Dialog } from '@/components/Dialog'
 import { Form, FormSchema } from '@/components/Form'
 import { useForm } from '@/hooks/web/useForm'
 import { useValidator } from '@/hooks/web/useValidator'
-import { 
-  getBotDetailApi, 
-  syncTgStatusApi, 
+import {
+  getBotDetailApi,
+  syncTgStatusApi,
   updateBotAllConfigsApi,
   getBotPaymentConfigApi,
   getBotTimeEnergyConfigApi,
@@ -324,18 +355,18 @@ const flashExchangeSchema = reactive<FormSchema[]>([
 // TG状态同步
 const syncTgStatus = async () => {
   if (syncing.value) return
-  
+
   try {
     syncing.value = true
     ElMessage.info('正在同步TG状态...')
-    
+
     // 调用同步TG状态接口
     const res = await syncTgStatusApi(currentBot.value.botId)
     const data = res.data || {}
-    
+
     // 更新状态
     tgStatus.value = data.status || 'pending'
-    
+
     ElMessage.success('TG状态同步' + (tgStatus.value === 'success' ? '成功' : '失败'))
   } catch (error) {
     console.error('TG状态同步失败:', error)
@@ -353,22 +384,22 @@ const loadBotAllConfigs = async (botId: string) => {
     ElMessage.error('机器人ID不能为空')
     return
   }
-  
+
   const loadingInstance = ElLoading.service({
     target: '.el-dialog__body',
     text: '加载配置中...'
   })
-  
+
   loading.value = true
-  
+
   try {
     // 获取机器人基本信息
     const botInfoRes = await getBotDetailApi(botId)
     const botInfo = botInfoRes.data || {}
-    
+
     // 设置TG同步状态
     tgStatus.value = botInfo.tgVerifyStatus || 'pending'
-    
+
     // 设置机器人信息表单数据
     botInfoMethods.setValues({
       ...botInfo,
@@ -381,7 +412,7 @@ const loadBotAllConfigs = async (botId: string) => {
       remark: botInfo.remark || '',
       status: botInfo.status === undefined ? true : botInfo.status
     })
-    
+
     try {
       // 获取并设置收款配置
       const paymentConfigRes = await getBotPaymentConfigApi(botId)
@@ -400,13 +431,14 @@ const loadBotAllConfigs = async (botId: string) => {
         minPaymentAmount: 0
       })
     }
-    
+
     try {
       // 获取并设置时间能量价格配置
       const timeEnergyConfigRes = await getBotTimeEnergyConfigApi(botId)
       const timeEnergyConfig = timeEnergyConfigRes.data || {}
       timeEnergyMethods.setValues({
-        timeEnergyEnabled: timeEnergyConfig.enabled === undefined ? false : timeEnergyConfig.enabled,
+        timeEnergyEnabled:
+          timeEnergyConfig.enabled === undefined ? false : timeEnergyConfig.enabled,
         timeEnergyPrice: timeEnergyConfig.price || 0
       })
     } catch (error) {
@@ -417,13 +449,14 @@ const loadBotAllConfigs = async (botId: string) => {
         timeEnergyPrice: 0
       })
     }
-    
+
     try {
       // 获取并设置笔数能量价格配置
       const countEnergyConfigRes = await getBotCountEnergyConfigApi(botId)
       const countEnergyConfig = countEnergyConfigRes.data || {}
       countEnergyMethods.setValues({
-        countEnergyEnabled: countEnergyConfig.enabled === undefined ? false : countEnergyConfig.enabled,
+        countEnergyEnabled:
+          countEnergyConfig.enabled === undefined ? false : countEnergyConfig.enabled,
         countEnergyPrice: countEnergyConfig.price || 0
       })
     } catch (error) {
@@ -434,13 +467,14 @@ const loadBotAllConfigs = async (botId: string) => {
         countEnergyPrice: 0
       })
     }
-    
+
     try {
       // 获取并设置托管模式价格配置
       const managedModeConfigRes = await getBotManagedModeConfigApi(botId)
       const managedModeConfig = managedModeConfigRes.data || {}
       managedModeMethods.setValues({
-        managedModeEnabled: managedModeConfig.enabled === undefined ? false : managedModeConfig.enabled,
+        managedModeEnabled:
+          managedModeConfig.enabled === undefined ? false : managedModeConfig.enabled,
         managedModePrice: managedModeConfig.price || 0
       })
     } catch (error) {
@@ -451,13 +485,14 @@ const loadBotAllConfigs = async (botId: string) => {
         managedModePrice: 0
       })
     }
-    
+
     try {
       // 获取并设置批量下单价格配置
       const batchOrderConfigRes = await getBotBatchOrderConfigApi(botId)
       const batchOrderConfig = batchOrderConfigRes.data || {}
       batchOrderMethods.setValues({
-        batchOrderEnabled: batchOrderConfig.enabled === undefined ? false : batchOrderConfig.enabled,
+        batchOrderEnabled:
+          batchOrderConfig.enabled === undefined ? false : batchOrderConfig.enabled,
         batchOrderPrice: batchOrderConfig.price || 0
       })
     } catch (error) {
@@ -468,13 +503,14 @@ const loadBotAllConfigs = async (botId: string) => {
         batchOrderPrice: 0
       })
     }
-    
+
     try {
       // 获取并设置闪兑配置
       const flashExchangeConfigRes = await getBotFlashExchangeConfigApi(botId)
       const flashExchangeConfig = flashExchangeConfigRes.data || {}
       flashExchangeMethods.setValues({
-        flashExchangeEnabled: flashExchangeConfig.enabled === undefined ? false : flashExchangeConfig.enabled,
+        flashExchangeEnabled:
+          flashExchangeConfig.enabled === undefined ? false : flashExchangeConfig.enabled,
         flashExchangeRate: flashExchangeConfig.rate || 0,
         flashExchangeFee: flashExchangeConfig.fee || 0
       })
@@ -487,10 +523,9 @@ const loadBotAllConfigs = async (botId: string) => {
         flashExchangeFee: 0
       })
     }
-    
+
     // 更新当前机器人对象
     currentBot.value = botInfo
-    
   } catch (error) {
     console.error('加载机器人配置失败:', error)
     ElMessage.error('加载机器人配置失败，请稍后重试')
@@ -506,12 +541,12 @@ const open = async (botInfo: Record<string, any>) => {
   currentBot.value = botInfo || {}
   dialogVisible.value = true
   activeTab.value = 'botInfo'
-  
+
   if (!botInfo || !botInfo.botId) {
     ElMessage.error('机器人信息不完整')
     return
   }
-  
+
   // 加载所有配置信息
   await loadBotAllConfigs(botInfo.botId)
 }
@@ -525,10 +560,10 @@ const close = () => {
 // 提交表单
 const submit = async () => {
   if (submitting.value) return
-  
+
   // 获取当前活动的表单
   let currentForm
-  
+
   switch (activeTab.value) {
     case 'botInfo':
       currentForm = await botInfoMethods.getElFormExpose()
@@ -552,19 +587,19 @@ const submit = async () => {
       currentForm = await flashExchangeMethods.getElFormExpose()
       break
   }
-  
+
   if (!currentForm) return
-  
+
   const valid = await currentForm.validate().catch(() => false)
   if (!valid) {
     ElMessage.warning('表单验证失败，请检查填写内容')
     return
   }
-  
+
   try {
     submitting.value = true
     ElMessage.info('正在保存配置...')
-    
+
     // 收集所有表单数据
     const botInfoData = await botInfoMethods.getFormData()
     const paymentData = await paymentMethods.getFormData()
@@ -573,12 +608,12 @@ const submit = async () => {
     const managedModeData = await managedModeMethods.getFormData()
     const batchOrderData = await batchOrderMethods.getFormData()
     const flashExchangeData = await flashExchangeMethods.getFormData()
-    
+
     if (!currentBot.value.botId) {
       ElMessage.error('机器人ID不能为空')
       return
     }
-    
+
     // 组合所有配置数据
     const formData = {
       // 基本信息
@@ -619,10 +654,10 @@ const submit = async () => {
       botId: currentBot.value.botId,
       tgVerifyStatus: tgStatus.value
     }
-    
+
     // 调用API更新所有配置
     await updateBotAllConfigsApi(formData)
-    
+
     ElMessage.success('配置保存成功')
     dialogVisible.value = false
     emit('success')
@@ -687,4 +722,4 @@ defineExpose({
 .el-tabs__content {
   padding: 0 10px;
 }
-</style> 
+</style>
