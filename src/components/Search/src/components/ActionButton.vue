@@ -30,30 +30,43 @@ const onExpand = () => {
 </script>
 
 <template>
-  <BaseButton
-    v-if="showSearch"
-    type="primary"
-    :loading="searchLoading"
-    :icon="useIcon({ icon: 'vi-ep:search' })"
-    @click="onSearch"
-  >
-    {{ t('common.query') }}
-  </BaseButton>
-  <BaseButton
-    v-if="showReset"
-    :loading="resetLoading"
-    plain
-    :icon="useIcon({ icon: 'vi-ep:refresh-right' })"
-    @click="onReset"
-  >
-    {{ t('common.reset') }}
-  </BaseButton>
-  <BaseButton
-    v-if="showExpand"
-    :icon="useIcon({ icon: visible ? 'vi-ep:arrow-up' : 'vi-ep:arrow-down' })"
-    text
-    @click="onExpand"
-  >
-    {{ t(visible ? 'common.shrink' : 'common.expand') }}
-  </BaseButton>
+  <div class="action-button-container">
+    <BaseButton
+      v-if="showSearch"
+      type="primary"
+      :loading="searchLoading"
+      :icon="useIcon({ icon: 'vi-ep:search' })"
+      @click="onSearch"
+    >
+      {{ t('common.query') }}
+    </BaseButton>
+    <BaseButton
+      v-if="showReset"
+      :loading="resetLoading"
+      plain
+      :icon="useIcon({ icon: 'vi-ep:refresh-right' })"
+      @click="onReset"
+    >
+      {{ t('common.reset') }}
+    </BaseButton>
+    <BaseButton
+      v-if="showExpand"
+      :icon="useIcon({ icon: visible ? 'vi-ep:arrow-up' : 'vi-ep:arrow-down' })"
+      text
+      @click="onExpand"
+    >
+      {{ t(visible ? 'common.shrink' : 'common.expand') }}
+    </BaseButton>
+    
+    <!-- 自定义按钮插槽 -->
+    <slot></slot>
+  </div>
 </template>
+
+<style scoped>
+.action-button-container {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+</style>

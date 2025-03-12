@@ -17,8 +17,12 @@
         @add="handleAdd"
         @loaded="handleDataLoaded"
         @error="handleLoadError"
+        :search-props="{
+          layout: 'inline',
+          buttonPosition: 'center',
+        }"
       >
-        <template #rightToolbar>
+        <template #searchButtons>
           <BaseButton type="primary" @click="openConsumptionRecord">消费记录</BaseButton>
         </template>
         <!-- 自定义表格列 -->
@@ -31,7 +35,7 @@
 
       <!-- 详情弹窗 -->
       <Dialog v-model="dialogVisible" title="添加机器人">
-        <Form :schema="formSchema" @register="formRegister" />
+        <Form :isCol="false" :schema="formSchema" @register="formRegister" />
         <template #footer>
           <div class="flex justify-end">
             <ElButton @click="dialogVisible = false">
@@ -197,7 +201,9 @@ const formSchema = reactive<FormSchema[]>([
     componentProps: {
       placeholder: '请输入备注',
       type: 'textarea',
-      rows: 3
+      rows: 3,
+      maxlength: 100,
+      showWordLimit: true
     }
   },
   {

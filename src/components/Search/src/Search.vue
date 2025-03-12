@@ -1,6 +1,6 @@
 <script setup lang="tsx">
 import { Form, FormSchema, FormSetProps } from '@/components/Form'
-import { PropType, computed, unref, ref, watch, onMounted } from 'vue'
+import { PropType, computed, unref, ref, watch, onMounted, useSlots } from 'vue'
 import { propTypes } from '@/utils/propTypes'
 import { useForm } from '@/hooks/web/useForm'
 import { findIndex } from '@/utils'
@@ -10,6 +10,9 @@ import ActionButton from './components/ActionButton.vue'
 import { SearchProps } from './types'
 import { FormItemProp } from 'element-plus'
 import { isObject, isEmptyVal } from '@/utils/is'
+
+// 添加slots定义
+const slots = useSlots()
 
 const props = defineProps({
   // 生成Form的布局结构数组
@@ -85,7 +88,10 @@ const newSchema = computed(() => {
                     onExpand={setVisible}
                     onReset={reset}
                     onSearch={search}
-                  />
+                  >
+                    {/* 传递自定义按钮插槽 */}
+                    {slots.actionButtons?.()}
+                  </ActionButton>
                 </div>
               )
             },
@@ -265,7 +271,9 @@ const onFormValidate = (prop: FormItemProp, isValid: boolean, message: string) =
         @expand="setVisible"
         @reset="reset"
         @search="search"
-      />
+      >
+        <slot name="actionButtons"></slot>
+      </ActionButton>
     </div>
   </template>
 </template>
