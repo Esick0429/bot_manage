@@ -1,10 +1,21 @@
 import request from '@/axios'
-import type { UserType } from './types'
+import type {
+  UserType,
+  PhoneRegisterParams,
+  EmailRegisterParams,
+  PasswordLoginParams,
+  VerifyCodeLoginParams,
+  ChangePasswordParams,
+  EmailCodeParams,
+  PhoneCodeParams,
+  LoginResponse
+} from './types'
 
 interface RoleParams {
   roleName: string
 }
 
+// 旧的API接口，保留供兼容
 export const loginApi = (data: UserType): Promise<IResponse<UserType>> => {
   // TODO：需要修改为后端接口
   return request.post({ url: '/mock/user/login', data })
@@ -32,4 +43,75 @@ export const getAdminRoleApi = (
 
 export const getTestRoleApi = (params: RoleParams): Promise<IResponse<string[]>> => {
   return request.get({ url: '/mock/role/list2', params })
+}
+
+// 新的API接口
+
+// 注册相关API
+/**
+ * 手机号注册
+ * @param data 注册参数
+ */
+export const phoneRegisterApi = (data: PhoneRegisterParams): Promise<IResponse> => {
+  return request.post({ url: '/v1/user/phone/register', data })
+}
+
+/**
+ * 邮箱注册
+ * @param data 注册参数
+ */
+export const emailRegisterApi = (data: EmailRegisterParams): Promise<IResponse> => {
+  return request.post({ url: '/v1/user/email/register', data })
+}
+
+// 登录相关API
+/**
+ * 账号密码登录
+ * @param data 登录参数
+ */
+export const passwordLoginApi = (data: PasswordLoginParams): Promise<IResponse<LoginResponse>> => {
+  return request.post({ url: '/v1/user/login', data })
+}
+
+/**
+ * 账号验证码登录
+ * @param data 登录参数
+ */
+export const verifyCodeLoginApi = (
+  data: VerifyCodeLoginParams
+): Promise<IResponse<LoginResponse>> => {
+  return request.post({ url: '/v1/user/verify/login', data })
+}
+
+/**
+ * 退出登录
+ */
+export const logoutApi = (): Promise<IResponse> => {
+  return request.post({ url: '/v1/user/logout' })
+}
+
+// 修改密码相关API
+/**
+ * 修改密码
+ * @param data 修改密码参数
+ */
+export const changePasswordApi = (data: ChangePasswordParams): Promise<IResponse> => {
+  return request.post({ url: '/v1/user/changepasswd', data })
+}
+
+// 验证码相关API
+/**
+ * 发送邮箱验证码
+ * @param data 发送验证码参数
+ */
+export const sendEmailCodeApi = (data: EmailCodeParams): Promise<IResponse> => {
+  return request.post({ url: '/v1/user/email/code', data })
+}
+
+/**
+ * 发送手机验证码
+ * @param data 发送验证码参数
+ */
+export const sendPhoneCodeApi = (data: PhoneCodeParams): Promise<IResponse> => {
+  return request.post({ url: '/v1/user/phone/code', data })
 }
