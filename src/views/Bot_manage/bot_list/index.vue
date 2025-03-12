@@ -89,7 +89,7 @@ const columns = [
       default: (data: any) => {
         return (
           <>
-            <ElLink type="primary" href={`https://t.me/${data.row.botUsername}`} target="_blank">
+            <ElLink type="primary" href={`https://t.me/woaihuaweiaaa_bot`} target="_blank">
               {data.row.botUsername}
             </ElLink>
           </>

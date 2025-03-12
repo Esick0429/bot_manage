@@ -31,18 +31,8 @@
                     style="color: #007bff"
                     @click="syncTgStatus"
                   >
-                    <div :class="{ syncing: syncing }">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          fill="currentColor"
-                          d="M20.5 5.835A10.49 10.49 0 0 0 12 1.5c-5.427 0-9.89 4.115-10.443 9.396l-.104.994l1.99.209l.103-.995A8.501 8.501 0 0 1 19.213 7.5H15.5v2h7v-7h-2zm.057 6.066l-.104.995A8.501 8.501 0 0 1 4.787 16.5H8.5v-2h-7v7h2v-3.335A10.49 10.49 0 0 0 12 22.5c5.426 0 9.89-4.115 10.442-9.396l.104-.994z"
-                        />
-                      </svg>
+                    <div :class="{ syncing: syncing }" style="display: flex; align-items: center">
+                      <Icon icon="ri:refresh-line" />
                     </div>
                     <span class="ml-1">{{ syncing ? '同步中...' : '点我同步' }}</span>
                   </div>
@@ -53,7 +43,7 @@
         </ElTabPane>
 
         <ElTabPane label="收款配置" name="payment">
-          <Form :schema="paymentSchema" @register="paymentRegister" />
+          <Form :isCol="false" labelPosition="top" :schema="paymentSchema" @register="paymentRegister" />
         </ElTabPane>
 
         <ElTabPane label="时间能量价格" name="timeEnergy">
@@ -87,7 +77,7 @@
   </Dialog>
 </template>
 
-<script setup lang="ts">
+<script setup lang="tsx">
 import { reactive, ref, onMounted } from 'vue'
 import {
   ElButton,
@@ -104,6 +94,8 @@ import { Dialog } from '@/components/Dialog'
 import { Form, FormSchema } from '@/components/Form'
 import { useForm } from '@/hooks/web/useForm'
 import { useValidator } from '@/hooks/web/useValidator'
+import { ElTooltip } from 'element-plus'
+import { Icon } from '@/components/Icon'
 import {
   getBotDetailApi,
   syncTgStatusApi,
@@ -212,26 +204,81 @@ const botInfoSchema = reactive<FormSchema[]>([
 const { formRegister: paymentRegister, formMethods: paymentMethods } = useForm()
 const paymentSchema = reactive<FormSchema[]>([
   {
-    field: 'paymentEnabled',
-    component: 'Switch' as const,
-    label: '启用收款',
-    value: true
-  },
-  {
-    field: 'paymentAddress',
+    field: 'username',
     component: 'Input' as const,
-    label: '收款地址',
+    label: '用户名：',
     componentProps: {
-      placeholder: '请输入收款地址'
+      placeholder: '请输入用户名'
+    },
+    formItemProps: {
+      rules: [{ required: true, message: '用户名是必填项' }],
+      style: {
+        width: '50%'
+      }
     }
   },
   {
-    field: 'minPaymentAmount',
-    component: 'InputNumber' as const,
-    label: '最小收款金额',
+    field: 'flashPaymentWallet',
+    component: 'Input' as const,
+    label: '【1小时能量闪租/余额充值】收款钱包地址：',
     componentProps: {
-      placeholder: '请输入最小收款金额',
-      min: 0
+      placeholder: '请输入闪充收款钱包地址'
+    },
+    formItemProps: {
+      rules: [{ required: true, message: '闪充收款钱包地址是必填项' }]
+    }
+  },
+  {
+    field: 'balancePaymentWallet',
+    component: 'Input' as const,
+    label: '',
+    componentProps: {
+      placeholder: '请输入余额收款钱包地址'
+    },
+    formItemProps: {
+      rules: [{ required: true, message: '余额收款钱包地址是必填项' }],
+      slots: {
+        label: () => {
+          return (
+            <span>
+              【余额充值】收款钱包地址
+              <ElTooltip
+                content="如果不填则使用1小时能量闪租的收款钱包地址"
+                placement="top"
+                effect="light"
+              >
+                <Icon icon="vi-ep:question-filled" size={12} />
+              </ElTooltip>
+              ：
+            </span>
+          )
+        }
+      }
+    }
+  },
+  {
+    field: 'orderNotificationAdmin',
+    component: 'Switch' as const,
+    label: '订单通知机器人管理员：',
+    value: true,
+    formItemProps: {
+      slots: {
+        label: () => {
+          return (
+            <span>
+              订单通知机器人管理员：
+              <ElTooltip
+                content="开启后，如果有新的订单，管理员将会接收到通知"
+                placement="top"
+                effect="light"
+              >
+                <Icon icon="vi-ep:question-filled" size={12} />
+              </ElTooltip>
+              ：
+            </span>
+          )
+        }
+      }
     }
   }
 ])
@@ -694,7 +741,7 @@ defineExpose({
 }
 
 .syncing {
-  animation: rotate 1s linear infinite;
+  animation: rotate 3s linear infinite;
 }
 
 @keyframes rotate {
