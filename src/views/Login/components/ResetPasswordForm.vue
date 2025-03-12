@@ -7,6 +7,7 @@ import { useForm } from '@/hooks/web/useForm'
 import { useValidator } from '@/hooks/web/useValidator'
 import { BaseButton } from '@/components/Button'
 import { useRouter } from 'vue-router'
+import { changePasswordApi, sendPhoneCodeApi, sendEmailCodeApi } from '@/api/login'
 
 defineOptions({
   name: 'ResetPasswordForm'
@@ -55,15 +56,51 @@ const startCountdown = () => {
 
 // 发送验证码
 const sendCode = async () => {
-  // TODO: 这里添加发送验证码的 API 调用
-  // const formData = await getFormData()
-  // if (resetType.value === 'phone') {
-  //   await sendSmsCodeApi(formData.phone)
-  // } else {
-  //   await sendEmailCodeApi(formData.email)
-  // }
-  ElMessage.success(t('resetPassword.codeSent'))
-  startCountdown()
+  const formRef = await getElFormExpose()
+
+  try {
+    if (resetType.value === 'phone') {
+      // 验证手机号
+      await formRef?.validateField('phone')
+      const formData = await getFormData()
+
+      if (!formData.phone) {
+        ElMessage.warning('请输入手机号')
+        return
+      }
+
+      // 发送手机验证码
+      await sendPhoneCodeApi({
+        mobile: formData.phone,
+        channel: 'change_passwd'
+      })
+
+      ElMessage.success('验证码已发送到手机')
+    } else {
+      // 验证邮箱
+      await formRef?.validateField('email')
+      const formData = await getFormData()
+
+      if (!formData.email) {
+        ElMessage.warning('请输入邮箱')
+        return
+      }
+
+      // 发送邮箱验证码
+      await sendEmailCodeApi({
+        email: formData.email,
+        channel: 'change_passwd'
+      })
+
+      ElMessage.success('验证码已发送到邮箱')
+    }
+
+    // 启动倒计时
+    startCountdown()
+  } catch (error) {
+    console.error('发送验证码失败:', error)
+    ElMessage.error('发送验证码失败，请稍后重试')
+  }
 }
 
 // 修改 schema 使用计算属性，根据当前重置类型返回对应表单
@@ -315,27 +352,39 @@ const resetPassword = async () => {
           return
         }
 
-        // TODO: 调用重置密码API
-        // if (resetType.value === 'phone') {
-        //   await resetPasswordByPhoneApi({
-        //     phone: formData.phone,
-        //     code: formData.code,
-        //     password: formData.password
-        //   })
-        // } else {
-        //   await resetPasswordByEmailApi({
-        //     email: formData.email,
-        //     code: formData.code,
-        //     password: formData.password
-        //   })
-        // }
+        // 调用重置密码API
+        if (resetType.value === 'phone') {
+          const res = await changePasswordApi({
+            phone: formData.phone,
+            verify_code: formData.code,
+            password: formData.password
+          })
 
-        // 模拟API调用成功
-        setTimeout(() => {
-          ElMessage.success(t('resetPassword.resetSuccess'))
-          // 跳转到登录页
-          backToLogin()
-        }, 1000)
+          if (res && res.code === '000000') {
+            ElMessage.success(t('resetPassword.resetSuccess'))
+            // 跳转到登录页
+            backToLogin()
+          } else {
+            ElMessage.error(res?.msg || t('resetPassword.resetFailed'))
+          }
+        } else {
+          const res = await changePasswordApi({
+            email: formData.email,
+            verify_code: formData.code,
+            password: formData.password
+          })
+
+          if (res && res.code === '000000') {
+            ElMessage.success(t('resetPassword.resetSuccess'))
+            // 跳转到登录页
+            backToLogin()
+          } else {
+            ElMessage.error(res?.msg || t('resetPassword.resetFailed'))
+          }
+        }
+      } catch (error) {
+        console.error('重置密码失败:', error)
+        ElMessage.error(t('resetPassword.resetFailed'))
       } finally {
         loading.value = false
       }

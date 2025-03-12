@@ -112,6 +112,8 @@ export default {
     register: '注册',
     checkPassword: '确认密码',
     login: '登录',
+    email: '邮箱',
+    inputEmail: '请输入邮箱',
     otherLogin: '其它登录方式',
     remember: '记住密码',
     hasUser: '已有账号？去登录',
@@ -146,7 +148,12 @@ export default {
     inputEmail: '请输入邮箱',
     getCode: '获取验证码',
     verificationCode: '验证码',
-    codeSent: '验证码已发送'
+    codeSent: '验证码已发送',
+    resetSuccess: '密码重置成功',
+    resetFailed: '密码重置失败',
+    resetSuccessMessage: '密码重置成功，请登录',
+    resetFailedMessage: '密码重置失败，请稍后重试',
+    passwordNotMatch: '两次输入的密码不一致'
   },
   router: {
     login: '登录',

@@ -14,6 +14,13 @@ import { useValidator } from '@/hooks/web/useValidator'
 import { Icon } from '@/components/Icon'
 import { useUserStore } from '@/store/modules/user'
 import { BaseButton } from '@/components/Button'
+import {
+  passwordLoginApi,
+  verifyCodeLoginApi,
+  sendPhoneCodeApi,
+  sendEmailCodeApi
+} from '@/api/login'
+import { ElMessage } from 'element-plus'
 
 const { required } = useValidator()
 
@@ -62,13 +69,41 @@ const startCountdown = () => {
   }, 1000)
 }
 
-// 发送验证码
+// 修改发送验证码函数
 const sendCode = async () => {
-  // TODO:这里添加发送验证码的 API 调用
-  // const formData = await getFormData()
-  // await sendSmsCodeApi(formData.phone)
-  // 启动倒计时
-  startCountdown()
+  try {
+    const formData = await getFormData()
+    if (!formData.phone) {
+      ElMessage.warning('请输入手机号/邮箱')
+      return
+    }
+
+    // 判断是手机号还是邮箱
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.phone)
+    const isPhone = /^1\d{10}$/.test(formData.phone)
+
+    if (isEmail) {
+      await sendEmailCodeApi({
+        email: formData.phone,
+        channel: 'login'
+      })
+    } else if (isPhone) {
+      await sendPhoneCodeApi({
+        mobile: formData.phone,
+        channel: 'login'
+      })
+    } else {
+      ElMessage.warning('请输入正确的手机号或邮箱')
+      return
+    }
+
+    ElMessage.success('验证码已发送')
+    // 启动倒计时
+    startCountdown()
+  } catch (error) {
+    console.error('发送验证码失败:', error)
+    ElMessage.error('发送验证码失败，请稍后重试')
+  }
 }
 
 // 修改 schema 使用计算属性，根据当前登录类型返回对应表单
@@ -329,7 +364,7 @@ watch(
   }
 )
 
-// 登录
+// 修改登录函数
 const signIn = async () => {
   const formRef = await getElFormExpose()
   await formRef?.validate(async (isValid) => {
@@ -338,43 +373,72 @@ const signIn = async () => {
       const formData = await getFormData()
 
       try {
-        // 根据登录类型调用不同的登录接口或传递不同参数
+        // 根据登录类型调用不同的登录接口
         let res
         if (loginType.value === 'account') {
-          res = await loginApi(formData as UserType)
+          // 账号密码登录
+          res = await passwordLoginApi({
+            username: formData.username,
+            password: formData.password
+          })
         } else {
-          // 手机验证码登录
-          // 假设使用同一个API但传递不同参数
-          res = await loginApi({
-            ...formData,
-            loginType: 'phone'
+          // 账号验证码登录
+          res = await verifyCodeLoginApi({
+            username: formData.phone,
+            verify_code: formData.code
           })
         }
 
-        if (res) {
+        if (res && res.code === '000000') {
           // 是否记住我
           if (unref(remember)) {
             userStore.setLoginInfo({
-              username: formData.username,
-              password: formData.password
+              username: loginType.value === 'account' ? formData.username : formData.phone,
+              password: loginType.value === 'account' ? formData.password : ''
             })
           } else {
             userStore.setLoginInfo(undefined)
           }
           userStore.setRememberMe(unref(remember))
-          userStore.setUserInfo(res.data)
+
+          // 设置Token
+          userStore.setToken(res.data)
+
+          // 获取用户信息
+          // TODO: 这里应该是从token解析或者调用获取用户信息接口
+          userStore.setUserInfo({ username: formData.username })
+
+          console.log('登录前 dynamicRouter 状态:', appStore.getDynamicRouter)
+          // 确保设置为false
+          appStore.$patch({
+            dynamicRouter: false,
+            serverDynamicRouter: false
+          })
+          console.log('登录后 dynamicRouter 状态:', appStore.getDynamicRouter)
+
           // 是否使用动态路由
           if (appStore.getDynamicRouter) {
+            console.log('使用动态路由')
             getRole()
           } else {
+            console.log('使用静态路由')
             await permissionStore.generateRoutes('static').catch(() => {})
+            console.log('permissionStore.getAddRouters', permissionStore.getAddRouters)
             permissionStore.getAddRouters.forEach((route) => {
               addRoute(route as RouteRecordRaw) // 动态添加可访问路由表
             })
             permissionStore.setIsAddRouters(true)
+            console.log('permissionStore.addRouters', permissionStore.addRouters)
             push({ path: redirect.value || permissionStore.addRouters[0].path })
           }
+
+          ElMessage.success('登录成功')
+        } else {
+          ElMessage.error(res?.msg || '登录失败')
         }
+      } catch (error) {
+        console.error('登录失败:', error)
+        ElMessage.error('登录失败，请检查账号密码或网络连接')
       } finally {
         loading.value = false
       }

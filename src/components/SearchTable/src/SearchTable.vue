@@ -14,9 +14,7 @@
     <div class="mb-10px">
       <slot name="toolbar">
         <slot name="leftToolbar"></slot>
-        <BaseButton v-if="showAddButton" type="primary" @click="$emit('add')">
-          新增
-        </BaseButton>
+        <BaseButton v-if="showAddButton" type="primary" @click="$emit('add')"> 新增 </BaseButton>
         <slot name="rightToolbar"></slot>
       </slot>
     </div>

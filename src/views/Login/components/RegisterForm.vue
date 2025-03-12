@@ -7,6 +7,8 @@ import { ElInput, FormRules, ElTabs, ElTabPane } from 'element-plus'
 import { useValidator } from '@/hooks/web/useValidator'
 import { BaseButton } from '@/components/Button'
 import { IAgree } from '@/components/IAgree'
+import { phoneRegisterApi, emailRegisterApi, sendPhoneCodeApi, sendEmailCodeApi } from '@/api/login'
+import { ElMessage } from 'element-plus'
 
 const emit = defineEmits(['to-login'])
 
@@ -39,8 +41,51 @@ const startCountdown = () => {
 
 // 发送验证码
 const sendCode = async () => {
-  // TODO: 这里添加发送验证码的 API 调用
-  startCountdown()
+  const formRef = await getElFormExpose()
+
+  try {
+    if (registerType.value === 'phone') {
+      // 验证手机号
+      await formRef?.validateField('phone')
+      const formData = await formMethods.getFormData()
+
+      if (!formData.phone) {
+        ElMessage.warning('请输入手机号')
+        return
+      }
+
+      // 发送手机验证码
+      await sendPhoneCodeApi({
+        mobile: formData.phone,
+        channel: 'register'
+      })
+
+      ElMessage.success('验证码已发送到手机')
+    } else {
+      // 验证邮箱
+      await formRef?.validateField('email')
+      const formData = await formMethods.getFormData()
+
+      if (!formData.email) {
+        ElMessage.warning('请输入邮箱')
+        return
+      }
+
+      // 发送邮箱验证码
+      await sendEmailCodeApi({
+        email: formData.email,
+        channel: 'register'
+      })
+
+      ElMessage.success('验证码已发送到邮箱')
+    }
+
+    // 启动倒计时
+    startCountdown()
+  } catch (error) {
+    console.error('发送验证码失败:', error)
+    ElMessage.error('发送验证码失败，请稍后重试')
+  }
 }
 
 // 切换注册方式时清空表单
@@ -285,30 +330,6 @@ const emailSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'iAgree',
-    colProps: { span: 24 },
-    formItemProps: {
-      slots: {
-        default: (formData: any) => {
-          return (
-            <>
-              <IAgree
-                v-model={formData.iAgree}
-                text={t('login.iAgreeText')}
-                link={[
-                  {
-                    text: t('login.userAgreement'),
-                    url: 'https://element-plus.org/'
-                  }
-                ]}
-              />
-            </>
-          )
-        }
-      }
-    }
-  },
-  {
     field: 'register',
     colProps: { span: 24 },
     formItemProps: {
@@ -359,18 +380,45 @@ const register = async () => {
         // 检查密码是否一致
         const formData = await formMethods.getFormData()
         if (formData.password !== formData.check_password) {
-          // 可以添加一个错误提示
+          ElMessage.error('两次输入的密码不一致')
           return
         }
-        // TODO: 根据注册类型调用不同的注册API
-        // if (registerType.value === 'phone') {
-        //   await registerByPhoneApi(formData)
-        // } else {
-        //   await registerByEmailApi(formData)
-        // }
 
-        // 注册成功后跳转到登录页
-        toLogin()
+        // 根据注册类型调用不同的注册API
+        if (registerType.value === 'phone') {
+          // 手机号注册
+          const res = await phoneRegisterApi({
+            phone: formData.phone,
+            password: formData.password,
+            verify_code: formData.code
+          })
+
+          if (res && res.code === '000000') {
+            ElMessage.success('注册成功，请登录')
+            // 注册成功后跳转到登录页
+            toLogin()
+          } else {
+            ElMessage.error(res?.msg || '注册失败')
+          }
+        } else {
+          // 邮箱注册
+          const res = await emailRegisterApi({
+            email: formData.email,
+            password: formData.password,
+            verify_code: formData.code
+          })
+
+          if (res && res.code === '000000') {
+            ElMessage.success('注册成功，请登录')
+            // 注册成功后跳转到登录页
+            toLogin()
+          } else {
+            ElMessage.error(res?.msg || '注册失败')
+          }
+        }
+      } catch (error) {
+        console.error('注册失败:', error)
+        ElMessage.error('注册失败，请稍后重试')
       } finally {
         loading.value = false
       }
