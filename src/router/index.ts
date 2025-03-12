@@ -89,6 +89,203 @@ export const constantRouterMap: AppRouteRecordRaw[] = [
   }
 ]
 
+// 新添加的路由（原来被注释的部分）
+export const newRouterMap: AppRouteRecordRaw[] = [
+  // {
+  //   path: '/real-time-data',
+  //   component: Layout,
+  //   name: 'RealTimeData',
+  //   meta: {
+  //     title: '实时数据',
+  //     icon: 'vi-carbon:data-vis-1',
+  //     alwaysShow: false
+  //   },
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       component: () => import('@/views/RealTimeData/index.vue'),
+  //       name: 'RealTimeDataIndex',
+  //       meta: {
+  //         title: '实时数据',
+  //         icon: 'vi-carbon:data-vis-1'
+  //       }
+  //     }
+  //   ]
+  // },
+  {
+    path: '/bot_manage',
+    component: Layout,
+    name: 'BotManage',
+    meta: {
+      title: '机器人管理',
+      icon: 'vi-bx:bxs-robot',
+      alwaysShow: true
+    },
+    children: [
+      {
+        path: 'bot_list',
+        component: () => import('@/views/Bot_manage/bot_list/index.vue'),
+        name: 'BotList',
+        meta: {
+          title: '机器人列表',
+          icon: 'vi-bx:bxs-component'
+        }
+      },
+      {
+        path: 'menu_list',
+        component: () => import('@/views/Bot_manage/menu_list/index.vue'),
+        name: 'MenuList',
+        meta: {
+          title: '菜单列表',
+          icon: 'vi-bx:bx-menu'
+        }
+      }
+    ]
+  },
+  // {
+  //   path: '/user_group',
+  //   component: Layout,
+  //   name: 'UserGroup',
+  //   meta: {
+  //     title: '用户群组',
+  //     icon: 'vi-ph:users-three-fill',
+  //     alwaysShow: true
+  //   },
+  //   children: [
+  //     {
+  //       path: 'user_list',
+  //       component: () => import('@/views/UserGroup/user_list/index.vue'),
+  //       name: 'UserList',
+  //       meta: {
+  //         title: '用户列表',
+  //         icon: 'vi-ph:user-list-fill'
+  //       }
+  //     },
+  //     {
+  //       path: 'group_list',
+  //       component: () => import('@/views/UserGroup/group_list/index.vue'),
+  //       name: 'GroupList',
+  //       meta: {
+  //         title: '群组列表',
+  //         icon: 'vi-clarity:group-solid'
+  //       }
+  //     }
+  //   ]
+  // },
+  // {
+  //   path: '/order_manage',
+  //   component: Layout,
+  //   name: 'OrderManage',
+  //   meta: {
+  //     title: '订单管理',
+  //     icon: 'vi-mdi:order-bool-ascending-variant',
+  //     alwaysShow: true
+  //   },
+  //   children: [
+  //     {
+  //       path: 'recharge_order',
+  //       component: () => import('@/views/OrderManage/recharge_order/index.vue'),
+  //       name: 'RechargeOrder',
+  //       meta: {
+  //         title: '充值订单',
+  //         icon: 'vi-mdi:credit-card-plus-outline'
+  //       }
+  //     },
+  //     {
+  //       path: 'energy_order',
+  //       component: () => import('@/views/OrderManage/energy_order/index.vue'),
+  //       name: 'EnergyOrder',
+  //       meta: {
+  //         title: '能量订单',
+  //         icon: 'vi-mdi:lightning-bolt'
+  //       }
+  //     },
+  //     {
+  //       path: 'hosted_order',
+  //       component: () => import('@/views/OrderManage/hosted_order/index.vue'),
+  //       name: 'HostedOrder',
+  //       meta: {
+  //         title: '托管订单',
+  //         icon: 'vi-mdi:server'
+  //       }
+  //     },
+  //     {
+  //       path: 'exchange_order',
+  //       component: () => import('@/views/OrderManage/exchange_order/index.vue'),
+  //       name: 'ExchangeOrder',
+  //       meta: {
+  //         title: '兑换订单',
+  //         icon: 'vi-mdi:swap-horizontal'
+  //       }
+  //     }
+  //   ]
+  // },
+  // {
+  //   path: '/data_statistics',
+  //   component: Layout,
+  //   name: 'DataStatistics',
+  //   meta: {
+  //     title: '数据统计',
+  //     icon: 'vi-carbon:chart-area',
+  //     alwaysShow: true
+  //   },
+  //   children: [
+  //     {
+  //       path: 'bot_summary',
+  //       component: () => import('@/views/DataStatistics/bot_summary/index.vue'),
+  //       name: 'BotSummary',
+  //       meta: {
+  //         title: '机器人汇总',
+  //         icon: 'vi-mdi:robot-industrial'
+  //       }
+  //     }
+  //   ]
+  // },
+  // {
+  //   path: '/account_manage',
+  //   component: Layout,
+  //   name: 'AccountManage',
+  //   meta: {
+  //     title: '账户管理',
+  //     icon: 'vi-mdi:account-cog',
+  //     alwaysShow: true
+  //   },
+  //   children: [
+  //     {
+  //       path: 'account_list',
+  //       component: () => import('@/views/AccountManage/account_list/index.vue'),
+  //       name: 'AccountList',
+  //       meta: {
+  //         title: '账户列表',
+  //         icon: 'vi-mdi:format-list-bulleted'
+  //       }
+  //     }
+  //   ]
+  // },
+  // {
+  //   path: '/system_notice',
+  //   component: Layout,
+  //   name: 'SystemNotice',
+  //   meta: {
+  //     title: '系统公告',
+  //     icon: 'vi-mdi:bullhorn',
+  //     alwaysShow: false
+  //   },
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       component: () => import('@/views/SystemNotice/index.vue'),
+  //       name: 'SystemNoticeIndex',
+  //       meta: {
+  //         title: '系统公告',
+  //         icon: 'vi-mdi:bullhorn'
+  //       }
+  //     }
+  //   ]
+  // }
+]
+
+// 原有的路由（未被注释的部分）
 export const asyncRouterMap: AppRouteRecordRaw[] = [
   {
     path: '/dashboard',
@@ -151,27 +348,6 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
         meta: {
           title: t('router.guide'),
           icon: 'vi-cib:telegram-plane'
-        }
-      }
-    ]
-  },
-  {
-    path: '/bot_manage',
-    component: Layout,
-    name: 'BotManage',
-    meta: {
-      title: '机器人管理',
-      icon: 'vi-bx:bxs-component',
-      alwaysShow: true
-    },
-    children: [
-      {
-        path: 'bot_list',
-        component: () => import('@/views/Bot_manage/bot_list/index.vue'),
-        name: 'BotList',
-        meta: {
-          title: '机器人列表',
-          icon: 'vi-bx:bxs-component'
         }
       }
     ]
@@ -758,8 +934,10 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
         }
       }
     ]
-  }
+  },
+  ...newRouterMap
 ]
+
 
 const router = createRouter({
   history: createWebHashHistory(),
