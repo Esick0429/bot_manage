@@ -366,7 +366,7 @@ export default defineComponent({
           }
         }
       }
-      
+
       // 处理label自带tips的情况
       if (item?.label && typeof item.label === 'object' && item.label.tips) {
         formItemSlots.label = () => {
@@ -382,20 +382,20 @@ export default defineComponent({
           return (item?.formItemProps?.slots as any)?.label(...args)
         }
       }
-      
+
       if (item?.formItemProps?.slots?.error) {
         formItemSlots.error = (...args: any[]) => {
           return (item?.formItemProps?.slots as any)?.error(...args)
         }
       }
-      
+
       return (
         <ElFormItem
           v-show={!item.hidden}
           ref={(el: any) => setFormItemRefMap(el, item.field)}
           {...(item.formItemProps || {})}
           prop={item.field}
-          label={typeof item.label === 'object' ? item.label.text : (item.label || '')}
+          label={typeof item.label === 'object' ? item.label.text : item.label || ''}
         >
           {formItemSlots}
         </ElFormItem>
