@@ -43,7 +43,7 @@ const defaultResponseInterceptors = (response: AxiosResponse) => {
     return response.data
   } else {
     ElMessage.error(response?.data?.msg)
-    if (response?.data?.code === 401) {
+    if (response?.data?.code == 400002) {
       const userStore = useUserStoreWithOut()
       userStore.logout()
     }
