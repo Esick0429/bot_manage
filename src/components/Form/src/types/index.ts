@@ -43,6 +43,7 @@ export enum ComponentNameEnum {
   SELECT = 'Select',
   CASCADER = 'Cascader',
   SWITCH = 'Switch',
+  TAG = 'Tag',
   SLIDER = 'Slider',
   TIME_PICKER = 'TimePicker',
   DATE_PICKER = 'DatePicker',
