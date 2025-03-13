@@ -57,7 +57,7 @@
 
 <script setup lang="tsx">
 import { ref, reactive, computed, onMounted, watch } from 'vue'
-import { ElButton, ElLink, ElMessage, ElMessageBox, ElEmpty, ElTooltip } from 'element-plus'
+import { ElButton, ElLink, ElMessage, ElMessageBox, ElEmpty } from 'element-plus'
 import { ContentWrap } from '@/components/ContentWrap'
 import { Dialog } from '@/components/Dialog'
 import { Form, FormSchema } from '@/components/Form'
@@ -71,6 +71,7 @@ import RenewBot from './components/RenewBot.vue'
 import BotConfig from './components/BotConfig.vue'
 import { getBotListApi } from '@/api/botlist'
 import { Icon } from '@/components/Icon'
+import { Tips } from '@/components/Tips'
 
 const { t } = useI18n()
 const { required } = useValidator()
@@ -165,14 +166,7 @@ const formSchema = reactive<FormSchema[]>([
           return (
             <div>
               机器人费用
-              <ElTooltip
-                content="将会从您的trongas账号扣费，请确保您的trongas账户余额充足"
-                placement="top"
-                effect="light"
-              >
-                <Icon icon="vi-ep:question-filled" size={12} />
-              </ElTooltip>
-              ：
+              <Tips content="将会从您的trongas账号扣费，请确保您的trongas账户余额充足" />：
             </div>
           )
         }
@@ -193,14 +187,7 @@ const formSchema = reactive<FormSchema[]>([
           return (
             <div>
               机器人token
-              <ElTooltip
-                content="将会从您的账号扣费，请确保您的账户余额充足"
-                placement="top"
-                effect="light"
-              >
-                <Icon icon="vi-ep:question-filled" size={12} />
-              </ElTooltip>
-              ：
+              <Tips content="将会从您的账号扣费，请确保您的账户余额充足" />：
             </div>
           )
         }

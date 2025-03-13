@@ -1,5 +1,5 @@
 <template>
-  <Dialog v-model="dialogVisible" title="机器人配置" width="800px">
+  <Dialog v-model="dialogVisible" title="机器人配置" width="1000px">
     <div v-loading="loading">
       <ElTabs v-model="activeTab">
         <ElTabPane label="机器人信息" name="botInfo">
@@ -43,11 +43,16 @@
         </ElTabPane>
 
         <ElTabPane label="收款配置" name="payment">
-          <Form :isCol="false" labelPosition="top" :schema="paymentSchema" @register="paymentRegister" />
+          <Form
+            :isCol="false"
+            labelPosition="top"
+            :schema="paymentSchema"
+            @register="paymentRegister"
+          />
         </ElTabPane>
 
         <ElTabPane label="时间能量价格" name="timeEnergy">
-          <Form :schema="timeEnergySchema" @register="timeEnergyRegister" />
+          <Form labelPosition="top" :schema="timeEnergySchema" @register="timeEnergyRegister" />
         </ElTabPane>
 
         <ElTabPane label="笔数能量价格" name="countEnergy">
@@ -78,7 +83,7 @@
 </template>
 
 <script setup lang="tsx">
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, ref, onMounted, computed } from 'vue'
 import {
   ElButton,
   ElMessage,
@@ -94,8 +99,8 @@ import { Dialog } from '@/components/Dialog'
 import { Form, FormSchema } from '@/components/Form'
 import { useForm } from '@/hooks/web/useForm'
 import { useValidator } from '@/hooks/web/useValidator'
-import { ElTooltip } from 'element-plus'
 import { Icon } from '@/components/Icon'
+import { Tips } from '@/components/Tips'
 import {
   getBotDetailApi,
   syncTgStatusApi,
@@ -118,6 +123,32 @@ const loading = ref(false)
 const submitting = ref(false)
 
 const { required } = useValidator()
+
+// 成本价配置
+const costPrices = reactive({
+  timeEnergy1Hour: 1.0, // 默认成本价
+  timeEnergy1Day: 3.0,
+  timeEnergy3Days: 8.0,
+  timeEnergy7Days: 15.0,
+  timeEnergy15Days: 28.0
+})
+
+// 成本价验证函数
+const validateMinPrice = (rule, value, callback) => {
+  const field = rule.field
+
+  if (value === null || value === undefined || value === '') {
+    return callback(new Error('该项不能为空'))
+  }
+
+  const minCost = costPrices[field] || 0
+
+  if (value < minCost) {
+    return callback(new Error(`价格不能低于运营后台配置的成本价`))
+  }
+
+  callback()
+}
 
 // 机器人信息表单
 const { formRegister: botInfoRegister, formMethods: botInfoMethods } = useForm()
@@ -242,14 +273,7 @@ const paymentSchema = reactive<FormSchema[]>([
           return (
             <span>
               【余额充值】收款钱包地址
-              <ElTooltip
-                content="如果不填则使用1小时能量闪租的收款钱包地址"
-                placement="top"
-                effect="light"
-              >
-                <Icon icon="vi-ep:question-filled" size={12} />
-              </ElTooltip>
-              ：
+              <Tips content="如果不填则使用1小时能量闪租的收款钱包地址" />：
             </span>
           )
         }
@@ -266,15 +290,8 @@ const paymentSchema = reactive<FormSchema[]>([
         label: () => {
           return (
             <span>
-              订单通知机器人管理员：
-              <ElTooltip
-                content="开启后，如果有新的订单，管理员将会接收到通知"
-                placement="top"
-                effect="light"
-              >
-                <Icon icon="vi-ep:question-filled" size={12} />
-              </ElTooltip>
-              ：
+              订单通知机器人管理员
+              <Tips content="开启后，如果有新的订单，管理员将会接收到通知" />：
             </span>
           )
         }
@@ -287,19 +304,138 @@ const paymentSchema = reactive<FormSchema[]>([
 const { formRegister: timeEnergyRegister, formMethods: timeEnergyMethods } = useForm()
 const timeEnergySchema = reactive<FormSchema[]>([
   {
-    field: 'timeEnergyEnabled',
-    component: 'Switch' as const,
-    label: '启用时间能量',
-    value: true
-  },
-  {
     field: 'timeEnergyPrice',
     component: 'InputNumber' as const,
-    label: '时间能量价格',
+    label: '【1小时】能量闪租价格（TRX ）（1笔6.5W能量）：',
     componentProps: {
       placeholder: '请输入价格',
       min: 0,
+      precision: 1
+    },
+    formItemProps: {
+      rules: [{ required: true, message: '时间能量价格是必填项' }],
+      slots: {
+        label: () => {
+          return (
+            <span>
+              【1小时】能量闪租价格（TRX ）（1笔6.5W能量）
+              <Tips content="最多支持保留一位小数，注意：此为1笔65000能量价格，不要设置0.1结尾的价格，避免和笔数价格冲突" />
+              ：
+            </span>
+          )
+        }
+      }
+    }
+  },
+  {
+    field: 'timeEnergyMultiplier',
+    component: 'InputNumber' as const,
+    label: '【1小时】能量闪租最大倍数：',
+    componentProps: {
+      placeholder: '请输入倍数',
+      min: 1,
       precision: 2
+    },
+    formItemProps: {
+      rules: [{ required: true, message: '时间能量倍数是必填项' }],
+      slots: {
+        label: () => {
+          return (
+            <span>
+              【1小时】能量闪租最大倍数
+              <Tips content="如果转账金额超过设置的倍数 * 单价，则不发货" />：
+            </span>
+          )
+        }
+      }
+    }
+  },
+  {
+    field: 'priceConfig',
+    component: 'Divider' as const,
+    label: '按时间购买能量价格配置（1笔6.5W能量）：',
+    componentProps: {
+      contentPosition: 'left'
+    }
+  },
+  {
+    field: 'timeEnergy1Hour',
+    component: 'InputNumber' as const,
+    label: '1小时配置：',
+    componentProps: {
+      placeholder: '请输入1小时配置',
+      min: 0,
+      precision: 1
+    },
+    formItemProps: {
+      rules: [
+        { required: true, message: '1小时配置是必填项' },
+        { validator: validateMinPrice, trigger: 'blur' }
+      ]
+    }
+  },
+  {
+    field: 'timeEnergy1Day',
+    component: 'InputNumber' as const,
+    label: '1天配置：',
+    componentProps: {
+      placeholder: '请输入1天配置',
+      min: 0,
+      precision: 1
+    },
+    formItemProps: {
+      rules: [
+        { required: true, message: '1天配置是必填项' },
+        { validator: validateMinPrice, trigger: 'blur' }
+      ]
+    }
+  },
+  {
+    field: 'timeEnergy3Days',
+    component: 'InputNumber' as const,
+    label: '3天配置：',
+    componentProps: {
+      placeholder: '请输入3天配置',
+      min: 0,
+      precision: 1
+    },
+    formItemProps: {
+      rules: [
+        { required: true, message: '3天配置是必填项' },
+        { validator: validateMinPrice, trigger: 'blur' }
+      ]
+    }
+  },
+  {
+    field: 'timeEnergy7Days',
+    component: 'InputNumber' as const,
+    label: '7天配置：',
+    componentProps: {
+      placeholder: '请输入7天配置',
+      min: 0,
+      precision: 1
+    },
+    formItemProps: {
+      rules: [
+        { required: true, message: '7天配置是必填项' },
+        { validator: validateMinPrice, trigger: 'blur' }
+      ]
+    }
+  },
+  {
+    field: 'timeEnergy15Days',
+    component: 'InputNumber' as const,
+    label: '15天配置：',
+    componentProps: {
+      placeholder: '请输入15天配置',
+      min: 0,
+      precision: 1
+    },
+    formItemProps: {
+      rules: [
+        { required: true, message: '15天配置是必填项' },
+        { validator: validateMinPrice, trigger: 'blur' }
+      ]
     }
   }
 ])
@@ -407,7 +543,7 @@ const syncTgStatus = async () => {
     syncing.value = true
     ElMessage.info('正在同步TG状态...')
 
-    // 调用同步TG状态接口
+    // TODO: 确保syncTgStatusApi能正确处理同步逻辑并返回标准化的状态信息
     const res = await syncTgStatusApi(currentBot.value.botId)
     const data = res.data || {}
 
@@ -440,7 +576,10 @@ const loadBotAllConfigs = async (botId: string) => {
   loading.value = true
 
   try {
-    // 获取机器人基本信息
+    // 获取运营后台配置的成本价
+    await loadCostPrices()
+
+    // TODO: 确保getBotDetailApi能返回完整的机器人信息，包括配置和状态
     const botInfoRes = await getBotDetailApi(botId)
     const botInfo = botInfoRes.data || {}
 
@@ -461,7 +600,7 @@ const loadBotAllConfigs = async (botId: string) => {
     })
 
     try {
-      // 获取并设置收款配置
+      // TODO: 需确保getBotPaymentConfigApi返回的数据结构符合新的表单字段（用户名、闪充收款钱包地址、余额收款钱包地址等）
       const paymentConfigRes = await getBotPaymentConfigApi(botId)
       const paymentConfig = paymentConfigRes.data || {}
       paymentMethods.setValues({
@@ -480,7 +619,7 @@ const loadBotAllConfigs = async (botId: string) => {
     }
 
     try {
-      // 获取并设置时间能量价格配置
+      // TODO: 需确保getBotTimeEnergyConfigApi返回所有时间段的价格配置和成本价信息
       const timeEnergyConfigRes = await getBotTimeEnergyConfigApi(botId)
       const timeEnergyConfig = timeEnergyConfigRes.data || {}
       timeEnergyMethods.setValues({
@@ -498,7 +637,7 @@ const loadBotAllConfigs = async (botId: string) => {
     }
 
     try {
-      // 获取并设置笔数能量价格配置
+      // TODO: 检查getBotCountEnergyConfigApi返回数据是否需要包含成本价限制
       const countEnergyConfigRes = await getBotCountEnergyConfigApi(botId)
       const countEnergyConfig = countEnergyConfigRes.data || {}
       countEnergyMethods.setValues({
@@ -516,7 +655,7 @@ const loadBotAllConfigs = async (botId: string) => {
     }
 
     try {
-      // 获取并设置托管模式价格配置
+      // TODO: 检查getBotManagedModeConfigApi返回数据是否需要包含成本价限制
       const managedModeConfigRes = await getBotManagedModeConfigApi(botId)
       const managedModeConfig = managedModeConfigRes.data || {}
       managedModeMethods.setValues({
@@ -534,7 +673,7 @@ const loadBotAllConfigs = async (botId: string) => {
     }
 
     try {
-      // 获取并设置批量下单价格配置
+      // TODO: 检查getBotBatchOrderConfigApi返回数据是否需要包含成本价限制
       const batchOrderConfigRes = await getBotBatchOrderConfigApi(botId)
       const batchOrderConfig = batchOrderConfigRes.data || {}
       batchOrderMethods.setValues({
@@ -552,7 +691,7 @@ const loadBotAllConfigs = async (botId: string) => {
     }
 
     try {
-      // 获取并设置闪兑配置
+      // TODO: 检查getBotFlashExchangeConfigApi返回数据是否包含最新的汇率和费率限制
       const flashExchangeConfigRes = await getBotFlashExchangeConfigApi(botId)
       const flashExchangeConfig = flashExchangeConfigRes.data || {}
       flashExchangeMethods.setValues({
@@ -579,6 +718,36 @@ const loadBotAllConfigs = async (botId: string) => {
   } finally {
     loading.value = false
     loadingInstance.close()
+  }
+}
+
+// 获取运营后台配置的成本价
+const loadCostPrices = async () => {
+  try {
+    // TODO: 此处需要替换为真实的API调用，从运营后台获取成本价配置
+    // const response = await getCostPricesApi();
+    // const data = response.data || {};
+
+    // 模拟后台返回的成本价数据
+    const data = {
+      timeEnergy1Hour: 1.5,
+      timeEnergy1Day: 5.0,
+      timeEnergy3Days: 10.0,
+      timeEnergy7Days: 20.0,
+      timeEnergy15Days: 35.0
+    }
+
+    // 更新成本价配置
+    Object.keys(data).forEach((key) => {
+      if (costPrices[key] !== undefined) {
+        costPrices[key] = data[key]
+      }
+    })
+
+    console.log('成本价配置加载成功:', costPrices)
+  } catch (error) {
+    console.error('加载成本价配置失败:', error)
+    ElMessage.warning('成本价配置加载失败，将使用默认值')
   }
 }
 
@@ -643,6 +812,30 @@ const submit = async () => {
     return
   }
 
+  // 如果是时间能量配置，进行额外验证
+  if (activeTab.value === 'timeEnergy') {
+    const timeEnergyData = await timeEnergyMethods.getFormData()
+
+    // 检查所有价格是否低于成本价
+    const priceFields = [
+      'timeEnergy1Hour',
+      'timeEnergy1Day',
+      'timeEnergy3Days',
+      'timeEnergy7Days',
+      'timeEnergy15Days'
+    ]
+
+    for (const field of priceFields) {
+      const price = timeEnergyData[field]
+      const minCost = costPrices[field]
+
+      if (price < minCost) {
+        ElMessage.error(`${field.replace('timeEnergy', '')}的价格不能低于成本价${minCost}`)
+        return
+      }
+    }
+  }
+
   try {
     submitting.value = true
     ElMessage.info('正在保存配置...')
@@ -661,20 +854,29 @@ const submit = async () => {
       return
     }
 
+    // TODO: 确保所有表单数据字段都与后端API期望的结构保持一致
     // 组合所有配置数据
     const formData = {
       // 基本信息
       ...botInfoData,
+      // TODO: 更新payment对象结构以匹配新的表单字段（用户名、闪充收款钱包地址、余额收款钱包地址等）
       // 收款配置
       payment: {
         enabled: paymentData.paymentEnabled,
         address: paymentData.paymentAddress,
         minAmount: paymentData.minPaymentAmount
       },
+      // TODO: 更新timeEnergy对象结构以包含所有时间段的价格配置
       // 时间能量价格配置
       timeEnergy: {
         enabled: timeEnergyData.timeEnergyEnabled,
-        price: timeEnergyData.timeEnergyPrice
+        price: timeEnergyData.timeEnergyPrice,
+        // TODO: 添加各时间段的价格字段
+        timeEnergy1Hour: timeEnergyData.timeEnergy1Hour,
+        timeEnergy1Day: timeEnergyData.timeEnergy1Day,
+        timeEnergy3Days: timeEnergyData.timeEnergy3Days,
+        timeEnergy7Days: timeEnergyData.timeEnergy7Days,
+        timeEnergy15Days: timeEnergyData.timeEnergy15Days
       },
       // 笔数能量价格配置
       countEnergy: {
@@ -702,7 +904,7 @@ const submit = async () => {
       tgVerifyStatus: tgStatus.value
     }
 
-    // 调用API更新所有配置
+    // TODO: 确保updateBotAllConfigsApi能处理所有新增的表单字段和验证规则
     await updateBotAllConfigsApi(formData)
 
     ElMessage.success('配置保存成功')
