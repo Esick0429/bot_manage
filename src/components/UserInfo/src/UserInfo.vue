@@ -57,17 +57,17 @@ const toPage = (path: string) => {
     </div>
     <template #dropdown>
       <ElDropdownMenu>
-        <ElDropdownItem>
+        <!-- <ElDropdownItem>
           <div @click="toPage('/personal/personal-center')">
             {{ t('router.personalCenter') }}
           </div>
-        </ElDropdownItem>
-        <ElDropdownItem>
+        </ElDropdownItem> -->
+        <!-- <ElDropdownItem>
           <div @click="toDocument">{{ t('common.document') }}</div>
-        </ElDropdownItem>
-        <ElDropdownItem divided>
+        </ElDropdownItem> -->
+        <!-- <ElDropdownItem divided>
           <div @click="lockScreen">{{ t('lock.lockScreen') }}</div>
-        </ElDropdownItem>
+        </ElDropdownItem> -->
         <ElDropdownItem>
           <div @click="loginOut">{{ t('common.loginOut') }}</div>
         </ElDropdownItem>
