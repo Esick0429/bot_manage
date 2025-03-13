@@ -6,7 +6,8 @@ import {
   ElRow,
   ElCol,
   FormRules,
-  ComponentSize
+  ComponentSize,
+  ElTag
   // FormItemProp
 } from 'element-plus'
 import { componentMap } from './helper/componentMap'
@@ -54,6 +55,8 @@ export default defineComponent({
     },
     // 是否需要栅格布局
     isCol: propTypes.bool.def(true),
+    // 栅格布局列数，默认为2
+    gridColumns: propTypes.number.def(2),
     // 是否需要提示
     isTips: propTypes.bool.def(false),
     // 表单数据对象
@@ -232,14 +235,25 @@ export default defineComponent({
     // 是否要渲染el-col
     const renderFormItemWrap = () => {
       // hidden属性表示隐藏，不做渲染
-      const { schema = [], isCol } = unref(getProps)
-
+      const { schema = [], isCol, gridColumns } = unref(getProps)
+      
+      // 计算默认列宽 (24等分栅格系统)
+      const defaultColSpan = 24 / gridColumns
+      
       return schema
         .filter((v) => !v.remove)
         .map((item) => {
           // 如果是 Divider 组件，需要自己占用一行
           const isDivider = item.component === 'Divider'
           const Com = componentMap['Divider'] as ReturnType<typeof defineComponent>
+          
+          // 如果没有设置colProps或者没有span属性，则使用默认计算的列宽
+          if (isCol && item.colProps && !item.colProps.span) {
+            item.colProps.span = defaultColSpan
+          } else if (isCol && !item.colProps) {
+            item.colProps = { span: defaultColSpan }
+          }
+          
           return isDivider ? (
             <Com {...{ contentPosition: 'left', ...item.componentProps }}>{item?.label}</Com>
           ) : isCol ? (
@@ -273,6 +287,9 @@ export default defineComponent({
             const componentSlots = (item?.componentProps as any)?.slots || {}
             const slotsMap: Recordable = {
               ...setItemComponentSlots(componentSlots)
+            }
+            if (item.component === ComponentNameEnum.TAG) {
+                return <ElTag>{item.value}</ElTag>
             }
             // // 如果是select组件，并且没有自定义模板，自动渲染options
             if (item.component === ComponentNameEnum.SELECT) {
