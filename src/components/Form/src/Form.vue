@@ -385,12 +385,14 @@ export default defineComponent({
       }
 
       // 处理label自带tips的情况
-      if (item?.label && typeof item.label === 'object' && item.label.tips) {
+      if (item?.label && typeof item.label === 'object' && 'text' in item.label && 'tips' in item.label) {
+        const labelObj = item.label as { text: string; tips: string }
+        let labelText = labelObj.text.includes('：') ? labelObj.text.split('：')[0] : labelObj.text
         formItemSlots.label = () => {
           return (
             <span>
-              {item.label.text || ''}
-              <Tips content={item.label.tips} />
+              {labelText || ''}
+              <Tips content={labelObj.tips} />：
             </span>
           )
         }

@@ -589,7 +589,7 @@ export interface TreeSelectComponentProps
 
 export interface FormItemLabel {
   text: string
-  tips: string
+  tips?: string
 }
 
 export interface FormSchema {
