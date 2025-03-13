@@ -586,6 +586,11 @@ export interface TreeSelectComponentProps
   style?: CSSProperties
 }
 
+export interface FormItemLabel {
+  text: string
+  tips: string
+}
+
 export interface FormSchema {
   /**
    * 唯一标识
@@ -595,7 +600,7 @@ export interface FormSchema {
   /**
    * 标题
    */
-  label?: string
+  label?: string | FormItemLabel
 
   /**
    * col组件属性

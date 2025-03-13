@@ -22,6 +22,7 @@ import {
 import { useRenderSelect } from './components/useRenderSelect'
 import { useRenderRadio } from './components/useRenderRadio'
 import { useRenderCheckbox } from './components/useRenderCheckbox'
+import { Tips } from '@/components/Tips'
 import { useDesign } from '@/hooks/web/useDesign'
 import { findIndex } from '@/utils'
 import { get, set } from 'lodash-es'
@@ -53,6 +54,8 @@ export default defineComponent({
     },
     // 是否需要栅格布局
     isCol: propTypes.bool.def(true),
+    // 是否需要提示
+    isTips: propTypes.bool.def(false),
     // 表单数据对象
     model: {
       type: Object as PropType<any>,
@@ -363,23 +366,36 @@ export default defineComponent({
           }
         }
       }
-      if (item?.formItemProps?.slots?.label) {
+      
+      // 处理label自带tips的情况
+      if (item?.label && typeof item.label === 'object' && item.label.tips) {
+        formItemSlots.label = () => {
+          return (
+            <span>
+              {item.label.text || ''}
+              <Tips content={item.label.tips} />
+            </span>
+          )
+        }
+      } else if (item?.formItemProps?.slots?.label) {
         formItemSlots.label = (...args: any[]) => {
           return (item?.formItemProps?.slots as any)?.label(...args)
         }
       }
+      
       if (item?.formItemProps?.slots?.error) {
         formItemSlots.error = (...args: any[]) => {
           return (item?.formItemProps?.slots as any)?.error(...args)
         }
       }
+      
       return (
         <ElFormItem
           v-show={!item.hidden}
           ref={(el: any) => setFormItemRefMap(el, item.field)}
           {...(item.formItemProps || {})}
           prop={item.field}
-          label={item.label || ''}
+          label={typeof item.label === 'object' ? item.label.text : (item.label || '')}
         >
           {formItemSlots}
         </ElFormItem>
