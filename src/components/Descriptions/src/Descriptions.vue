@@ -8,10 +8,6 @@ import { DescriptionsSchema } from './types'
 import { Icon } from '@/components/Icon'
 import { get } from 'lodash-es'
 
-const appStore = useAppStore()
-
-const mobile = computed(() => appStore.getMobile)
-
 const { getPrefixCls } = useDesign()
 
 const prefixCls = getPrefixCls('descriptions')
@@ -39,6 +35,9 @@ export default defineComponent({
     }
   },
   setup(props, { attrs }) {
+    const appStore = useAppStore()
+    const mobile = computed(() => appStore.getMobile)
+
     const getBindValue = computed((): any => {
       const delArr: string[] = ['title', 'message', 'collapse', 'schema', 'data', 'class']
       const obj = { ...attrs, ...props }
