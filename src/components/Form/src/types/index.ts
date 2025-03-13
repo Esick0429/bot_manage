@@ -658,7 +658,7 @@ export interface FormSchema {
   /**
    * 样式隐藏，不会把值一同删掉，类似v-show
    */
-  hidden?: boolean
+  hidden?: boolean | (() => boolean)
 
   /**
    * @returns 远程加载下拉项

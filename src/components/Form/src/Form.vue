@@ -410,7 +410,7 @@ export default defineComponent({
 
       return (
         <ElFormItem
-          v-show={!item.hidden}
+          v-show={!((typeof item.hidden === 'function') ? item.hidden() : item.hidden)}
           ref={(el: any) => setFormItemRefMap(el, item.field)}
           {...(item.formItemProps || {})}
           prop={item.field}
