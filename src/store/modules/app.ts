@@ -52,7 +52,7 @@ export const useAppStore = defineStore('app', {
       locale: false, // 多语言图标
       tagsView: true, // 标签页
       tagsViewIcon: true, // 是否显示标签图标
-      logo: true, // logo
+      logo: false, // logo
       fixedHeader: true, // 固定toolheader
       footer: true, // 显示页脚
       greyMode: false, // 是否开始灰色模式，用于特殊悼念日

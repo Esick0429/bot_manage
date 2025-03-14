@@ -17,9 +17,9 @@ const axiosInstance: AxiosInstance = axios.create({
 axiosInstance.interceptors.request.use((res: InternalAxiosRequestConfig) => {
   const controller = new AbortController()
   let url = res.url || ''
-
+  let MOCK_LIST = ['/bot', '/menu_list']
   // 如果启用了mock并且是bot相关请求，添加/mock前缀
-  if (import.meta.env.VITE_USE_MOCK === 'true' && url.startsWith('/bot')) {
+  if (import.meta.env.VITE_USE_MOCK === 'true' && MOCK_LIST.some((item) => url.indexOf(item) !== -1)) {
     url = '/mock' + url
     res.url = url
 
