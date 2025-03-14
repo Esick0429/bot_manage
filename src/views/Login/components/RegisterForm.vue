@@ -17,7 +17,7 @@ const { getElFormExpose } = formMethods
 
 const { t } = useI18n()
 
-const { required, check } = useValidator()
+const { required, email, phone } = useValidator()
 
 // 添加注册类型切换
 const registerType = ref('phone') // 'phone' 或 'email'
@@ -112,17 +112,15 @@ const rules = computed<FormRules>(() => {
         username: [required()],
         password: [required()],
         check_password: [required()],
-        phone: [required()],
+        phone: [required(), phone()],
         code: [required()],
-        iAgree: [required(), check()]
       }
     : {
         username: [required()],
         password: [required()],
         check_password: [required()],
-        email: [required()],
+        email: [required(), email()],
         code: [required()],
-        iAgree: [required(), check()]
       }
 })
 

@@ -22,7 +22,7 @@ import {
 } from '@/api/login'
 import { ElMessage } from 'element-plus'
 
-const { required } = useValidator()
+const { required, email, phone } = useValidator()
 
 const emit = defineEmits(['to-register'])
 
@@ -47,7 +47,7 @@ const rules = computed(() => {
         password: [required()]
       }
     : {
-        phone: [required()],
+        phone: [required(), phone()],
         code: [required()]
       }
 })
@@ -150,7 +150,7 @@ const accountSchema = reactive<FormSchema[]>([
     component: 'Input',
     colProps: { span: 24 },
     componentProps: {
-      placeholder: '支持手机号/邮箱登录'
+      placeholder: '支持手机号/邮箱登录',
     }
   },
   {
