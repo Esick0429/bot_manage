@@ -136,7 +136,7 @@ const phoneSchema = reactive<FormSchema[]>([
                 {t('resetPassword.resetPassword')}
               </h2>
               <ElTabs v-model={resetType.value} class="w-[100%]" onTabChange={handleTabChange}>
-                <ElTabPane label={t('resetPassword.phoneReset')} name="phone"></ElTabPane>
+                {/* <ElTabPane label={t('resetPassword.phoneReset')} name="phone"></ElTabPane> */}
                 <ElTabPane label={t('resetPassword.emailReset')} name="email"></ElTabPane>
               </ElTabs>
             </>
@@ -241,7 +241,7 @@ const emailSchema = reactive<FormSchema[]>([
                 {t('resetPassword.resetPassword')}
               </h2>
               <ElTabs v-model={resetType.value} class="w-[100%]" onTabChange={handleTabChange}>
-                <ElTabPane label={t('resetPassword.phoneReset')} name="phone"></ElTabPane>
+                {/* <ElTabPane label={t('resetPassword.phoneReset')} name="phone"></ElTabPane> */}
                 <ElTabPane label={t('resetPassword.emailReset')} name="email"></ElTabPane>
               </ElTabs>
             </>

@@ -136,7 +136,7 @@ const phoneSchema = reactive<FormSchema[]>([
             <>
               <h2 class="text-2xl font-bold text-center w-[100%] mb-4">{t('login.register')}</h2>
               <ElTabs v-model={registerType.value} class="w-[100%]" onTabChange={handleTabChange}>
-                <ElTabPane label={t('login.phoneRegister')} name="phone"></ElTabPane>
+                {/* <ElTabPane label={t('login.phoneRegister')} name="phone"></ElTabPane> */}
                 <ElTabPane label={t('login.emailRegister')} name="email"></ElTabPane>
               </ElTabs>
             </>
@@ -253,7 +253,7 @@ const emailSchema = reactive<FormSchema[]>([
             <>
               <h2 class="text-2xl font-bold text-center w-[100%] mb-4">{t('login.register')}</h2>
               <ElTabs v-model={registerType.value} class="w-[100%]" onTabChange={handleTabChange}>
-                <ElTabPane label={t('login.phoneRegister')} name="phone"></ElTabPane>
+                {/* <ElTabPane label={t('login.phoneRegister')} name="phone"></ElTabPane> */}
                 <ElTabPane label={t('login.emailRegister')} name="email"></ElTabPane>
               </ElTabs>
             </>

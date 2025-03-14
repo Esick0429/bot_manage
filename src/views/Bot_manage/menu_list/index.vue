@@ -316,9 +316,8 @@ const searchSchema = [
     componentProps: {
       options: [
         { label: '全部', value: '' },
-        { label: '目录', value: 1 },
-        { label: '菜单', value: 2 },
-        { label: '内联按钮', value: 3 }
+        { label: '菜单', value: 1 },
+        { label: '内联按钮', value: 2 }
       ],
       placeholder: '请选择菜单类型'
     }
