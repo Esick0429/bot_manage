@@ -7,7 +7,8 @@ import {
   ElCol,
   FormRules,
   ComponentSize,
-  ElTag
+  ElTag,
+  ElInputNumber
   // FormItemProp
 } from 'element-plus'
 import { componentMap } from './helper/componentMap'
@@ -309,6 +310,22 @@ export default defineComponent({
               }
             }
 
+            if (item.component === ComponentNameEnum.INPUT_NUMBER && item.componentProps.remark) {
+              return (
+                <>
+                  <ElInputNumber
+                    v-model={formModel.value[item.field]}
+                    {...(item?.componentProps as any)}
+                    style="width: 100%"
+                  />
+                  <div class="mt-2 text-10px leading-12px">
+                    {typeof item.componentProps.remark === 'function'
+                      ? item.componentProps.remark()
+                      : item.componentProps.remark}
+                  </div>
+                </>
+              )
+            }
             // 单选框组和按钮样式
             if (
               item.component === ComponentNameEnum.RADIO_GROUP ||
@@ -392,7 +409,9 @@ export default defineComponent({
         'tips' in item.label
       ) {
         const labelObj = item.label as { text: string; tips: string }
-        const labelText = labelObj.text.includes('：') ? labelObj.text.split('：')[0] : labelObj.text
+        const labelText = labelObj.text.includes('：')
+          ? labelObj.text.split('：')[0]
+          : labelObj.text
         formItemSlots.label = () => {
           return (
             <span>
