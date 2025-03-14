@@ -236,24 +236,24 @@ export default defineComponent({
     const renderFormItemWrap = () => {
       // hidden属性表示隐藏，不做渲染
       const { schema = [], isCol, gridColumns } = unref(getProps)
-      
+
       // 计算默认列宽 (24等分栅格系统)
       const defaultColSpan = 24 / gridColumns
-      
+
       return schema
         .filter((v) => !v.remove)
         .map((item) => {
           // 如果是 Divider 组件，需要自己占用一行
           const isDivider = item.component === 'Divider'
           const Com = componentMap['Divider'] as ReturnType<typeof defineComponent>
-          
+
           // 如果没有设置colProps或者没有span属性，则使用默认计算的列宽
           if (isCol && item.colProps && !item.colProps.span) {
             item.colProps.span = defaultColSpan
           } else if (isCol && !item.colProps) {
             item.colProps = { span: defaultColSpan }
           }
-          
+
           return isDivider ? (
             <Com {...{ contentPosition: 'left', ...item.componentProps }}>{item?.label}</Com>
           ) : isCol ? (
@@ -289,7 +289,7 @@ export default defineComponent({
               ...setItemComponentSlots(componentSlots)
             }
             if (item.component === ComponentNameEnum.TAG) {
-                return <ElTag>{item.value}</ElTag>
+              return <ElTag>{item.value}</ElTag>
             }
             // // 如果是select组件，并且没有自定义模板，自动渲染options
             if (item.component === ComponentNameEnum.SELECT) {
@@ -385,9 +385,14 @@ export default defineComponent({
       }
 
       // 处理label自带tips的情况
-      if (item?.label && typeof item.label === 'object' && 'text' in item.label && 'tips' in item.label) {
+      if (
+        item?.label &&
+        typeof item.label === 'object' &&
+        'text' in item.label &&
+        'tips' in item.label
+      ) {
         const labelObj = item.label as { text: string; tips: string }
-        let labelText = labelObj.text.includes('：') ? labelObj.text.split('：')[0] : labelObj.text
+        const labelText = labelObj.text.includes('：') ? labelObj.text.split('：')[0] : labelObj.text
         formItemSlots.label = () => {
           return (
             <span>
@@ -410,7 +415,7 @@ export default defineComponent({
 
       return (
         <ElFormItem
-          v-show={!((typeof item.hidden === 'function') ? item.hidden() : item.hidden)}
+          v-show={!(typeof item.hidden === 'function' ? item.hidden() : item.hidden)}
           ref={(el: any) => setFormItemRefMap(el, item.field)}
           {...(item.formItemProps || {})}
           prop={item.field}

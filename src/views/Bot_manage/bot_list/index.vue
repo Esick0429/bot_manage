@@ -282,7 +282,7 @@ const handleSubmit = async () => {
     const formData = await formMethods.getFormData()
 
     // 这里应该调用真实的API
-    console.log('提交的表单数据:', formData)
+    console.log('提交的表单数据2:', formData)
 
     ElMessage.success(dialogType.value === 'add' ? t('common.addSuccess') : t('common.editSuccess'))
     dialogVisible.value = false
@@ -315,23 +315,11 @@ const fetchBotList = async (params) => {
           expireTime: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleString()
         }))
 
-        console.log('数据生成完毕，返回数据:', list)
-
         // 直接返回符合接口要求的对象格式
         const result = {
           list,
           total: 100
         }
-
-        console.log('API返回结果对象:', result)
-        console.log('API返回数据类型检查:', {
-          resultType: typeof result,
-          listIsArray: Array.isArray(result.list),
-          listLength: result.list.length,
-          totalType: typeof result.total,
-          totalValue: result.total
-        })
-
         resolve(result)
       } catch (error) {
         console.error('生成数据失败:', error)
