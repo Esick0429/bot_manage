@@ -11,7 +11,7 @@ const abortControllerMap: Map<string, AbortController> = new Map()
 
 const axiosInstance: AxiosInstance = axios.create({
   timeout: REQUEST_TIMEOUT,
-  baseURL: import.meta.env.VITE_USE_MOCK === 'true' ? '' : PATH_URL // 如果使用mock，则不使用API基础路径
+  baseURL: PATH_URL // 如果使用mock，则不使用API基础路径
 })
 
 axiosInstance.interceptors.request.use((res: InternalAxiosRequestConfig) => {

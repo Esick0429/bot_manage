@@ -17,6 +17,7 @@ export interface PhoneRegisterParams {
 }
 
 export interface EmailRegisterParams {
+  username: string
   email: string
   password: string
   verify_code: string
