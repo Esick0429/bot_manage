@@ -11,17 +11,24 @@ const abortControllerMap: Map<string, AbortController> = new Map()
 
 const axiosInstance: AxiosInstance = axios.create({
   timeout: REQUEST_TIMEOUT,
-  baseURL: PATH_URL
+  baseURL: import.meta.env.VITE_USE_MOCK === 'true' ? '' : PATH_URL // 如果使用mock，则不使用API基础路径
 })
 
 axiosInstance.interceptors.request.use((res: InternalAxiosRequestConfig) => {
   const controller = new AbortController()
-  const url = res.url || ''
+  let url = res.url || ''
+
+  // 如果启用了mock并且是bot相关请求，添加/mock前缀
+  if (import.meta.env.VITE_USE_MOCK === 'true' && url.startsWith('/bot')) {
+    url = '/mock' + url
+    res.url = url
+
+    // 完全覆盖baseURL，确保使用本地mock而不是远程服务器
+    res.baseURL = ''
+  }
+
   res.signal = controller.signal
-  abortControllerMap.set(
-    import.meta.env.VITE_USE_MOCK === 'true' ? url.replace('/mock', '') : url,
-    controller
-  )
+  abortControllerMap.set(url, controller)
   return res
 })
 
