@@ -12,6 +12,11 @@ import {
   getBotFlashExchangeConfigApi
 } from '@/api/botlist'
 
+// 假设我们有一个成本价API
+const getCostPricesApi = () => {
+  return fetch('/bot/cost-prices').then((res) => res.json())
+}
+
 export function useBotConfig() {
   // 共享状态
   const dialogVisible = ref(false)
@@ -34,18 +39,8 @@ export function useBotConfig() {
   // 加载成本价格
   const loadCostPrices = async () => {
     try {
-      // TODO: 此处需要替换为真实的API调用，从运营后台获取成本价配置
-      // const response = await getCostPricesApi();
-      // const data = response.data || {};
-
-      // 模拟后台返回的成本价数据
-      const data = {
-        timeEnergy1Hour: 1.5,
-        timeEnergy1Day: 5.0,
-        timeEnergy3Days: 10.0,
-        timeEnergy7Days: 20.0,
-        timeEnergy15Days: 35.0
-      }
+      const response = await getCostPricesApi()
+      const data = response.data || {}
 
       // 更新成本价配置
       Object.keys(data).forEach((key) => {
@@ -53,8 +48,6 @@ export function useBotConfig() {
           costPrices[key] = data[key]
         }
       })
-
-      console.log('成本价配置加载成功:', costPrices)
     } catch (error) {
       console.error('加载成本价配置失败:', error)
       ElMessage.warning('成本价配置加载失败，将使用默认值')
@@ -101,18 +94,14 @@ export function useBotConfig() {
     loading.value = true
 
     try {
-      // 获取运营后台配置的成本价
-      await loadCostPrices()
-
-      // 获取机器人基本信息
-      const botInfoRes = await getBotDetailApi(botId)
-      const botInfo = botInfoRes.data || {}
-
-      // 设置TG同步状态
-      tgStatus.value = botInfo.tgVerifyStatus || 'pending'
-
-      // 调用对应表单的setValues方法设置数据
+      // 如果是加载botInfo，需要获取机器人基本信息
       if (formMethods.botInfo) {
+        const botInfoRes = await getBotDetailApi(botId)
+        const botInfo = botInfoRes.data || {}
+
+        // 设置TG同步状态
+        tgStatus.value = botInfo.tgVerifyStatus || 'pending'
+
         formMethods.botInfo.setValues({
           ...botInfo,
           botId: botInfo.botId || '',
@@ -124,29 +113,37 @@ export function useBotConfig() {
           remark: botInfo.remark || '',
           status: botInfo.status === undefined ? true : botInfo.status
         })
+
+        // 更新当前机器人对象
+        currentBot.value = botInfo
       }
 
-      // 加载收款配置
-      try {
-        const paymentConfigRes = await getBotPaymentConfigApi(botId)
-        const paymentConfig = paymentConfigRes.data || {}
-        if (formMethods.payment) {
+      // 如果是加载payment，需要获取收款配置
+      if (formMethods.payment) {
+        try {
+          const paymentConfigRes = await getBotPaymentConfigApi(botId)
+          const paymentConfig = paymentConfigRes.data || {}
+
           formMethods.payment.setValues({
             username: paymentConfig.username || '',
             flashPaymentWallet: paymentConfig.flashPaymentWallet || '',
             balancePaymentWallet: paymentConfig.balancePaymentWallet || '',
             orderNotificationAdmin: paymentConfig.orderNotificationAdmin !== false
           })
+        } catch (error) {
+          console.error('加载收款配置失败:', error)
         }
-      } catch (error) {
-        console.error('加载收款配置失败:', error)
       }
 
-      // 加载时间能量价格配置
-      try {
-        const timeEnergyConfigRes = await getBotTimeEnergyConfigApi(botId)
-        const timeEnergyConfig = timeEnergyConfigRes.data || {}
-        if (formMethods.timeEnergy) {
+      // 如果是加载timeEnergy，需要获取时间能量价格配置和成本价
+      if (formMethods.timeEnergy) {
+        try {
+          // 获取运营后台配置的成本价
+          await loadCostPrices()
+
+          const timeEnergyConfigRes = await getBotTimeEnergyConfigApi(botId)
+          const timeEnergyConfig = timeEnergyConfigRes.data || {}
+
           formMethods.timeEnergy.setValues({
             timeEnergyPrice: timeEnergyConfig.price || 0,
             timeEnergyMultiplier: timeEnergyConfig.multiplier || 1,
@@ -156,76 +153,104 @@ export function useBotConfig() {
             timeEnergy7Days: timeEnergyConfig.timeEnergy7Days || costPrices.timeEnergy7Days,
             timeEnergy15Days: timeEnergyConfig.timeEnergy15Days || costPrices.timeEnergy15Days
           })
+        } catch (error) {
+          console.error('加载时间能量价格配置失败:', error)
         }
-      } catch (error) {
-        console.error('加载时间能量价格配置失败:', error)
       }
 
-      // 加载笔数能量价格配置
-      try {
-        const countEnergyConfigRes = await getBotCountEnergyConfigApi(botId)
-        const countEnergyConfig = countEnergyConfigRes.data || {}
-        if (formMethods.countEnergy) {
-          formMethods.countEnergy.setValues({
-            countEnergyEnabled: countEnergyConfig.enabled !== false,
-            countEnergyPrice: countEnergyConfig.price || 0
-          })
+      // 如果是加载countEnergy，需要获取笔数能量价格配置
+      if (formMethods.countEnergy) {
+        try {
+          const countEnergyConfigRes = await getBotCountEnergyConfigApi(botId)
+          const countEnergyConfig = countEnergyConfigRes.data || {}
+
+          const countEnergyValues = {
+            countEnergyEnabled: countEnergyConfig.enabled,
+            countEnergyPriceTRX: countEnergyConfig.countEnergyPriceTRX || 0,
+            countEnergyPriceUSDT: countEnergyConfig.countEnergyPriceUSDT || 0,
+            notifyUser: countEnergyConfig.notifyUser || false,
+            notifyGroupOwner: countEnergyConfig.notifyGroupOwner || false,
+            notifyAdmin: countEnergyConfig.notifyAdmin || false
+          }
+
+          // 设置表单值
+          formMethods.countEnergy.setValues(countEnergyValues)
+        } catch (error) {
+          console.error('加载笔数能量价格配置失败:', error)
         }
-      } catch (error) {
-        console.error('加载笔数能量价格配置失败:', error)
       }
 
-      // 加载托管模式价格配置
-      try {
-        const managedModeConfigRes = await getBotManagedModeConfigApi(botId)
-        const managedModeConfig = managedModeConfigRes.data || {}
-        if (formMethods.managedMode) {
-          formMethods.managedMode.setValues({
-            managedModeEnabled: managedModeConfig.enabled !== false,
-            managedModePrice: managedModeConfig.price || 0
-          })
+      // 如果是加载managedMode，需要获取托管模式价格配置
+      if (formMethods.managedMode) {
+        try {
+          const managedModeConfigRes = await getBotManagedModeConfigApi(botId)
+          const managedModeConfig = managedModeConfigRes.data || {}
+
+          const managedModeValues = {
+            enabled: managedModeConfig.enabled,
+            countPrice: managedModeConfig.countPrice || 0,
+            customPriceEnabled: managedModeConfig.customPriceEnabled || false,
+            price65000: managedModeConfig.price65000 || 0,
+            price131000: managedModeConfig.price131000 || 0
+          }
+
+          // 设置表单值
+          formMethods.managedMode.setValues(managedModeValues)
+        } catch (error) {
+          console.error('加载托管模式价格配置失败:', error)
         }
-      } catch (error) {
-        console.error('加载托管模式价格配置失败:', error)
       }
 
-      // 加载批量下单价格配置
-      try {
-        const batchOrderConfigRes = await getBotBatchOrderConfigApi(botId)
-        const batchOrderConfig = batchOrderConfigRes.data || {}
-        if (formMethods.batchOrder) {
-          formMethods.batchOrder.setValues({
-            batchOrderEnabled: batchOrderConfig.enabled !== false,
-            batchOrderPrice: batchOrderConfig.price || 0
-          })
+      // 如果是加载batchOrder，需要获取批量下单价格配置
+      if (formMethods.batchOrder) {
+        try {
+          const batchOrderConfigRes = await getBotBatchOrderConfigApi(botId)
+          const batchOrderConfig = batchOrderConfigRes.data || {}
+
+          const batchOrderValues = {
+            enabled: batchOrderConfig.enabled,
+            energyPrice: batchOrderConfig.energyPrice || 0,
+            activatePrice: batchOrderConfig.activatePrice || 1.1
+          }
+
+          // 设置表单值
+          formMethods.batchOrder.setValues(batchOrderValues)
+        } catch (error) {
+          console.error('加载批量下单价格配置失败:', error)
         }
-      } catch (error) {
-        console.error('加载批量下单价格配置失败:', error)
       }
 
-      // 加载闪兑配置
-      try {
-        const flashExchangeConfigRes = await getBotFlashExchangeConfigApi(botId)
-        const flashExchangeConfig = flashExchangeConfigRes.data || {}
-        if (formMethods.flashExchange) {
-          formMethods.flashExchange.setValues({
-            flashExchangeEnabled: flashExchangeConfig.enabled !== false,
-            flashExchangeRate: flashExchangeConfig.rate || 0,
-            flashExchangeFee: flashExchangeConfig.fee || 0
-          })
-        }
-      } catch (error) {
-        console.error('加载闪兑配置失败:', error)
-      }
+      // 如果是加载flashExchange，需要获取闪兑配置
+      if (formMethods.flashExchange) {
+        try {
+          const flashExchangeConfigRes = await getBotFlashExchangeConfigApi(botId)
+          const flashExchangeConfig = flashExchangeConfigRes.data || {}
 
-      // 更新当前机器人对象
-      currentBot.value = botInfo
+          const flashExchangeValues = {
+            enabled: flashExchangeConfig.enabled,
+            walletAddress: flashExchangeConfig.walletAddress || '',
+            minBalance: flashExchangeConfig.minBalance || 0,
+            exchangeProfit: flashExchangeConfig.exchangeProfit || 0,
+            exchangeLimit: flashExchangeConfig.exchangeLimit || 0,
+            insufficientStock: flashExchangeConfig.insufficientStock || false,
+            insufficientStockValue: flashExchangeConfig.insufficientStockValue || 0
+          }
+
+          // 设置表单值
+          formMethods.flashExchange.setValues(flashExchangeValues)
+        } catch (error) {
+          console.error('加载闪兑配置失败:', error)
+        }
+      }
     } catch (error) {
       console.error('加载机器人配置失败:', error)
       ElMessage.error('加载机器人配置失败，请稍后重试')
     } finally {
-      loading.value = false
-      loadingInstance.close()
+      // 延迟关闭loading状态，给用户更好的体验
+      setTimeout(() => {
+        loading.value = false
+        loadingInstance.close()
+      }, 500)
     }
   }
 
@@ -253,49 +278,35 @@ export function useBotConfig() {
 
       // 组合所有配置数据
       const formData = {
+        botId: currentBot.value.botId,
         // 基本信息
-        ...botInfoData,
+        botInfo: {
+          ...botInfoData
+        },
         // 收款配置
         payment: {
-          username: paymentData.username,
-          flashPaymentWallet: paymentData.flashPaymentWallet,
-          balancePaymentWallet: paymentData.balancePaymentWallet,
-          orderNotificationAdmin: paymentData.orderNotificationAdmin
+          ...paymentData
         },
-        // 时间能量价格配置
+        // 时间能量配置
         timeEnergy: {
-          price: timeEnergyData.timeEnergyPrice,
-          multiplier: timeEnergyData.timeEnergyMultiplier,
-          timeEnergy1Hour: timeEnergyData.timeEnergy1Hour,
-          timeEnergy1Day: timeEnergyData.timeEnergy1Day,
-          timeEnergy3Days: timeEnergyData.timeEnergy3Days,
-          timeEnergy7Days: timeEnergyData.timeEnergy7Days,
-          timeEnergy15Days: timeEnergyData.timeEnergy15Days
+          ...timeEnergyData
         },
-        // 笔数能量价格配置
+        // 笔数能量配置
         countEnergy: {
-          enabled: countEnergyData.countEnergyEnabled,
-          price: countEnergyData.countEnergyPrice
+          ...countEnergyData
         },
-        // 托管模式价格配置
+        // 托管模式配置
         managedMode: {
-          enabled: managedModeData.managedModeEnabled,
-          price: managedModeData.managedModePrice
+          ...managedModeData
         },
-        // 批量下单价格配置
+        // 批量下单配置
         batchOrder: {
-          enabled: batchOrderData.batchOrderEnabled,
-          price: batchOrderData.batchOrderPrice
+          ...batchOrderData
         },
         // 闪兑配置
         flashExchange: {
-          enabled: flashExchangeData.flashExchangeEnabled,
-          rate: flashExchangeData.flashExchangeRate,
-          fee: flashExchangeData.flashExchangeFee
-        },
-        id: currentBot.value.id,
-        botId: currentBot.value.botId,
-        tgVerifyStatus: tgStatus.value
+          ...flashExchangeData
+        }
       }
 
       await updateBotAllConfigsApi(formData)

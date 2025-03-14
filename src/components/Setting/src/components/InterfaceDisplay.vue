@@ -53,7 +53,7 @@ const sizeChange = (show: boolean) => {
 const locale = ref(appStore.getLocale)
 
 const localeChange = (show: boolean) => {
-  appStore.setLocale(show)
+  appStore.setLocale(false)
 }
 
 // 标签页
