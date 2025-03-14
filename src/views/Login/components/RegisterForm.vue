@@ -401,6 +401,7 @@ const register = async () => {
         } else {
           // 邮箱注册
           const res = await emailRegisterApi({
+            username: formData.username,
             email: formData.email,
             password: formData.password,
             verify_code: formData.code
