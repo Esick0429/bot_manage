@@ -13,7 +13,7 @@ defineOptions({
   name: 'ResetPasswordForm'
 })
 
-const { required } = useValidator()
+const { required, email, phone } = useValidator()
 const { push } = useRouter()
 const { t } = useI18n()
 
@@ -24,13 +24,13 @@ const resetType = ref('phone') // 'phone' 或 'email'
 const rules = computed(() => {
   return resetType.value === 'phone'
     ? {
-        phone: [required()],
+        phone: [required(), phone()],
         code: [required()],
         password: [required()],
         confirmPassword: [required()]
       }
     : {
-        email: [required()],
+        email: [required(), email()],
         code: [required()],
         password: [required()],
         confirmPassword: [required()]
