@@ -18,7 +18,7 @@ const { push } = useRouter()
 const { t } = useI18n()
 
 // 重置密码方式切换
-const resetType = ref('phone') // 'phone' 或 'email'
+const resetType = ref('email') // 'phone' 或 'email'
 
 // 根据重置类型使用不同的验证规则
 const rules = computed(() => {
