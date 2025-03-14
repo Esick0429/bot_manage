@@ -20,7 +20,7 @@ const { t } = useI18n()
 const { required, email, phone } = useValidator()
 
 // 添加注册类型切换
-const registerType = ref('phone') // 'phone' 或 'email'
+const registerType = ref('email') // 'phone' 或 'email'
 
 // 验证码倒计时相关
 const countdown = ref(0)
