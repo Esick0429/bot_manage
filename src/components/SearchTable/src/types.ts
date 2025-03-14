@@ -1,5 +1,6 @@
 import { FormSchema } from '@/components/Form'
 import { TableColumn } from '@/components/Table'
+import { Ref } from 'vue'
 
 export interface SearchTableProps {
   columns: TableColumn[]
