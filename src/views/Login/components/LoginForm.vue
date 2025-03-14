@@ -134,9 +134,10 @@ const accountSchema = reactive<FormSchema[]>([
         default: () => {
           return (
             <>
+              <h2 class="text-2xl font-bold text-center w-[100%] mb-4">{t('login.login')}</h2>
               <ElTabs v-model={loginType.value} class="w-[100%]" onTabChange={handleTabChange}>
                 <ElTabPane label={t('login.accountLogin')} name="account"></ElTabPane>
-                <ElTabPane label={t('login.phoneLogin')} name="phone"></ElTabPane>
+                {/* <ElTabPane label={t('login.phoneLogin')} name="phone"></ElTabPane> */}
               </ElTabs>
             </>
           )
@@ -230,9 +231,10 @@ const phoneSchema = reactive<FormSchema[]>([
         default: () => {
           return (
             <>
+              <h2 class="text-2xl font-bold text-center w-[100%] mb-4">{t('login.login')}</h2>
               <ElTabs v-model={loginType.value} class="w-[100%]" onTabChange={handleTabChange}>
                 <ElTabPane label={t('login.accountLogin')} name="account"></ElTabPane>
-                <ElTabPane label={t('login.phoneLogin')} name="phone"></ElTabPane>
+                {/* <ElTabPane label={t('login.phoneLogin')} name="phone"></ElTabPane> */}
               </ElTabs>
             </>
           )
