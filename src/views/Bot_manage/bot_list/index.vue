@@ -115,9 +115,17 @@ const columns = [
   },
   {
     field: 'auto_renew',
-    label: '自动续费',
+    // label: '自动续费',
     // formatter: (row) => (row.auto_renew === 1 ? '是' : '否'),
     slots: {
+      header: () => {
+        return (
+          <div>
+            自动续费
+            <Tips content="当机器人余额不足时，将会自动续费" />：
+          </div>
+        )
+      },
       default: (data: any) => {
         return (
           <>
@@ -128,7 +136,18 @@ const columns = [
     }
   },
   { field: 'createTime', label: '创建时间', formatter: (row) => dateUtil(row.createTime).format('YYYY-MM-DD HH:mm:ss') },
-  { field: 'expireTime', label: '到期时间', formatter: (row) => dateUtil(row.expireTime).format('YYYY-MM-DD HH:mm:ss') }
+  { field: 'expireTime', label: '到期时间', formatter: (row) => dateUtil(row.expireTime).format('YYYY-MM-DD HH:mm:ss'),
+    slots: {
+      header: () => {
+        return (
+          <div>
+            到期时间
+            <Tips content="到期后，您的机器人将会被暂停使用" />：
+          </div>
+        )
+      }
+    }
+  }
 ]
 
 // 操作列配置
