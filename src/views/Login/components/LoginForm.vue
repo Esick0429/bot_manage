@@ -151,7 +151,7 @@ const accountSchema = reactive<FormSchema[]>([
     component: 'Input',
     colProps: { span: 24 },
     componentProps: {
-      placeholder: '支持用户名/邮箱登录',
+      placeholder: '支持用户名/邮箱登录'
     }
   },
   {
