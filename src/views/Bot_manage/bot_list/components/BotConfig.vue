@@ -88,7 +88,7 @@ const {
 // 添加tab切换处理函数
 const handleTabChange = async (tabName: string) => {
   console.log('切换到标签页:', tabName)
-  if (!currentBot.value.botId) return
+  if (!currentBot.value.tg_bot_id) return
 
   const formMethods = getFormMethods()
   const currentFormMethod = formMethods[tabName]
@@ -102,7 +102,7 @@ const handleTabChange = async (tabName: string) => {
   loading.value = true
   try {
     // 直接加载数据，不再检查是否有数据
-    await loadBotAllConfigs(currentBot.value.botId, { [tabName]: currentFormMethod })
+    await loadBotAllConfigs(currentBot.value.tg_bot_id, { [tabName]: currentFormMethod })
   } catch (error) {
     console.error(`加载 ${tabName} 数据失败:`, error)
     ElMessage.error(`加载${tabName}配置失败，请重试`)
@@ -143,7 +143,7 @@ const open = async (botInfo: Record<string, any>) => {
   dialogVisible.value = true
   activeTab.value = 'botInfo'
 
-  if (!botInfo || !botInfo.botId) {
+  if (!botInfo || !botInfo.tg_bot_id) {
     ElMessage.error('机器人信息不完整')
     return
   }
@@ -153,7 +153,7 @@ const open = async (botInfo: Record<string, any>) => {
 
   // 只加载当前tab的配置信息
   const formMethods = getFormMethods()
-  await loadBotAllConfigs(botInfo.botId, { botInfo: formMethods.botInfo })
+  await loadBotAllConfigs(botInfo.tg_bot_id, { botInfo: formMethods.botInfo })
 }
 
 // 关闭弹窗

@@ -19,9 +19,8 @@ import { Dialog } from '@/components/Dialog'
 import { Table } from '@/components/Table'
 
 interface ConsumptionRecord {
-  id: number
-  botId: string
-  botNickname: string
+  tg_bot_id: number
+  name: string
   type: number
   amount: number
   createTime: string
@@ -36,8 +35,8 @@ const total = ref(0)
 
 // 表格列配置
 const columns = [
-  { field: 'botId', label: '机器人ID', width: 120 },
-  { field: 'botNickname', label: '机器人昵称' },
+  { field: 'tg_bot_id', label: '机器人ID', width: 120 },
+  { field: 'name', label: '机器人昵称' },
   {
     field: 'type',
     label: '类型',
@@ -64,9 +63,8 @@ const getList = async () => {
   try {
     // 模拟数据
     const list = Array.from({ length: 10 }).map((_, index) => ({
-      id: index + 1,
-      botId: `BOT_${Math.floor(Math.random() * 1000)}`,
-      botNickname: `机器人${index + 1}`,
+      tg_bot_id: Number(`BOT_${Math.floor(Math.random() * 1000)}`),
+      name: `机器人${index + 1}`,
       type: Math.floor(Math.random() * 3) + 1,
       amount: Math.random() * 1000,
       createTime: new Date().toLocaleString()
