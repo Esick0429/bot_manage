@@ -19,15 +19,17 @@ const getMockBotInfo = (botId: string) => {
   const botNumber = parseInt(botId.replace(/\D/g, '')) || 1
   return {
     id: botId,
-    botId: botId,
-    botName: `能量机器人${botNumber}`,
-    botUsername: `energy_bot_${botNumber}`,
-    botToken: `${botNumber}234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ`,
-    apiKey: `apikey_${botNumber}2345`,
-    adminTgAccount: `@admin_user_${botNumber}`,
+    tg_bot_id: botId,
+    fee: 100,
+    name: `能量机器人${botNumber}`,
+    username: `energy_bot_${botNumber}`,
+    token: `${botNumber}234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ`,
+    api_key: `apikey_${botNumber}2345`,
+    tg_admin: `@admin_user_${botNumber}`,
     remark: `这是第${botNumber}号测试机器人`,
     status: botNumber % 2 === 0,
-    tgVerifyStatus: botNumber % 3 === 0 ? 'pending' : 'success',
+    auto_renew: botNumber % 2 === 0,
+    tg_verify_status: botNumber % 3 === 0 ? 'pending' : 'success',
     createTime: `2023-01-0${botNumber} 12:00:00`
   }
 }
@@ -115,7 +117,7 @@ const mockTgSyncResult = () => ({
 export default [
   // 获取机器人列表
   {
-    url: '/mock/bot/list',
+    url: '/mock/v1/bot/list',
     method: 'get',
     timeout,
     response: ({ query }: { query: any }) => {
@@ -136,7 +138,7 @@ export default [
 
   // 获取机器人详情
   {
-    url: '/mock/bot/:id',
+    url: '/mock/v1/bot/:id',
     method: 'get',
     timeout,
     response: ({ url }: { url: string }) => {
@@ -150,7 +152,7 @@ export default [
   
   // 同步TG状态
   {
-    url: '/mock/bot/sync-tg-status',
+    url: '/mock/v1/bot/sync-tg-status',
     method: 'post',
     timeout,
     response: () => {
@@ -163,7 +165,7 @@ export default [
   
   // 获取机器人收款配置
   {
-    url: '/mock/bot/payment-config/:id',
+    url: '/mock/v1/bot/payment-config/:id',
     method: 'get',
     timeout,
     response: ({ url }: { url: string }) => {
@@ -177,7 +179,7 @@ export default [
   
   // 获取机器人时间能量价格配置
   {
-    url: '/mock/bot/time-energy-config/:id',
+    url: '/mock/v1/bot/time-energy-config/:id',
     method: 'get',
     timeout,
     response: ({ url }: { url: string }) => {
@@ -191,7 +193,7 @@ export default [
   
   // 获取机器人笔数能量价格配置
   {
-    url: '/mock/bot/count-energy-config/:id',
+    url: '/mock/v1/bot/count-energy-config/:id',
     method: 'get',
     timeout,
     response: ({ url }: { url: string }) => {
@@ -205,7 +207,7 @@ export default [
   
   // 获取机器人托管模式价格配置
   {
-    url: '/mock/bot/managed-mode-config/:id',
+    url: '/mock/v1/bot/managed-mode-config/:id',
     method: 'get',
     timeout,
     response: ({ url }: { url: string }) => {
@@ -219,7 +221,7 @@ export default [
   
   // 获取机器人批量下单价格配置
   {
-    url: '/mock/bot/batch-order-config/:id',
+    url: '/mock/v1/bot/batch-order-config/:id',
     method: 'get',
     timeout,
     response: ({ url }: { url: string }) => {
@@ -233,7 +235,7 @@ export default [
   
   // 获取机器人闪兑配置
   {
-    url: '/mock/bot/flash-exchange-config/:id',
+    url: '/mock/v1/bot/flash-exchange-config/:id',
     method: 'get',
     timeout,
     response: ({ url }: { url: string }) => {
@@ -244,10 +246,25 @@ export default [
       }
     }
   },
-  
+  {
+    url: '/mock/v1/bot/update',
+    method: 'put',
+    timeout,
+    response: (request: { body: any }) => {
+      console.log('收到更新机器人配置请求:', request.body)
+      return {
+        code: SUCCESS_CODE,
+        msg: '配置更新成功',
+        data: {
+          success: true,
+          message: '配置更新成功'
+        }
+      }
+    }
+  },
   // 更新所有机器人配置（一次性提交所有配置）
   {
-    url: '/mock/bot/update-all-configs',
+    url: '/mock/v1/bot/update-all-configs',
     method: 'put',
     timeout,
     response: (request: { body: any }) => {
@@ -264,7 +281,7 @@ export default [
   
   // 成本价接口
   {
-    url: '/mock/bot/cost-prices',
+    url: '/mock/v1/bot/cost-prices',
     method: 'get',
     timeout,
     response: () => {

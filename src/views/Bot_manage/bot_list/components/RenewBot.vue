@@ -82,7 +82,7 @@ const submit = async () => {
       // 这里应该调用真实的续费API
       console.log('提交的续费数据:', {
         ...formData,
-        botId: currentBot.value.botId,
+        tg_bot_id: currentBot.value.tg_bot_id,
         botUsername: currentBot.value.botUsername
       })
 

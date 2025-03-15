@@ -62,7 +62,7 @@ export function useBotConfig() {
       syncing.value = true
       ElMessage.info('正在同步TG状态...')
 
-      const res = await syncTgStatusApi(currentBot.value.botId)
+      const res = await syncTgStatusApi(currentBot.value.tg_bot_id)
       const data = res.data || {}
 
       // 更新状态
@@ -80,8 +80,8 @@ export function useBotConfig() {
   }
 
   // 加载机器人配置
-  const loadBotAllConfigs = async (botId: string, formMethods: any) => {
-    if (!botId) {
+  const loadBotAllConfigs = async (tg_bot_id: string, formMethods: any) => {
+    if (!tg_bot_id) {
       ElMessage.error('机器人ID不能为空')
       return
     }
@@ -96,7 +96,7 @@ export function useBotConfig() {
     try {
       // 如果是加载botInfo，需要获取机器人基本信息
       if (formMethods.botInfo) {
-        const botInfoRes = await getBotDetailApi(botId)
+        const botInfoRes = await getBotDetailApi(tg_bot_id)
         const botInfo = botInfoRes.data || {}
 
         // 设置TG同步状态
@@ -104,7 +104,7 @@ export function useBotConfig() {
 
         formMethods.botInfo.setValues({
           ...botInfo,
-          botId: botInfo.botId || '',
+          tg_bot_id: botInfo.tg_bot_id || '',
           botName: botInfo.botName || '',
           botUsername: botInfo.botUsername || '',
           botToken: botInfo.botToken || '',
@@ -121,7 +121,7 @@ export function useBotConfig() {
       // 如果是加载payment，需要获取收款配置
       if (formMethods.payment) {
         try {
-          const paymentConfigRes = await getBotPaymentConfigApi(botId)
+          const paymentConfigRes = await getBotPaymentConfigApi(tg_bot_id)
           const paymentConfig = paymentConfigRes.data || {}
 
           formMethods.payment.setValues({
@@ -141,7 +141,7 @@ export function useBotConfig() {
           // 获取运营后台配置的成本价
           await loadCostPrices()
 
-          const timeEnergyConfigRes = await getBotTimeEnergyConfigApi(botId)
+          const timeEnergyConfigRes = await getBotTimeEnergyConfigApi(tg_bot_id)
           const timeEnergyConfig = timeEnergyConfigRes.data || {}
 
           formMethods.timeEnergy.setValues({
@@ -161,7 +161,7 @@ export function useBotConfig() {
       // 如果是加载countEnergy，需要获取笔数能量价格配置
       if (formMethods.countEnergy) {
         try {
-          const countEnergyConfigRes = await getBotCountEnergyConfigApi(botId)
+          const countEnergyConfigRes = await getBotCountEnergyConfigApi(tg_bot_id)
           const countEnergyConfig = countEnergyConfigRes.data || {}
 
           const countEnergyValues = {
@@ -183,7 +183,7 @@ export function useBotConfig() {
       // 如果是加载managedMode，需要获取托管模式价格配置
       if (formMethods.managedMode) {
         try {
-          const managedModeConfigRes = await getBotManagedModeConfigApi(botId)
+          const managedModeConfigRes = await getBotManagedModeConfigApi(tg_bot_id)
           const managedModeConfig = managedModeConfigRes.data || {}
 
           const managedModeValues = {
@@ -204,7 +204,7 @@ export function useBotConfig() {
       // 如果是加载batchOrder，需要获取批量下单价格配置
       if (formMethods.batchOrder) {
         try {
-          const batchOrderConfigRes = await getBotBatchOrderConfigApi(botId)
+          const batchOrderConfigRes = await getBotBatchOrderConfigApi(tg_bot_id)
           const batchOrderConfig = batchOrderConfigRes.data || {}
 
           const batchOrderValues = {
@@ -223,7 +223,7 @@ export function useBotConfig() {
       // 如果是加载flashExchange，需要获取闪兑配置
       if (formMethods.flashExchange) {
         try {
-          const flashExchangeConfigRes = await getBotFlashExchangeConfigApi(botId)
+          const flashExchangeConfigRes = await getBotFlashExchangeConfigApi(tg_bot_id)
           const flashExchangeConfig = flashExchangeConfigRes.data || {}
 
           const flashExchangeValues = {
@@ -271,14 +271,14 @@ export function useBotConfig() {
       const batchOrderData = (await formMethods.batchOrder?.getFormData()) || {}
       const flashExchangeData = (await formMethods.flashExchange?.getFormData()) || {}
 
-      if (!currentBot.value.botId) {
+      if (!currentBot.value.tg_bot_id) {
         ElMessage.error('机器人ID不能为空')
         return false
       }
 
       // 组合所有配置数据
       const formData = {
-        botId: currentBot.value.botId,
+        tg_bot_id: currentBot.value.tg_bot_id,
         // 基本信息
         botInfo: {
           ...botInfoData

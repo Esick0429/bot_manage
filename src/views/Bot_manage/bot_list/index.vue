@@ -9,7 +9,7 @@
         :fetch-del-api="fetchBotDelete"
         :action-column="actionColumn"
         :table-props="{
-          rowKey: 'id',
+          rowKey: 'tg_bot_id',
           highlightCurrentRow: false,
           reserveSelection: false
         }"
@@ -57,7 +57,7 @@
 
 <script setup lang="tsx">
 import { ref, reactive, computed, onMounted, watch } from 'vue'
-import { ElButton, ElLink, ElMessage, ElMessageBox, ElEmpty } from 'element-plus'
+import { ElButton, ElLink, ElMessage, ElMessageBox, ElSwitch } from 'element-plus'
 import { ContentWrap } from '@/components/ContentWrap'
 import { Dialog } from '@/components/Dialog'
 import { Form, FormSchema } from '@/components/Form'
@@ -69,9 +69,10 @@ import { BaseButton } from '@/components/Button'
 import ConsumptionRecord from './components/ConsumptionRecord.vue'
 import RenewBot from './components/RenewBot.vue'
 import BotConfig from './components/BotConfig.vue'
-import { getBotListApi } from '@/api/botlist'
+import { getBotListApi, addBotApi,updateBotApi } from '@/api/botlist'
 import { Icon } from '@/components/Icon'
 import { Tips } from '@/components/Tips'
+import { dateUtil } from '@/utils/dateUtil'
 
 const { t } = useI18n()
 const { required } = useValidator()
@@ -82,16 +83,16 @@ const botConfigRef = ref()
 
 // 表格列配置
 const columns = [
-  { field: 'botId', label: '机器人ID' },
+  { field: 'tg_bot_id', label: '机器人ID' },
   {
-    field: 'botUsername',
+    field: 'name',
     label: '机器人用户名',
     slots: {
       default: (data: any) => {
         return (
           <>
-            <ElLink type="primary" href={`https://t.me/woaihuaweiaaa_bot`} target="_blank">
-              {data.row.botUsername}
+            <ElLink type="primary" href={`https://t.me/${data.row.name}`} target="_blank">
+              {data.row.name}
             </ElLink>
           </>
         )
@@ -101,10 +102,33 @@ const columns = [
   {
     field: 'status',
     label: '状态',
-    formatter: (row) => (row.status === 1 ? '是' : '否')
+    // formatter: (row) => (row.status === 1 ? '是' : '否'),
+    slots: {
+      default: (data: any) => {
+        return (
+          <>
+            <ElSwitch v-model={data.row.status} onChange={() => handleStatusChange(data.row)} />
+          </>
+        )
+      }
+    }
   },
-  { field: 'createTime', label: '创建时间' },
-  { field: 'expireTime', label: '到期时间' }
+  {
+    field: 'auto_renew',
+    label: '自动续费',
+    // formatter: (row) => (row.auto_renew === 1 ? '是' : '否'),
+    slots: {
+      default: (data: any) => {
+        return (
+          <>
+            <ElSwitch v-model={data.row.auto_renew} onChange={() => handleStatusChange(data.row)} />
+          </>
+        )
+      }
+    }
+  },
+  { field: 'createTime', label: '创建时间', formatter: (row) => dateUtil(row.createTime).format('YYYY-MM-DD HH:mm:ss') },
+  { field: 'expireTime', label: '到期时间', formatter: (row) => dateUtil(row.expireTime).format('YYYY-MM-DD HH:mm:ss') }
 ]
 
 // 操作列配置
@@ -132,7 +156,7 @@ const actionColumn = {
 // 搜索表单配置
 const searchSchema = [
   {
-    field: 'botId',
+    field: 'tg_bot_id',
     component: 'Input',
     label: '机器人ID：',
     componentProps: {
@@ -141,7 +165,7 @@ const searchSchema = [
     }
   },
   {
-    field: 'botUsername',
+    field: 'name',
     component: 'Input',
     label: '机器人用户名：',
     componentProps: {
@@ -174,7 +198,7 @@ const formSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'botToken',
+    field: 'token',
     component: 'Input' as const,
     // label: '机器人token：',
     componentProps: {
@@ -195,7 +219,7 @@ const formSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'apiKey',
+    field: 'api_key',
     component: 'Input' as const,
     label: 'API秘钥：',
     componentProps: {
@@ -206,7 +230,7 @@ const formSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'adminTgAccount',
+    field: 'tg_admin',
     component: 'Input' as const,
     label: '管理员TG账号：',
     componentProps: {
@@ -217,7 +241,7 @@ const formSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'remark',
+    field: 'describe',
     component: 'Input' as const,
     label: '备注：',
     componentProps: {
@@ -250,13 +274,26 @@ const handleAdd = () => {
   // 重置表单
   formMethods.setValues({
     fee: '',
-    botToken: '',
-    apiKey: '',
-    adminTgAccount: '',
-    remark: '',
+    token: '',
+    api_key: '',
+    tg_admin: '',
+    describe: '',
     status: true
   })
 }
+
+// 状态切换
+const handleStatusChange = async (value) => {
+  console.log('状态切换:', value)
+  // 调用API更新状态
+  let res = await updateBotApi(value)
+  if(res.code === 200){
+    ElMessage.success('状态更新成功')
+  }else{
+    ElMessage.error('状态更新失败')
+  }
+}
+
 
 // 编辑
 const handleEdit = (row) => {
@@ -283,7 +320,7 @@ const handleSubmit = async () => {
 
     // 这里应该调用真实的API
     console.log('提交的表单数据2:', formData)
-
+    await addBotApi(formData)
     ElMessage.success(dialogType.value === 'add' ? t('common.addSuccess') : t('common.editSuccess'))
     dialogVisible.value = false
 
@@ -294,40 +331,13 @@ const handleSubmit = async () => {
 
 // 修改 fetchBotList 函数，修复数据加载问题
 const fetchBotList = async (params) => {
-  console.log('查询参数:', params)
-
-  return new Promise((resolve) => {
-    // 模拟异步请求
-    setTimeout(() => {
-      try {
-        // 生成测试数据
-        const list = Array.from({ length: 10 }).map((_, index) => ({
-          id: index + 1,
-          botId: `BOT_${index + 1}`,
-          botUsername: `机器人${index + 1}`,
-          status: Math.random() > 0.5 ? 1 : 0,
-          fee: Math.floor(Math.random() * 1000),
-          botToken: `token_${Math.random().toString(36).substring(2, 15)}`,
-          apiKey: `key_${Math.random().toString(36).substring(2, 10)}`,
-          adminTgAccount: `admin_${index}`,
-          remark: `这是机器人${index + 1}的备注信息`,
-          createTime: new Date().toLocaleString(),
-          expireTime: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleString()
-        }))
-
-        // 直接返回符合接口要求的对象格式
-        const result = {
-          list,
-          total: 100
-        }
-        resolve(result)
-      } catch (error) {
-        console.error('生成数据失败:', error)
-        // 出错时返回空数组
-        resolve({ list: [], total: 0 })
-      }
-    }, 300)
-  })
+  try {
+    const response = await getBotListApi(params)
+    return response?.data
+  } catch (error) {
+    console.error('获取菜单列表失败:', error)
+    return { list: [], total: 0 }
+  }
 }
 
 // 模拟删除API

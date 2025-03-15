@@ -39,7 +39,7 @@ const { required } = useFormValidation({})
 // 机器人信息表单
 const botInfoSchema = reactive<FormSchema[]>([
   {
-    field: 'botId',
+    field: 'tg_bot_id',
     component: 'Input' as const,
     label: '机器人ID：',
     componentProps: {
@@ -47,7 +47,7 @@ const botInfoSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'botName',
+    field: 'name',
     component: 'Input' as const,
     label: '机器人昵称：',
     componentProps: {
@@ -58,7 +58,7 @@ const botInfoSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'botUsername',
+    field: 'username',
     component: 'Input' as const,
     label: '机器人用户名：',
     componentProps: {
@@ -66,7 +66,7 @@ const botInfoSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'botToken',
+    field: 'token',
     component: 'Input' as const,
     label: '机器人Token：',
     componentProps: {
@@ -74,7 +74,7 @@ const botInfoSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'apiKey',
+    field: 'api_key',
     component: 'Input' as const,
     label: 'API秘钥：',
     componentProps: {
@@ -82,7 +82,7 @@ const botInfoSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'adminTgAccount',
+    field: 'tg_admin',
     component: 'Input' as const,
     label: '管理员TG账号：',
     componentProps: {
@@ -115,7 +115,7 @@ const botInfoSchema = reactive<FormSchema[]>([
     value: true
   },
   {
-    field: 'TGstatus',
+    field: 'tg_verify_status',
     component: 'Tag' as const,
     label: 'TG同步状态：',
     componentProps: {
