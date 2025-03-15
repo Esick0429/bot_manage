@@ -113,14 +113,14 @@ const rules = computed<FormRules>(() => {
         password: [required()],
         check_password: [required()],
         phone: [required(), phone()],
-        code: [required()],
+        code: [required()]
       }
     : {
         username: [required()],
         password: [required()],
         check_password: [required()],
         email: [required(), email()],
-        code: [required()],
+        code: [required()]
       }
 })
 
