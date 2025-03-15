@@ -8,7 +8,8 @@ import {
   FormRules,
   ComponentSize,
   ElTag,
-  ElInputNumber
+  ElInputNumber,
+  ElInput
   // FormItemProp
 } from 'element-plus'
 import { componentMap } from './helper/componentMap'
@@ -310,8 +311,9 @@ export default defineComponent({
               }
             }
 
-            if (item.component === ComponentNameEnum.INPUT_NUMBER && item.componentProps.remark) {
-              return (
+            if (item.component === ComponentNameEnum.INPUT_NUMBER || item.component === ComponentNameEnum.INPUT && item.componentProps.remark) {
+              if(item.component === ComponentNameEnum.INPUT_NUMBER){
+                return (
                 <>
                   <ElInputNumber
                     v-model={formModel.value[item.field]}
@@ -325,6 +327,22 @@ export default defineComponent({
                   </div>
                 </>
               )
+              }else{
+                return (
+                  <>
+                    <ElInput
+                      v-model={formModel.value[item.field]}
+                      {...(item?.componentProps as any)}
+                      style="width: 100%"
+                    />
+                    <div class="mt-2 text-10px leading-12px">
+                      {typeof item.componentProps.remark === 'function'
+                        ? item.componentProps.remark()
+                        : item.componentProps.remark}
+                    </div>
+                  </>
+                )
+              }
             }
             // 单选框组和按钮样式
             if (
