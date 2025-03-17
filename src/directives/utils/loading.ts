@@ -29,7 +29,7 @@ const loading: Directive = {
       loadingMap.set(el, instance)
     }
   },
-  
+
   updated(el: HTMLElement, binding: DirectiveBinding) {
     // 值改变时处理loading状态
     if (binding.value !== binding.oldValue) {
@@ -39,7 +39,7 @@ const loading: Directive = {
           const instance = loadingMap.get(el)
           instance?.close()
         }
-        
+
         // 创建新实例
         const options = getOptions(el, binding)
         const instance = ElLoading.service(options)
@@ -54,7 +54,7 @@ const loading: Directive = {
       }
     }
   },
-  
+
   unmounted(el: HTMLElement) {
     // 组件卸载时关闭loading
     const instance = loadingMap.get(el)
@@ -72,28 +72,28 @@ function getOptions(el: HTMLElement, binding: DirectiveBinding): LoadingOptions 
   const options: LoadingOptions = {
     target: el
   }
-  
+
   // 从元素属性中获取选项
   if (el.hasAttribute('loading-text')) {
     options.text = el.getAttribute('loading-text') || undefined
   }
-  
+
   if (el.hasAttribute('loading-background')) {
     options.background = el.getAttribute('loading-background') || undefined
   }
-  
+
   if (el.hasAttribute('loading-fullscreen')) {
     options.fullscreen = true
   }
-  
+
   if (el.hasAttribute('loading-body')) {
     options.body = true
   }
-  
+
   if (el.hasAttribute('loading-lock')) {
     options.lock = true
   }
-  
+
   return options
 }
 
@@ -101,4 +101,4 @@ export const setupLoadingDirective = (app: App<Element>) => {
   app.directive('loading', loading)
 }
 
-export default loading 
+export default loading

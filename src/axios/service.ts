@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios'
 import { defaultRequestInterceptors, defaultResponseInterceptors } from './config'
 import { AxiosInstance, InternalAxiosRequestConfig, RequestConfig, AxiosResponse } from './types'
-import { ElMessage} from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { REQUEST_TIMEOUT } from '@/constants'
 import { useAppStore } from '@/store/modules/app'
 
@@ -18,7 +18,6 @@ axiosInstance.interceptors.request.use((res: InternalAxiosRequestConfig) => {
   const controller = new AbortController()
   let url = res.url || ''
   let MOCK_LIST = useAppStore().mockList
-  console.log('MOCK_LIST', MOCK_LIST)
   // 如果启用了mock并且是bot相关请求，添加/mock前缀
   if (
     import.meta.env.VITE_USE_MOCK === 'true' &&

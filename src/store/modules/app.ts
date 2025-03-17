@@ -32,7 +32,7 @@ interface AppState {
   mobile: boolean
   footer: boolean
   theme: ThemeTypes
-  fixedMenu: boolean,
+  fixedMenu: boolean
   mockList: string[]
 }
 
@@ -60,7 +60,7 @@ export const useAppStore = defineStore('app', {
       dynamicRouter: false, // 是否动态路由
       serverDynamicRouter: false, // 是否服务端渲染动态路由
       fixedMenu: false, // 是否固定菜单
-      mockList: ['/recharge_order','/menu_list','/energy_order'], // 需要mock的接口
+      mockList: ['/recharge_order', '/menu_list', '/energy_order'], // 需要mock的接口
       layout: 'classic', // layout布局
       isDark: false, // 是否是暗黑模式
       currentSize: 'default', // 组件尺寸

@@ -311,23 +311,27 @@ export default defineComponent({
               }
             }
 
-            if ((item.component === ComponentNameEnum.INPUT_NUMBER || item.component === ComponentNameEnum.INPUT) && item.componentProps.remark) {
-              if(item.component === ComponentNameEnum.INPUT_NUMBER){
+            if (
+              (item.component === ComponentNameEnum.INPUT_NUMBER ||
+                item.component === ComponentNameEnum.INPUT) &&
+              item.componentProps.remark
+            ) {
+              if (item.component === ComponentNameEnum.INPUT_NUMBER) {
                 return (
-                <>
-                  <ElInputNumber
-                    v-model={formModel.value[item.field]}
-                    {...(item?.componentProps as any)}
-                    style="width: 100%"
-                  />
-                  <div class="mt-2 text-10px leading-12px">
-                    {typeof item.componentProps.remark === 'function'
-                      ? item.componentProps.remark()
-                      : item.componentProps.remark}
-                  </div>
-                </>
-              )
-              }else{
+                  <>
+                    <ElInputNumber
+                      v-model={formModel.value[item.field]}
+                      {...(item?.componentProps as any)}
+                      style="width: 100%"
+                    />
+                    <div class="mt-2 text-10px leading-12px">
+                      {typeof item.componentProps.remark === 'function'
+                        ? item.componentProps.remark()
+                        : item.componentProps.remark}
+                    </div>
+                  </>
+                )
+              } else {
                 return (
                   <>
                     <ElInput
