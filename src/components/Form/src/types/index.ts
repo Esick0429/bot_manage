@@ -116,6 +116,10 @@ export interface InputNumberComponentProps extends Partial<InputNumberProps> {
     blur?: (event: FocusEvent) => void
     focus?: (event: FocusEvent) => void
   }
+  slots?: {
+    prefix?: (...args: any[]) => JSX.Element | null
+    suffix?: (...args: any[]) => JSX.Element | null
+  }
   style?: CSSProperties
 }
 
