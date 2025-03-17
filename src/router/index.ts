@@ -131,7 +131,7 @@ export const newRouterMap: AppRouteRecordRaw[] = [
           icon: 'vi-bx:bxs-component'
         }
       },
-    {
+      {
         path: 'menu_list',
         component: () => import('@/views/Bot_manage/menu_list/index.vue'),
         name: 'MenuList',
@@ -219,7 +219,7 @@ export const newRouterMap: AppRouteRecordRaw[] = [
         }
       }
     ]
-  },
+  }
   // {
   //   path: '/data_statistics',
   //   component: Layout,

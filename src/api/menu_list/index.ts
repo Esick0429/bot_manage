@@ -13,4 +13,4 @@ export const deleteMenuApi = (id: number) => {
 // 保存菜单（新增或更新）
 export const saveMenuApi = (data: any) => {
   return request.post({ url: '/menu_list/save', data })
-} 
+}
