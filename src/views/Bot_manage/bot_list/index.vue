@@ -56,7 +56,7 @@
 </template>
 
 <script setup lang="tsx">
-import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { ref, reactive, computed, onMounted, h, nextTick } from 'vue'
 import { ElButton, ElLink, ElMessage, ElMessageBox, ElSwitch } from 'element-plus'
 import { ContentWrap } from '@/components/ContentWrap'
 import { Dialog } from '@/components/Dialog'
@@ -73,13 +73,29 @@ import { getBotListApi, addBotApi,updateBotApi } from '@/api/botlist'
 import { Icon } from '@/components/Icon'
 import { Tips } from '@/components/Tips'
 import { dateUtil } from '@/utils/dateUtil'
+import { useRoute } from 'vue-router'
+interface SearchTableInstance {
+  reload: () => Promise<void>
+  reset: () => Promise<any>
+  search: () => Promise<any>
+  delete: (row: any) => Promise<boolean>
+  currentRow: any
+  tableMethods: any
+  searchMethods: any
+  tableState: any
+  searchParams: any
+  setSearchParams: (params: any) => any
+  hasError: boolean
+}
+
+const searchTableRef = ref<SearchTableInstance | null>(null)
 
 const { t } = useI18n()
 const { required } = useValidator()
-const searchTableRef = ref(null)
 const consumptionRecordRef = ref()
 const renewBotRef = ref()
 const botConfigRef = ref()
+const isLoaded = ref(false)
 
 // 表格列配置
 const columns = [
@@ -303,6 +319,7 @@ const handleAdd = () => {
 
 // 状态切换
 const handleStatusChange = async (value) => {
+  if (!isLoaded.value) return
   console.log('状态切换:', value)
   // 调用API更新状态
   let res = await updateBotApi(value)
@@ -382,7 +399,9 @@ const handleDataLoaded = ({ data, total, success }) => {
     数据: data,
     条数: data?.length || 0
   })
-
+  nextTick(() => {
+    isLoaded.value = true
+  })
   if (data?.length === 0 && success) {
     ElMessage.info('未查询到符合条件的数据')
   }
@@ -429,9 +448,14 @@ const handleConfigSuccess = () => {
 
 // 手动触发加载
 onMounted(() => {
+  const query = useRoute().query
+  console.log('query', query)
   // 确保组件挂载后可以访问表格实例
   setTimeout(() => {
     if (searchTableRef.value) {
+      searchTableRef.value.setSearchParams({
+        name: query.name
+      })
       console.log('手动触发数据刷新')
       searchTableRef.value.reload()
     }

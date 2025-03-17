@@ -27,7 +27,7 @@ export const addBotApi = (data: any) => {
 
 // 编辑机器人
 export const updateBotApi = (data: any) => {
-  return request.put({ url: '/v1/bot/update', data })
+  return request.post({ url: '/v1/bot/update', data })
 }
 
 // 删除机器人
@@ -41,7 +41,7 @@ export const syncTgStatusApi = (botId: string) => {
 }
 
 // 机器人续费
-export const renewBotApi = (data: { botId: string; months: number }) => {
+export const renewBotApi = (data: { id: string; months: number }) => {
   return request.post({ url: '/v1/bot/renew', data })
 }
 
@@ -52,7 +52,7 @@ export const getBotPaymentConfigApi = (botId: string) => {
 
 // 更新机器人收款配置
 export const updateBotPaymentConfigApi = (data: any) => {
-  return request.put({ url: '/v1/bot/payment-config/update', data })
+  return request.post({ url: '/v1/bot/payment-config/update', data })
 }
 
 // 获取机器人时间能量价格配置
@@ -62,7 +62,7 @@ export const getBotTimeEnergyConfigApi = (botId: string) => {
 
 // 更新机器人时间能量价格配置
 export const updateBotTimeEnergyConfigApi = (data: any) => {
-  return request.put({ url: '/v1/bot/time-energy-config/update', data })
+  return request.post({ url: '/v1/bot/time-energy-config/update', data })
 }
 
 // 获取机器人笔数能量价格配置
@@ -72,7 +72,7 @@ export const getBotCountEnergyConfigApi = (botId: string) => {
 
 // 更新机器人笔数能量价格配置
 export const updateBotCountEnergyConfigApi = (data: any) => {
-  return request.put({ url: '/v1/bot/count-energy-config/update', data })
+  return request.post({ url: '/v1/bot/count-energy-config/update', data })
 }
 
 // 获取机器人托管模式价格配置
@@ -82,7 +82,7 @@ export const getBotManagedModeConfigApi = (botId: string) => {
 
 // 更新机器人托管模式价格配置
 export const updateBotManagedModeConfigApi = (data: any) => {
-  return request.put({ url: '/v1/bot/managed-mode-config/update', data })
+  return request.post({ url: '/v1/bot/managed-mode-config/update', data })
 }
 
 // 获取机器人批量下单价格配置
@@ -92,7 +92,7 @@ export const getBotBatchOrderConfigApi = (botId: string) => {
 
 // 更新机器人批量下单价格配置
 export const updateBotBatchOrderConfigApi = (data: any) => {
-  return request.put({ url: '/v1/bot/batch-order-config/update', data })
+  return request.post({ url: '/v1/bot/batch-order-config/update', data })
 }
 
 // 获取机器人闪兑配置
@@ -102,10 +102,10 @@ export const getBotFlashExchangeConfigApi = (botId: string) => {
 
 // 更新机器人闪兑配置
 export const updateBotFlashExchangeConfigApi = (data: any) => {
-  return request.put({ url: '/v1/bot/flash-exchange-config/update', data })
+  return request.post({ url: '/v1/bot/flash-exchange-config/update', data })
 }
 
 // 更新所有机器人配置（一次性提交所有配置）
 export const updateBotAllConfigsApi = (data: any) => {
-  return request.put({ url: '/v1/bot/update-all-configs', data })
+  return request.post({ url: '/v1/bot/update-all-configs', data })
 }
