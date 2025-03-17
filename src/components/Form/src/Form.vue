@@ -311,7 +311,7 @@ export default defineComponent({
               }
             }
 
-            if (item.component === ComponentNameEnum.INPUT_NUMBER || item.component === ComponentNameEnum.INPUT && item.componentProps.remark) {
+            if ((item.component === ComponentNameEnum.INPUT_NUMBER || item.component === ComponentNameEnum.INPUT) && item.componentProps.remark) {
               if(item.component === ComponentNameEnum.INPUT_NUMBER){
                 return (
                 <>

@@ -18,7 +18,8 @@ import {
   ElAutocomplete,
   ElDivider,
   ElTreeSelect,
-  ElUpload
+  ElUpload,
+  ElTag
 } from 'element-plus'
 import { InputPassword } from '@/components/InputPassword'
 import { Editor } from '@/components/Editor'
@@ -53,7 +54,8 @@ const componentMap: Recordable<Component, ComponentName> = {
   Upload: ElUpload,
   JsonEditor: JsonEditor,
   IconPicker: IconPicker,
-  IAgree: IAgree
+  IAgree: IAgree,
+  Tag: ElTag
 }
 
 export { componentMap }
