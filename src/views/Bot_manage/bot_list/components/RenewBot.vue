@@ -18,7 +18,7 @@ import { Dialog } from '@/components/Dialog'
 import { Form, FormSchema } from '@/components/Form'
 import { useForm } from '@/hooks/web/useForm'
 import { useValidator } from '@/hooks/web/useValidator'
-
+import { renewBotApi } from '@/api/botlist'
 const props = defineProps({
   fee: {
     type: [Number, String],
@@ -79,16 +79,11 @@ const submit = async () => {
     const formData = await formMethods.getFormData()
 
     try {
-      // 这里应该调用真实的续费API
-      console.log('提交的续费数据:', {
-        ...formData,
-        tg_bot_id: currentBot.value.tg_bot_id,
-        botUsername: currentBot.value.botUsername
+      const res = await renewBotApi({
+        id: currentBot.value.tg_bot_id,
+        months: formData.months
       })
-
-      // 模拟API调用
-      await new Promise((resolve) => setTimeout(resolve, 500))
-
+      console.log('续费结果:', res)
       ElMessage.success('续费成功')
       dialogVisible.value = false
       emit('success')

@@ -10,13 +10,13 @@ export interface SearchTableState {
   dataList: any[]
   pageSize: number
   currentPage: number
-  total: number
+  totalCount: number
 }
 
 interface UseSearchTableConfig {
   searchSchema?: FormSchema[] // 查询表单配置
   tableColumns: TableColumn[] // 表格列配置
-  fetchDataApi: (params?: any) => Promise<{ list: any[]; total?: number }>
+  fetchDataApi: (params?: any) => Promise<{ list: any[]; totalCount?: number }>
   fetchDelApi?: () => Promise<boolean>
   immediate?: boolean
   defaultParams?: Recordable // 默认参数
@@ -52,7 +52,7 @@ export const useSearchTable = (config: UseSearchTableConfig) => {
         // 返回处理后的结果
         return {
           list: result.list || [],
-          total: result.total
+          total: result.totalCount
         }
       } catch (error) {
         console.error('搜索操作失败:', error)
@@ -169,7 +169,9 @@ export const useSearchTable = (config: UseSearchTableConfig) => {
 
   // 设置参数
   const setSearchParams = (params: Recordable) => {
+    console.log('设置参数', params)
     searchParams.value = { ...searchParams.value, ...params }
+    searchMethods.setValues(searchParams.value)
     return searchParams.value
   }
 

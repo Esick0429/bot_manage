@@ -3,6 +3,7 @@ import { defaultRequestInterceptors, defaultResponseInterceptors } from './confi
 import { AxiosInstance, InternalAxiosRequestConfig, RequestConfig, AxiosResponse } from './types'
 import { ElMessage} from 'element-plus'
 import { REQUEST_TIMEOUT } from '@/constants'
+import { useAppStore } from '@/store/modules/app'
 
 export const PATH_URL = import.meta.env.VITE_API_BASE_PATH
 
@@ -16,7 +17,8 @@ const axiosInstance: AxiosInstance = axios.create({
 axiosInstance.interceptors.request.use((res: InternalAxiosRequestConfig) => {
   const controller = new AbortController()
   let url = res.url || ''
-  let MOCK_LIST = ['/bot', '/menu_list']
+  let MOCK_LIST = useAppStore().mockList
+  console.log('MOCK_LIST', MOCK_LIST)
   // 如果启用了mock并且是bot相关请求，添加/mock前缀
   if (
     import.meta.env.VITE_USE_MOCK === 'true' &&

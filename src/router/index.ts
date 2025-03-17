@@ -118,7 +118,7 @@ export const newRouterMap: AppRouteRecordRaw[] = [
     name: 'BotManage',
     meta: {
       title: '机器人管理',
-      icon: 'vi-bx:bxs-robot',
+      icon: 'lucide:bot',
       alwaysShow: true
     },
     children: [
@@ -131,7 +131,7 @@ export const newRouterMap: AppRouteRecordRaw[] = [
           icon: 'vi-bx:bxs-component'
         }
       },
-      {
+    {
         path: 'menu_list',
         component: () => import('@/views/Bot_manage/menu_list/index.vue'),
         name: 'MenuList',
@@ -141,7 +141,7 @@ export const newRouterMap: AppRouteRecordRaw[] = [
         }
       }
     ]
-  }
+  },
   // {
   //   path: '/user_group',
   //   component: Layout,
@@ -172,54 +172,54 @@ export const newRouterMap: AppRouteRecordRaw[] = [
   //     }
   //   ]
   // },
-  // {
-  //   path: '/order_manage',
-  //   component: Layout,
-  //   name: 'OrderManage',
-  //   meta: {
-  //     title: '订单管理',
-  //     icon: 'vi-mdi:order-bool-ascending-variant',
-  //     alwaysShow: true
-  //   },
-  //   children: [
-  //     {
-  //       path: 'recharge_order',
-  //       component: () => import('@/views/OrderManage/recharge_order/index.vue'),
-  //       name: 'RechargeOrder',
-  //       meta: {
-  //         title: '充值订单',
-  //         icon: 'vi-mdi:credit-card-plus-outline'
-  //       }
-  //     },
-  //     {
-  //       path: 'energy_order',
-  //       component: () => import('@/views/OrderManage/energy_order/index.vue'),
-  //       name: 'EnergyOrder',
-  //       meta: {
-  //         title: '能量订单',
-  //         icon: 'vi-mdi:lightning-bolt'
-  //       }
-  //     },
-  //     {
-  //       path: 'hosted_order',
-  //       component: () => import('@/views/OrderManage/hosted_order/index.vue'),
-  //       name: 'HostedOrder',
-  //       meta: {
-  //         title: '托管订单',
-  //         icon: 'vi-mdi:server'
-  //       }
-  //     },
-  //     {
-  //       path: 'exchange_order',
-  //       component: () => import('@/views/OrderManage/exchange_order/index.vue'),
-  //       name: 'ExchangeOrder',
-  //       meta: {
-  //         title: '兑换订单',
-  //         icon: 'vi-mdi:swap-horizontal'
-  //       }
-  //     }
-  //   ]
-  // },
+  {
+    path: '/order_manage',
+    component: Layout,
+    name: 'OrderManage',
+    meta: {
+      title: '订单管理',
+      icon: 'vi-mdi:order-bool-ascending-variant',
+      alwaysShow: true
+    },
+    children: [
+      {
+        path: 'recharge_order',
+        component: () => import('@/views/OrderManage/recharge_order/index.vue'),
+        name: 'RechargeOrder',
+        meta: {
+          title: '充值订单',
+          icon: 'vi-mdi:credit-card-plus-outline'
+        }
+      },
+      {
+        path: 'energy_order',
+        component: () => import('@/views/OrderManage/energy_order/index.vue'),
+        name: 'EnergyOrder',
+        meta: {
+          title: '能量订单',
+          icon: 'vi-mdi:lightning-bolt'
+        }
+      },
+      {
+        path: 'hosted_order',
+        component: () => import('@/views/OrderManage/hosted_order/index.vue'),
+        name: 'HostedOrder',
+        meta: {
+          title: '托管订单',
+          icon: 'vi-mdi:server'
+        }
+      },
+      {
+        path: 'exchange_order',
+        component: () => import('@/views/OrderManage/exchange_order/index.vue'),
+        name: 'ExchangeOrder',
+        meta: {
+          title: '兑换订单',
+          icon: 'vi-mdi:swap-horizontal'
+        }
+      }
+    ]
+  },
   // {
   //   path: '/data_statistics',
   //   component: Layout,
