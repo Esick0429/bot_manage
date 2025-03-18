@@ -21,6 +21,9 @@
           layout: 'inline',
           buttonPosition: 'center'
         }"
+        :pagination="{
+          total: totalCount
+        }"
       >
         <template #searchButtons>
           <BaseButton type="primary" @click="openConsumptionRecord">消费记录</BaseButton>
@@ -57,7 +60,7 @@
 
 <script setup lang="tsx">
 import { ref, reactive, computed, onMounted, h, nextTick } from 'vue'
-import { ElButton, ElLink, ElMessage, ElMessageBox, ElSwitch } from 'element-plus'
+import { ElButton, ElLink, ElMessage, ElMessageBox, ElSwitch, ElInputNumber } from 'element-plus'
 import { ContentWrap } from '@/components/ContentWrap'
 import { Dialog } from '@/components/Dialog'
 import { Form, FormSchema } from '@/components/Form'
@@ -69,7 +72,7 @@ import { BaseButton } from '@/components/Button'
 import ConsumptionRecord from './components/ConsumptionRecord.vue'
 import RenewBot from './components/RenewBot.vue'
 import BotConfig from './components/BotConfig.vue'
-import { getBotListApi, addBotApi,updateBotApi } from '@/api/botlist'
+import { getBotListApi, addBotApi, updateBotApi } from '@/api/botlist'
 import { Icon } from '@/components/Icon'
 import { Tips } from '@/components/Tips'
 import { dateUtil } from '@/utils/dateUtil'
@@ -123,7 +126,12 @@ const columns = [
       default: (data: any) => {
         return (
           <>
-            <ElSwitch v-model={data.row.status} onChange={() => handleStatusChange(data.row)} />
+            <ElSwitch
+              v-model={data.row.status}
+              activeValue={1}
+              inactiveValue={2}
+              onChange={() => handleStatusChange(data.row)}
+            />
           </>
         )
       }
@@ -145,14 +153,26 @@ const columns = [
       default: (data: any) => {
         return (
           <>
-            <ElSwitch v-model={data.row.auto_renew} onChange={() => handleStatusChange(data.row)} />
+            <ElSwitch
+              v-model={data.row.auto_renew}
+              activeValue={1}
+              inactiveValue={2}
+              onChange={() => handleStatusChange(data.row)}
+            />
           </>
         )
       }
     }
   },
-  { field: 'createTime', label: '创建时间', formatter: (row) => dateUtil(row.createTime).format('YYYY-MM-DD HH:mm:ss') },
-  { field: 'expireTime', label: '到期时间', formatter: (row) => dateUtil(row.expireTime).format('YYYY-MM-DD HH:mm:ss'),
+  {
+    field: 'createTime',
+    label: '创建时间',
+    formatter: (row) => dateUtil(row.create_time).format('YYYY-MM-DD HH:mm:ss')
+  },
+  {
+    field: 'expireTime',
+    label: '到期时间',
+    formatter: (row) => dateUtil(row.expire_time).format('YYYY-MM-DD HH:mm:ss'),
     slots: {
       header: () => {
         return (
@@ -192,7 +212,7 @@ const actionColumn = {
 const searchSchema = [
   {
     field: 'tg_bot_id',
-    component: 'Input',
+    component: 'Input' as const,
     label: '机器人ID：',
     componentProps: {
       placeholder: '请输入机器人ID',
@@ -201,7 +221,7 @@ const searchSchema = [
   },
   {
     field: 'name',
-    component: 'Input',
+    component: 'Input' as const,
     label: '机器人用户名：',
     componentProps: {
       placeholder: '请输入机器人用户名',
@@ -214,10 +234,18 @@ const searchSchema = [
 const formSchema = reactive<FormSchema[]>([
   {
     field: 'fee',
-    component: 'Input' as const,
+    component: 'InputNumber' as const,
     // label: '机器人费用：',
     componentProps: {
-      placeholder: '请输入机器人费用'
+      placeholder: '请输入机器人费用',
+      min: 0,
+      precision: 2,
+      disabled: true,
+      slots: {
+        suffix: () => {
+          return <span>TRX/个</span>
+        }
+      }
     },
     formItemProps: {
       slots: {
@@ -237,7 +265,12 @@ const formSchema = reactive<FormSchema[]>([
     component: 'Input' as const,
     // label: '机器人token：',
     componentProps: {
-      placeholder: '请输入机器人token'
+      placeholder: '请输入机器人token',
+      slots: {
+        suffix: () => {
+          return <span>123123</span>
+        }
+      }
     },
     formItemProps: {
       rules: [required()],
@@ -253,17 +286,17 @@ const formSchema = reactive<FormSchema[]>([
       }
     }
   },
-  {
-    field: 'api_key',
-    component: 'Input' as const,
-    label: 'API秘钥：',
-    componentProps: {
-      placeholder: '请输入API秘钥'
-    },
-    formItemProps: {
-      rules: [required()]
-    }
-  },
+  // {
+  //   field: 'api_key',
+  //   component: 'Input' as const,
+  //   label: 'API秘钥：',
+  //   componentProps: {
+  //     placeholder: '请输入API秘钥'
+  //   },
+  //   formItemProps: {
+  //     rules: [required()]
+  //   }
+  // },
   {
     field: 'tg_admin',
     component: 'Input' as const,
@@ -291,7 +324,11 @@ const formSchema = reactive<FormSchema[]>([
     field: 'status',
     component: 'Switch' as const,
     label: '状态：',
-    value: true
+    value: true,
+    componentProps: {
+      activeValue: 1,
+      inactiveValue: 2
+    }
   }
 ]) as FormSchema[]
 
@@ -308,12 +345,12 @@ const handleAdd = () => {
   dialogVisible.value = true
   // 重置表单
   formMethods.setValues({
-    fee: '',
+    fee: 100,
     token: '',
     api_key: '',
     tg_admin: '',
     describe: '',
-    status: true
+    status: 2
   })
 }
 
@@ -323,14 +360,13 @@ const handleStatusChange = async (value) => {
   console.log('状态切换:', value)
   // 调用API更新状态
   let res = await updateBotApi(value)
-  if(res.code === 200){
+  if (res.code === '000000') {
     ElMessage.success('状态更新成功')
-  }else{
+  } else {
     ElMessage.error('状态更新失败')
   }
+  console.log('状态切换结果:', res)
 }
-
-
 // 编辑
 const handleEdit = (row) => {
   if (botConfigRef.value) {
@@ -357,7 +393,7 @@ const handleSubmit = async () => {
     // 这里应该调用真实的API
     console.log('提交的表单数据2:', formData)
     await addBotApi(formData)
-    ElMessage.success(dialogType.value === 'add' ? t('common.addSuccess') : t('common.editSuccess'))
+    ElMessage.success(dialogType.value === 'add' ? '添加成功' : '编辑成功')
     dialogVisible.value = false
 
     // 刷新表格数据
@@ -365,13 +401,15 @@ const handleSubmit = async () => {
   })
 }
 
+const totalCount = ref(0)
 // 修改 fetchBotList 函数，修复数据加载问题
 const fetchBotList = async (params) => {
   try {
     const response = await getBotListApi(params)
+    totalCount.value = response?.data?.totalCount || 0
     return response?.data
   } catch (error) {
-    console.error('获取菜单列表失败:', error)
+    console.error('获取机器人列表失败:', error)
     return { list: [], total: 0 }
   }
 }

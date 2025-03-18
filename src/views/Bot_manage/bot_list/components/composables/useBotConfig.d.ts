@@ -20,7 +20,7 @@ export interface BotConfig {
   submitting: Ref<boolean>
   costPrices: Record<string, number>
   syncTgStatus: () => Promise<void>
-  loadBotAllConfigs: (tg_bot_id: string, formMethods: FormMethods) => Promise<void>
+  loadBotAllConfigs: (id: number, formMethods: FormMethods) => Promise<void>
   submitConfig: (formMethods: FormMethods) => Promise<boolean>
 }
 

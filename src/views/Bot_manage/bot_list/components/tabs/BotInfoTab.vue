@@ -58,7 +58,7 @@ const botInfoSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'username',
+    field: 'firstname',
     component: 'Input' as const,
     label: '机器人用户名：',
     componentProps: {
@@ -99,7 +99,7 @@ const botInfoSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'remark',
+    field: 'describe',
     component: 'Input' as const,
     label: '备注：',
     componentProps: {
@@ -112,7 +112,11 @@ const botInfoSchema = reactive<FormSchema[]>([
     field: 'status',
     component: 'Switch' as const,
     label: '状态：',
-    value: true
+    value: 1,
+    componentProps: {
+      activeValue: 1,
+      inactiveValue: 2
+    }
   },
   {
     field: 'tg_verify_status',
