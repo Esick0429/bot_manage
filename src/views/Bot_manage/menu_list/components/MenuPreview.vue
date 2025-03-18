@@ -1,0 +1,316 @@
+<script setup lang="tsx">
+import { ref, computed, watch, nextTick } from 'vue'
+import { ElRow, ElCol, ElButton, ElMessage } from 'element-plus'
+import { Dialog } from '@/components/Dialog'
+import { getMenuListApi, saveMenuApi } from '@/api/menu_list'
+import { useDraggable } from '@/hooks/event/useDraggable'
+
+// 定义菜单项接口
+interface MenuItem {
+  id: number
+  name: string
+  type: string
+  sort: number
+  other?: string
+  status: number
+  span?: number
+  text?: string
+}
+
+// 定义预览内容区域的ref
+const previewRef = ref<HTMLElement | null>(null)
+// 加载状态
+const loading = ref(false)
+
+// 定义菜单布局类型
+type MenuLayout = (MenuItem | null)[][]
+
+const props = defineProps<{
+  modelValue: boolean
+}>()
+
+const emit = defineEmits(['update:modelValue'])
+
+// 预览弹窗显示状态
+const previewVisible = computed({
+  get: () => props.modelValue,
+  set: (value) => emit('update:modelValue', value)
+})
+
+// 菜单布局数据
+const keyboardLayout = ref<MenuLayout>([])
+// 原始菜单数据
+const originalMenuList = ref<MenuItem[]>([])
+// 是否有未保存的更改
+const hasChanges = ref(false)
+
+// 将一维数组转换为4*3布局
+const convertToKeyboardLayout = (list: MenuItem[]) => {
+  // 保存原始数据
+  originalMenuList.value = [...list]
+
+  // 创建一个4*3的二维数组
+  const layout: MenuLayout = Array(4)
+    .fill(null)
+    .map(() => Array(3).fill(null))
+
+  // 根据sort值将菜单项放入对应位置
+  list.forEach((item) => {
+    if (!item || !item.name) return
+
+    const row = Math.floor((item.sort - 1) / 3)
+    const col = (item.sort - 1) % 3
+
+    if (row < 4 && col < 3) {
+      layout[row][col] = {
+        ...item,
+        text: item.name,
+        span: 24
+      }
+    }
+  })
+
+  // 过滤掉全为null的行，并计算每行的span值
+  return layout
+    .filter((row) => row.some((item) => item !== null))
+    .map((row) => {
+      const validItems = row.filter((item) => item !== null)
+      const span = validItems.length === 0 ? 0 : 24 / validItems.length
+      return row.map((item) => (item ? { ...item, span } : null))
+    })
+}
+
+// 获取菜单数据
+const fetchMenuData = async () => {
+  try {
+    // 设置加载状态
+    loading.value = true
+
+    // 确保DOM已更新并且previewRef已指向实际元素
+    await nextTick()
+
+    // 获取菜单数据
+    const data = await getMenuListApi({})
+    keyboardLayout.value = convertToKeyboardLayout(data.data.list || [])
+    hasChanges.value = false
+  } catch (error) {
+    console.error('获取菜单预览失败:', error)
+    ElMessage.error('获取菜单预览失败')
+  } finally {
+    // 无论成功或失败，都结束loading
+    loading.value = false
+  }
+}
+
+// 处理拖拽完成后的更新
+const onDragEnd = (
+  newLayout: MenuLayout,
+  oldLayout: MenuLayout,
+  startPos: { row: number; col: number },
+  endPos: { row: number; col: number }
+) => {
+  // 更新布局并重新计算span值
+  keyboardLayout.value = newLayout.map((row) => {
+    const validItems = row.filter((item): item is MenuItem => item !== null)
+    const span = validItems.length === 0 ? 0 : 24 / validItems.length
+    return row.map((item) => (item ? { ...item, span } : null))
+  })
+  hasChanges.value = true
+}
+
+// 使用拖拽hook
+const {
+  isDragging,
+  dragItem,
+  handleDragStart,
+  handleDragOver,
+  handleDragEnter,
+  handleDrop,
+  handleDragEnd
+} = useDraggable({
+  onDragEnd
+})
+
+// 保存菜单排序
+const saveMenuOrder = async () => {
+  if (!hasChanges.value) return
+
+  try {
+    // 设置加载状态
+    loading.value = true
+
+    // 从布局中提取更新后的菜单项
+    const updatedMenuItems: Array<{ id: number; sort: number }> = []
+
+    for (let rowIndex = 0; rowIndex < keyboardLayout.value.length; rowIndex++) {
+      const row = keyboardLayout.value[rowIndex]
+      for (let colIndex = 0; colIndex < row.length; colIndex++) {
+        const item = row[colIndex]
+        if (item) {
+          // 计算新的sort值
+          const sort = rowIndex * 3 + colIndex + 1
+          updatedMenuItems.push({
+            id: item.id,
+            sort: sort
+          })
+        }
+      }
+    }
+
+    // 为每个更改过的菜单项调用保存API
+    for (const item of updatedMenuItems) {
+      // 查找原始数据
+      const originalItem = originalMenuList.value.find((menu) => menu.id === item.id)
+      if (originalItem && originalItem.sort !== item.sort) {
+        await saveMenuApi({
+          ...originalItem,
+          sort: item.sort
+        })
+      }
+    }
+
+    ElMessage.success('菜单排序已保存')
+    hasChanges.value = false
+
+    // 重新获取最新数据
+    await fetchMenuData()
+  } catch (error) {
+    console.error('保存菜单排序失败:', error)
+    ElMessage.error('保存失败，请重试')
+  } finally {
+    // 结束加载状态
+    loading.value = false
+  }
+}
+
+// 监听弹窗显示状态变化
+watch(
+  () => previewVisible.value,
+  (newVal) => {
+    if (newVal) {
+      fetchMenuData()
+    }
+  }
+)
+
+// 关闭弹窗
+const handleClose = () => {
+  emit('update:modelValue', false)
+}
+</script>
+
+<template>
+  <Dialog v-model="previewVisible" title="菜单预览" @close="handleClose">
+    <div
+      ref="previewRef"
+      class="menu-preview"
+      v-loading="loading"
+      loading-text="加载中..."
+      loading-background="#eeeeee7"
+    >
+      <el-row :gutter="20">
+        <template v-for="(row, rowIndex) in keyboardLayout" :key="rowIndex">
+          <el-col :span="item?.span || 24" v-for="(item, colIndex) in row" :key="colIndex">
+            <div
+              v-if="item"
+              class="menu-item"
+              :class="{ 'is-dragging': isDragging && dragItem?.id === item?.id }"
+              @dragover="handleDragOver"
+              @dragenter="handleDragEnter"
+              @drop="(e) => handleDrop(rowIndex, colIndex, keyboardLayout, e)"
+            >
+              <el-button
+                type="info"
+                class="menu-button"
+                draggable="true"
+                @dragstart="(e) => handleDragStart(item, rowIndex, colIndex, e)"
+                @dragend="handleDragEnd"
+              >
+                {{ item.text }}
+              </el-button>
+              <!-- <div 
+                v-else 
+                class="empty-slot"
+                @dragover="handleDragOver"
+                @dragenter="handleDragEnter"
+                @drop="(e) => handleDrop(rowIndex, colIndex, keyboardLayout, e)"
+              ></div> -->
+            </div>
+          </el-col>
+        </template>
+      </el-row>
+    </div>
+    <template #footer>
+      <div class="preview-controls">
+        <ElButton type="info" @click="handleClose"> 取消 </ElButton>
+        <ElButton type="primary" @click="saveMenuOrder" :disabled="!hasChanges || loading">
+          {{ loading ? '保存中...' : '保存排序' }}
+        </ElButton>
+      </div>
+    </template>
+  </Dialog>
+</template>
+
+<style scoped>
+.menu-preview {
+  padding: 20px;
+  background-color: #f5f7fa;
+  border-radius: 8px;
+  min-height: 300px;
+  position: relative; /* 添加相对定位，使子元素可以参照它进行定位 */
+}
+
+/* 确保元素能接收loading遮罩 */
+:deep(.el-loading-mask) {
+  z-index: 1000;
+  border-radius: 8px;
+}
+
+.menu-item {
+  margin-bottom: 20px;
+  padding: 0 10px;
+  height: 100%;
+  min-height: 48px;
+}
+
+.menu-button {
+  width: 100%;
+  height: 48px;
+  font-size: 15px;
+  white-space: normal;
+  word-break: break-all;
+  padding: 0 15px;
+  border-radius: 8px;
+  transition: all 0.3s;
+  cursor: move;
+}
+
+.menu-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.empty-slot {
+  width: 100%;
+  height: 48px;
+  border: 2px dashed #dcdfe6;
+  border-radius: 8px;
+}
+
+.is-dragging .menu-button {
+  opacity: 0.5;
+}
+
+.preview-controls {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.unsaved-changes-tip {
+  margin-left: 10px;
+  color: #e6a23c;
+  font-size: 14px;
+}
+</style>
