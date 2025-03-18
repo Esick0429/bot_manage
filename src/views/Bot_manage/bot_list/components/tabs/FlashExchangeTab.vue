@@ -19,12 +19,12 @@ import { ElInputNumber } from 'element-plus'
 const { formRegister, formMethods } = useForm()
 
 // 创建内部状态管理开关值
-const insufficientStockEnabled = ref(false)
+const insufficientStockEnabled = ref(2)
 
 // 闪兑配置表单
 const flashExchangeSchema = reactive<FormSchema[]>([
   {
-    field: 'walletAddress',
+    field: 'transfer_address',
     component: 'Input' as const,
     label: {
       text: '【闪兑TRX/USDT】收款钱包地址 ',
@@ -38,7 +38,7 @@ const flashExchangeSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'minBalance',
+    field: 'min_trx_balance',
     component: 'InputNumber' as const,
     label: {
       text: '最低账号余额',
@@ -51,7 +51,7 @@ const flashExchangeSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'exchangeProfit',
+    field: 'profit_usdt_to_trx',
     component: 'InputNumber' as const,
     label: {
       text: 'USDT兑TRX利润',
@@ -74,7 +74,7 @@ const flashExchangeSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'exchangeLimit',
+    field: 'max_usdt_to_trx',
     component: 'InputNumber' as const,
     label: {
       text: 'USDT兑TRX可兑换上限',
@@ -87,15 +87,16 @@ const flashExchangeSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'insufficientStock',
+    field: 'stock_notice',
     component: 'Switch' as const,
     label: {
       text: '启用库存不足提醒',
       tips: '当您的可兑换库存低于设置值时，将会发送通知机器人管理员'
     },
+    value: 2,
     componentProps: {
-      activeValue: true,
-      inactiveValue: false,
+      activeValue: 1,
+      inactiveValue: 2,
       onChange: async (value) => {
         insufficientStockEnabled.value = value
         await formMethods.setValues({
@@ -105,7 +106,7 @@ const flashExchangeSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'insufficientStockValue',
+    field: 'stock_notice_trx_amount',
     component: 'InputNumber' as const,
     label: '库存告警值',
     componentProps: {
@@ -113,7 +114,7 @@ const flashExchangeSchema = reactive<FormSchema[]>([
       min: 0,
       precision: 2
     },
-    hidden: () => !insufficientStockEnabled.value,
+    hidden: () => insufficientStockEnabled.value === 2,
     formItemProps: {
       rules: [
         {

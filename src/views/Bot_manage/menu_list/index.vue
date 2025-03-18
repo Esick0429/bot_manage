@@ -194,9 +194,10 @@ const formSchema = reactive<FormSchema[]>([
     field: 'status',
     component: 'Switch' as const,
     label: '状态',
+    value: 2,
     componentProps: {
       activeValue: 1,
-      inactiveValue: 0
+      inactiveValue: 2
     },
     formItemProps: {
       rules: [{ required: true, message: '状态不能为空' }]
