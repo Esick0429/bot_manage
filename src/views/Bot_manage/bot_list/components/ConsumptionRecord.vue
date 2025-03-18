@@ -9,14 +9,17 @@
       :pagination="{
         total: total
       }"
+      @pagination-change="getList"
     />
   </Dialog>
 </template>
 
-<script setup lang="ts">
+<script setup lang="tsx">
 import { ref } from 'vue'
 import { Dialog } from '@/components/Dialog'
 import { Table } from '@/components/Table'
+import { getBotConsumptionRecordApi } from '@/api/botlist'
+import { dateUtil } from '@/utils/dateUtil'
 
 interface ConsumptionRecord {
   tg_bot_id: number
@@ -36,41 +39,54 @@ const total = ref(0)
 // 表格列配置
 const columns = [
   { field: 'tg_bot_id', label: '机器人ID', width: 120 },
-  { field: 'name', label: '机器人昵称' },
+  { field: 'firstname', label: '机器人昵称' },
   {
-    field: 'type',
+    field: 'charge_type',
     label: '类型',
-    formatter: (row) => {
-      const typeMap = {
-        1: '充值',
-        2: '消费',
-        3: '退款'
-      }
-      return typeMap[row.type] || '-'
+    slots: {
+      default: ({ row }) => (
+        <span style={{ color: row.charge_type === 1 ? 'red' : 'green' }}>
+          {row.charge_type === 1 ? '支出' : '收入'}
+        </span>
+      )
     }
   },
   {
-    field: 'amount',
+    field: 'mount',
     label: '费用',
-    formatter: (row) => `￥${row.amount?.toFixed(2) || '0.00'}`
+    slots: {
+      default: ({ row }) => (
+        <span style={{ color: row.charge_type === 1 ? 'red' : 'green' }}>
+          {row.charge_type === 1 ? `-${row.mount}TRX` : `${row.mount}TRX`}
+        </span>
+      )
+    }
   },
-  { field: 'createTime', label: '创建时间', width: 160 }
+  {
+    field: 'describe',
+    label: '描述'
+  },
+  {
+    field: 'create_time',
+    label: '创建时间',
+    width: 160,
+    formatter: (row) => dateUtil(row.create_time).format('YYYY-MM-DD HH:mm:ss')
+  }
 ]
 
 // 获取列表数据
 const getList = async () => {
   loading.value = true
   try {
-    // 模拟数据
-    const list = Array.from({ length: 10 }).map((_, index) => ({
-      tg_bot_id: Number(`BOT_${Math.floor(Math.random() * 1000)}`),
-      name: `机器人${index + 1}`,
-      type: Math.floor(Math.random() * 3) + 1,
-      amount: Math.random() * 1000,
-      createTime: new Date().toLocaleString()
-    }))
-    dataList.value = list
-    total.value = 100
+    const params = {
+      pageSize: pageSize.value,
+      pageNum: currentPage.value
+    }
+    const res = await getBotConsumptionRecordApi(params)
+    if (res?.data) {
+      dataList.value = res.data.list || []
+      total.value = res.data.totalCount || 0
+    }
   } finally {
     loading.value = false
   }

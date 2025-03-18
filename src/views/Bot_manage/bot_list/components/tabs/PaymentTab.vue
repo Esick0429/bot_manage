@@ -31,7 +31,7 @@ const paymentSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'flashPaymentWallet',
+    field: 'energy_address',
     component: 'Input' as const,
     label: '【1小时能量闪租/余额充值】收款钱包地址：',
     componentProps: {
@@ -42,27 +42,33 @@ const paymentSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'balancePaymentWallet',
+    field: 'receive_address',
     component: 'Input' as const,
     label: {
       text: '【余额充值】收款钱包地址',
       tips: '如果不填则使用1小时能量闪租的收款钱包地址'
     },
     componentProps: {
-      placeholder: '请输入余额收款钱包地址'
+      placeholder: '请输入余额收款钱包地址',
+      // disabled: true
     },
     formItemProps: {
       rules: [{ required: true, message: '余额收款钱包地址是必填项' }]
     }
   },
   {
-    field: 'orderNotificationAdmin',
+    field: 'notice_order_tg_admin',
     component: 'Switch' as const,
     label: {
       text: '订单通知机器人管理员',
       tips: '开启后，如果有新的订单，管理员将会接收到通知'
     },
-    value: true
+    value: 2,
+    componentProps: {
+      disabled: true,
+      activeValue: 1,
+      inactiveValue: 2
+    }
   }
 ])
 

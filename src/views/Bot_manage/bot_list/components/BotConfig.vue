@@ -1,7 +1,7 @@
 <template>
   <Dialog v-model="dialogVisible" title="机器人配置" width="1000px">
     <div v-loading="loading">
-      <ElTabs v-model="activeTab">
+      <ElTabs v-model="activeTab" @change="handleTabChange">
         <ElTabPane label="机器人信息" name="botInfo">
           <BotInfoTab
             ref="botInfoTabRef"
@@ -88,7 +88,7 @@ const {
 // 添加tab切换处理函数
 const handleTabChange = async (tabName: string) => {
   console.log('切换到标签页:', tabName)
-  if (!currentBot.value.tg_bot_id) return
+  if (!currentBot.value.id) return
 
   const formMethods = getFormMethods()
   const currentFormMethod = formMethods[tabName]
@@ -102,7 +102,7 @@ const handleTabChange = async (tabName: string) => {
   loading.value = true
   try {
     // 直接加载数据，不再检查是否有数据
-    await loadBotAllConfigs(currentBot.value.tg_bot_id, { [tabName]: currentFormMethod })
+    await loadBotAllConfigs(currentBot.value.id, { [tabName]: currentFormMethod })
   } catch (error) {
     console.error(`加载 ${tabName} 数据失败:`, error)
     ElMessage.error(`加载${tabName}配置失败，请重试`)
@@ -143,7 +143,7 @@ const open = async (botInfo: Record<string, any>) => {
   dialogVisible.value = true
   activeTab.value = 'botInfo'
 
-  if (!botInfo || !botInfo.tg_bot_id) {
+  if (!botInfo || !botInfo.id) {
     ElMessage.error('机器人信息不完整')
     return
   }
@@ -153,7 +153,7 @@ const open = async (botInfo: Record<string, any>) => {
 
   // 只加载当前tab的配置信息
   const formMethods = getFormMethods()
-  await loadBotAllConfigs(botInfo.tg_bot_id, { botInfo: formMethods.botInfo })
+  await loadBotAllConfigs(botInfo.id, { botInfo: formMethods.botInfo })
 }
 
 // 关闭弹窗
@@ -216,9 +216,15 @@ const submit = async () => {
     }
   }
 
-  // 提交所有配置
-  console.log('提交所有配置', getFormMethods())
-  const success = await submitConfig(getFormMethods())
+  // 构建表单方法对象，只包含当前激活的表单
+  const formMethodsToSubmit = {
+    [activeTab.value]: currentFormMethod
+  }
+
+  // 提交当前激活的表单配置，传递表单类型
+  console.log('提交配置:', activeTab.value)
+  const success = await submitConfig(formMethodsToSubmit, activeTab.value)
+
   if (success) {
     // dialogVisible.value = false
     emit('success')

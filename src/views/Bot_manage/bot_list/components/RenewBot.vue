@@ -1,6 +1,6 @@
 <template>
   <Dialog v-model="dialogVisible" title="机器人续费" maxHeight="150px">
-    <div class="text-lg font-bold mb-4"> 机器人费用：{{ fee }} PRX/月 </div>
+    <div class="text-lg font-bold mb-4"> 机器人费用：{{ currentBot.fee }} PRX/月 </div>
     <Form :schema="formSchema" @register="formRegister" />
     <template #footer>
       <div class="flex justify-end">
@@ -19,12 +19,6 @@ import { Form, FormSchema } from '@/components/Form'
 import { useForm } from '@/hooks/web/useForm'
 import { useValidator } from '@/hooks/web/useValidator'
 import { renewBotApi } from '@/api/botlist'
-const props = defineProps({
-  fee: {
-    type: [Number, String],
-    default: 0
-  }
-})
 
 const emit = defineEmits(['success', 'close'])
 const dialogVisible = ref(false)
@@ -36,7 +30,7 @@ const { formRegister, formMethods } = useForm()
 // 表单配置
 const formSchema = reactive<FormSchema[]>([
   {
-    field: 'months',
+    field: 'month_num',
     component: 'InputNumber' as const,
     label: '续费月数：',
     componentProps: {
@@ -54,12 +48,13 @@ const formSchema = reactive<FormSchema[]>([
 // 打开弹窗
 const open = (botInfo: Record<string, any>) => {
   currentBot.value = botInfo
+  console.log('currentBot', botInfo.fee)
   dialogVisible.value = true
 
   // 设置表单数据
   formMethods.setValues({
     fee: botInfo.fee || 0,
-    months: 1
+    month_num: 1
   })
 }
 
@@ -80,8 +75,8 @@ const submit = async () => {
 
     try {
       const res = await renewBotApi({
-        id: currentBot.value.tg_bot_id,
-        months: formData.months
+        id: currentBot.value.id,
+        month_num: formData.month_num
       })
       console.log('续费结果:', res)
       ElMessage.success('续费成功')
