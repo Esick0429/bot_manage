@@ -17,7 +17,7 @@ const axiosInstance: AxiosInstance = axios.create({
 axiosInstance.interceptors.request.use((res: InternalAxiosRequestConfig) => {
   const controller = new AbortController()
   let url = res.url || ''
-  let MOCK_LIST = useAppStore().mockList
+  let MOCK_LIST = import.meta.env.VITE_MOCK_LIST.split(',')
   // 如果启用了mock并且是bot相关请求，添加/mock前缀
   if (
     import.meta.env.VITE_USE_MOCK === 'true' &&
