@@ -16,7 +16,7 @@ const { formRegister, formMethods } = useForm()
 // 托管模式价格表单
 const managedModeSchema = reactive<FormSchema[]>([
   {
-    field: 'countPrice',
+    field: 'delegate_price_trx',
     component: 'InputNumber' as const,
     label: '笔数价格:',
     componentProps: {
@@ -38,19 +38,23 @@ const managedModeSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'customPriceEnabled',
+    field: 'enable_custom_delegate',
     component: 'Switch' as const,
     label: {
       text: '是否开启',
       tips: '可以自定义65000或131000能量使用的不同价格'
     },
-    value: false,
+    value: 2,
+    componentProps: {
+      activeValue: 1,
+      inactiveValue: 2
+    },
     colProps: {
       span: 24
     }
   },
   {
-    field: 'price65000',
+    field: 'price_trx_65000',
     component: 'InputNumber' as const,
     label: '65000能量价格:',
     componentProps: {
@@ -70,7 +74,7 @@ const managedModeSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'price131000',
+    field: 'price_trx_131000',
     component: 'InputNumber' as const,
     label: '131000能量价格:',
     componentProps: {

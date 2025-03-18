@@ -166,7 +166,7 @@ export function useBotConfig() {
             // 获取运营后台配置的成本价
             await loadCostPrices()
 
-            const timeEnergyConfigRes = await getCountEnergyConfigApi(id)
+            const timeEnergyConfigRes = await getBotTimeEnergyConfigApi(id)
             const timeEnergyConfig = timeEnergyConfigRes.data || {}
 
             formMethods.timeEnergy.setValues({
@@ -188,13 +188,13 @@ export function useBotConfig() {
         // 笔数能量加载策略
         countEnergy: async () => {
           try {
-            const countEnergyConfigRes = await getBotCountEnergyConfigApi(id)
+            const countEnergyConfigRes = await getCountEnergyConfigApi(id)
             const countEnergyConfig = countEnergyConfigRes.data || {}
 
             const countEnergyValues = {
               countEnergyEnabled: countEnergyConfig.enabled,
-              countEnergyPriceTRX: countEnergyConfig.countEnergyPriceTRX || 0,
-              countEnergyPriceUSDT: countEnergyConfig.countEnergyPriceUSDT || 0,
+              count_price_trx: countEnergyConfig.count_price_trx || 0,
+              count_price_usdt: countEnergyConfig.count_price_usdt || 0,
               notifyUser: countEnergyConfig.notifyUser || false,
               notifyGroupOwner: countEnergyConfig.notifyGroupOwner || false,
               notifyAdmin: countEnergyConfig.notifyAdmin || false
@@ -216,11 +216,10 @@ export function useBotConfig() {
             const managedModeConfig = managedModeConfigRes.data || {}
 
             const managedModeValues = {
-              enabled: managedModeConfig.enabled,
-              countPrice: managedModeConfig.countPrice || 0,
-              customPriceEnabled: managedModeConfig.customPriceEnabled || false,
-              price65000: managedModeConfig.price65000 || 0,
-              price131000: managedModeConfig.price131000 || 0
+              delegate_price_trx: managedModeConfig.delegate_price_trx || 0,
+              enable_custom_delegate: managedModeConfig.enable_custom_delegate || false,
+              price_trx_65000: managedModeConfig.price_trx_65000 || 0,
+              price_trx_131000: managedModeConfig.price_trx_131000 || 0
             }
 
             // 设置表单值
@@ -239,9 +238,8 @@ export function useBotConfig() {
             const batchOrderConfig = batchOrderConfigRes.data || {}
 
             const batchOrderValues = {
-              enabled: batchOrderConfig.enabled,
-              energyPrice: batchOrderConfig.energyPrice || 0,
-              activatePrice: batchOrderConfig.activatePrice || 1.1
+              batch_energy_price: batchOrderConfig.batch_energy_price || 0,
+              batch_active_price: batchOrderConfig.batch_active_price || 1.1
             }
 
             // 设置表单值
@@ -256,17 +254,16 @@ export function useBotConfig() {
         // 闪兑加载策略
         flashExchange: async () => {
           try {
-            const flashExchangeConfigRes = await getBotFlashExchangeConfigApi(id)
-            const flashExchangeConfig = flashExchangeConfigRes.data || {}
+            const flashExchangeConfigRes = await getCountEnergyConfigApi(id)
+            const flashExchangeConfig = flashExchangeConfigRes.data.exchange || {}
 
             const flashExchangeValues = {
-              enabled: flashExchangeConfig.enabled,
-              walletAddress: flashExchangeConfig.walletAddress || '',
-              minBalance: flashExchangeConfig.minBalance || 0,
-              exchangeProfit: flashExchangeConfig.exchangeProfit || 0,
-              exchangeLimit: flashExchangeConfig.exchangeLimit || 0,
-              insufficientStock: flashExchangeConfig.insufficientStock || false,
-              insufficientStockValue: flashExchangeConfig.insufficientStockValue || 0
+              transfer_address: flashExchangeConfig.transfer_address || '',
+              min_trx_balance: flashExchangeConfig.min_trx_balance || 0,
+              profit_usdt_to_trx: flashExchangeConfig.profit_usdt_to_trx || 0,
+              max_usdt_to_trx: flashExchangeConfig.max_usdt_to_trx || 0,
+              stock_notice: flashExchangeConfig.stock_notice || false,
+              stock_notice_trx_amount: flashExchangeConfig.stock_notice_trx_amount || 0
             }
 
             // 设置表单值
