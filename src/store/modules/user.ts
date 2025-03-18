@@ -70,7 +70,6 @@ export const useUserStore = defineStore('user', {
       })
         .then(async () => {
           const res = await logoutApi().catch(() => {})
-          console.log('logoutApi', res)
           if (res) {
             this.reset()
           }
