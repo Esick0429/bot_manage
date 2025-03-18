@@ -1,0 +1,26 @@
+import request from '@/axios'
+
+// 获取兑换订单列表
+export const getExchangeOrderListApi = (params: any) => {
+  return request.get({ url: '/v1/order/exchange_order/list', params })
+}
+
+// 获取兑换订单详情
+export const getExchangeOrderDetailApi = (id: number) => {
+  return request.get({ url: '/v1/order/exchange_order/detail', params: { id } })
+}
+
+// 获取交易详情
+export const getTransactionDetailApi = (transaction_hash: string) => {
+  return request.get({ url: '/v1/order/transaction/detail', params: { transaction_hash } })
+}
+
+// 获取转入详情
+export const getTransferInDetailApi = (transaction_hash: string) => {
+  return request.get({ url: '/v1/order/transfer-in/detail', params: { transaction_hash } })
+}
+
+// 导出兑换订单
+export const exportExchangeOrderApi = (params: any) => {
+  return request.get({ url: '/v1/order/exchange_order/export', params, responseType: 'blob' })
+} 
