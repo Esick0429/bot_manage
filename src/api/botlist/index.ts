@@ -121,3 +121,8 @@ export const updateBotAllConfigsApi = (data: any) => {
 export const getBotConsumptionRecordApi = (params: { pageSize: number; pageNum: number }) => {
   return request.get({ url: '/v1/bot/charge_record/list', params })
 }
+
+export const getCountEnergyConfigApi = (id: number) => {
+  return request.get({ url: `/v1/bot/count-energy-config/${id}` })
+}
+
