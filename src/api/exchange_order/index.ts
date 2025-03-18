@@ -23,4 +23,4 @@ export const getTransferInDetailApi = (transaction_hash: string) => {
 // 导出兑换订单
 export const exportExchangeOrderApi = (params: any) => {
   return request.get({ url: '/v1/order/exchange_order/export', params, responseType: 'blob' })
-} 
+}

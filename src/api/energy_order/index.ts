@@ -12,7 +12,10 @@ export const getEnergyOrderDetailApi = (id: number) => {
 
 // 获取交易详情
 export const getTransactionDetailApi = (transaction_hash: string) => {
-  return request.get({ url: '/v1/order/energy_order/transaction_detail', params: { transaction_hash } })
+  return request.get({
+    url: '/v1/order/energy_order/transaction_detail',
+    params: { transaction_hash }
+  })
 }
 
 // 导出能量订单
