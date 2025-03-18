@@ -30,29 +30,25 @@
         </template>
       </Dialog>
 
-      <!-- 预览弹窗 -->
-      <Dialog v-model="previewVisible" title="菜单预览">
-        <div class="menu-preview">
-          <el-row :gutter="20">
-            <template v-for="(row, rowIndex) in keyboardLayout" :key="rowIndex">
-              <el-col :span="item?.span || 24" v-for="(item, colIndex) in row" :key="colIndex">
-                <div class="menu-item" v-if="item">
-                  <el-button type="primary" class="menu-button" :disabled="true">
-                    {{ item.text }}
-                  </el-button>
-                </div>
-              </el-col>
-            </template>
-          </el-row>
-        </div>
-      </Dialog>
+      <!-- 使用菜单预览组件 -->
+      <MenuPreview v-model="previewVisible" @update:modelValue="previewHandleClose" />
     </ContentWrap>
   </div>
 </template>
 
 <script setup lang="tsx">
 import { ref, onMounted, h, computed, watch, reactive } from 'vue'
-import { ElButton, ElLink, ElTag, ElMessage, ElMessageBox, ElSwitch, ElRow, ElCol } from 'element-plus'
+import {
+  ElButton,
+  ElLink,
+  ElTag,
+  ElMessage,
+  ElMessageBox,
+  ElSwitch,
+  ElRow,
+  ElCol,
+  ElInput
+} from 'element-plus'
 import { ContentWrap } from '@/components/ContentWrap'
 import { Dialog } from '@/components/Dialog'
 import { SearchTable } from '@/components/SearchTable'
@@ -63,6 +59,7 @@ import { useI18n } from '@/hooks/web/useI18n'
 import type { TableColumn } from '@/components/Table'
 import type { FormSchema } from '@/components/Form'
 import { getMenuListApi, deleteMenuApi, saveMenuApi } from '@/api/menu_list'
+import MenuPreview from './components/MenuPreview.vue'
 
 const { t } = useI18n()
 const searchTableRef = ref<InstanceType<typeof SearchTable> | null>(null)
@@ -74,10 +71,10 @@ const isUrlType = ref(true)
 
 // 添加formValues来跟踪表单值
 const formValues = reactive<{
-  type: number;
-  buttonType: string;
-  other: string;
-  [key: string]: any;
+  type: number
+  buttonType: string
+  other: string
+  [key: string]: any
 }>({
   type: 1,
   buttonType: 'url',
@@ -156,7 +153,7 @@ const formSchema = reactive<FormSchema[]>([
         isUrlType.value = value === 'url'
         formValues.buttonType = value
         await formMethods.setValues({
-          buttonType: value,
+          buttonType: value
         })
       }
     },
@@ -169,7 +166,22 @@ const formSchema = reactive<FormSchema[]>([
     component: 'Input' as const,
     label: '链接地址/回调函数',
     componentProps: {
-      placeholder: '请输入链接地址或回调函数名称'
+      placeholder: '请输入链接地址或回调函数名称',
+      remark: () => {
+        if (formValues.buttonType === 'url') {
+          return (
+            <>
+              <p>例如：https://www.123456789.com</p>
+            </>
+          )
+        } else {
+          return (
+            <>
+              <p>例如：callbackName</p>
+            </>
+          )
+        }
+      }
     },
     formItemProps: {
       rules: [{ required: true, message: '该字段不能为空' }]
@@ -192,69 +204,38 @@ const formSchema = reactive<FormSchema[]>([
   }
 ])
 
-// 修改菜单数据存储方式
-const keyboardLayout = ref<any[][]>([])
-
-// 将一维数组转换为4*3布局
-const convertToKeyboardLayout = (list: any[]) => {
-  // 创建一个4*3的二维数组
-  const layout = Array(4).fill(null).map(() => Array(3).fill(null))
-  
-  // 根据sort值将菜单项放入对应位置
-  list.forEach(item => {
-    if (!item || !item.name) return
-    
-    const row = Math.floor((item.sort - 1) / 3)
-    const col = (item.sort - 1) % 3
-    
-    if (row < 4 && col < 3) {
-      layout[row][col] = {
-        text: item.name,
-        id: item.id,
-        type: item.type,
-        sort: item.sort,
-        other: item.other,
-        status: item.status
-      }
-    }
-  })
-  
-  // 过滤掉全为null的行，并计算每行的span值
-  return layout.filter(row => row.some(item => item !== null)).map(row => {
-    const validItems = row.filter(item => item !== null)
-    const span = validItems.length === 0 ? 0 : 24 / validItems.length
-    return row.map(item => item ? { ...item, span } : null)
-  })
-}
-
 // 表格列配置
 const columns: TableColumn[] = [
-  { 
-    field: 'name', 
-    label: '菜单名称',
+  {
+    field: 'name',
+    label: '菜单名称'
   },
-  { 
-    field: 'type', 
-    label: '类型', 
+  {
+    field: 'type',
+    label: '类型',
     slots: {
       default: (data: any) => {
         const typeMap = {
           1: { label: '菜单', type: 'success' },
-          2: { label: '内联按钮', type: 'primary' },
+          2: { label: '内联按钮', type: 'primary' }
         }
         const type = typeMap[data.row.type] || { label: '-', type: 'info' }
-        return h(ElTag, {
-          type: type.type
-        }, () => type.label)
+        return h(
+          ElTag,
+          {
+            type: type.type
+          },
+          () => type.label
+        )
       }
     }
   },
   { field: 'sort', label: '排序' },
   { field: 'other', label: '其他' },
-  { 
-    field: 'status', 
-    label: '状态', 
-    slots: { 
+  {
+    field: 'status',
+    label: '状态',
+    slots: {
       default: (data: any) => {
         return h(ElSwitch, {
           modelValue: data.row.status === 1,
@@ -265,14 +246,14 @@ const columns: TableColumn[] = [
       }
     }
   },
-  { 
-    field: 'createTime', 
-    label: '创建时间', 
+  {
+    field: 'createTime',
+    label: '创建时间',
     formatter: (row: any) => row.createTime || '-'
   },
-  { 
-    field: 'updateTime', 
-    label: '更新时间', 
+  {
+    field: 'updateTime',
+    label: '更新时间',
     formatter: (row: any) => row.updateTime || '-'
   }
 ]
@@ -347,16 +328,18 @@ const handleDelete = (row: any) => {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning'
-  }).then(async () => {
-    searchTableRef.value?.delete(row)
-  }).catch(() => {})
+  })
+    .then(async () => {
+      searchTableRef.value?.delete(row)
+    })
+    .catch(() => {})
 }
 
 // 事件处理函数
 const handleAdd = () => {
   dialogVisible.value = true
   dialogTitle.value = '添加菜单'
-  
+
   // 重置表单
   const defaultValues = {
     name: '',
@@ -366,13 +349,13 @@ const handleAdd = () => {
     sort: 0,
     status: 1
   }
-  
+
   // 同步更新显示状态
   isUrlType.value = true
-  
+
   // 更新本地响应式数据
   Object.assign(formValues, defaultValues)
-  
+
   // 设置表单值
   formMethods.setValues(defaultValues)
 }
@@ -380,7 +363,7 @@ const handleAdd = () => {
 const handleEdit = (row: any) => {
   dialogVisible.value = true
   dialogTitle.value = '编辑菜单'
-  
+
   // 设置表单值
   const editValues = {
     id: row.id,
@@ -391,42 +374,33 @@ const handleEdit = (row: any) => {
     buttonType: row.buttonType || 'url',
     other: row.other || ''
   }
-  
+
   // 同步更新显示状态
   isUrlType.value = (row.buttonType || 'url') === 'url'
-  
+
   // 更新本地响应式数据
   Object.assign(formValues, editValues)
-  
+
   // 设置表单值
   formMethods.setValues(editValues)
 }
 
-const handlePreview = async () => {
-  try {
-    previewVisible.value = true
-    const data = await getMenuListApi({})
-    // 将一维数组转换为4*3布局
-    keyboardLayout.value = convertToKeyboardLayout(data.data.list || [])
-    console.log('keyboardLayout.value', keyboardLayout.value)
-  } catch (error) {
-    console.error('获取菜单预览失败:', error)
-    ElMessage.error('获取菜单预览失败')
-  }
+const handlePreview = () => {
+  previewVisible.value = true
 }
 
 const handleSubmit = async () => {
   try {
     const formRef = ref()
     await formRef.value?.validate()
-    
+
     const values = await formMethods.getFormData()
-    
+
     await saveMenuApi(values)
-    
+
     ElMessage.success(values.id ? '更新成功' : '添加成功')
     dialogVisible.value = false
-    
+
     // 刷新列表
     searchTableRef.value?.reload()
   } catch (error) {
@@ -457,21 +431,29 @@ const handleTableDelete = async (row: any, result: boolean) => {
 }
 
 // 监听状态变化
-watch([() => formValues.type, isUrlType], () => {
-  // 更新表单配置中的disabled和hidden属性
-  formSchema.forEach(item => {
-    if (item.field === 'buttonType') {
-      item.hidden = formValues.type !== 2
-    } else if (item.field === 'other') {
-      item.hidden = formValues.type !== 2
-      item.label = isUrlType.value ? '链接地址' : '回调函数'
-      item.componentProps = {
-        ...item.componentProps,
-        disabled: formValues.type !== 2
+watch(
+  [() => formValues.type, isUrlType],
+  () => {
+    // 更新表单配置中的disabled和hidden属性
+    formSchema.forEach((item) => {
+      if (item.field === 'buttonType') {
+        item.hidden = formValues.type !== 2
+      } else if (item.field === 'other') {
+        item.hidden = formValues.type !== 2
+        item.label = isUrlType.value ? '链接地址' : '回调函数'
+        item.componentProps = {
+          ...item.componentProps,
+          disabled: formValues.type !== 2
+        }
       }
-    }
-  })
-}, { immediate: true })
+    })
+  },
+  { immediate: true }
+)
+
+const previewHandleClose = () => {
+  searchTableRef.value?.reload()
+}
 
 onMounted(() => {
   // 组件加载后自动调用首次查询
@@ -480,32 +462,5 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.menu-preview {
-  padding: 20px;
-  background-color: #f5f7fa;
-  border-radius: 8px;
-}
-
-.menu-item {
-  margin-bottom: 20px;
-  padding: 0 10px;
-  height: 100%;
-}
-
-.menu-button {
-  width: 100%;
-  height: 48px;
-  font-size: 15px;
-  white-space: normal;
-  word-break: break-all;
-  padding: 0 15px;
-  border-radius: 8px;
-  transition: all 0.3s;
-}
-
-.menu-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
+/* 移除菜单预览相关样式 */
 </style>
