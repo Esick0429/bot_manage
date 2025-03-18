@@ -18,4 +18,4 @@ export const getTransactionDetailApi = (transaction_hash: string) => {
 // 导出托管订单
 export const exportHostedOrderApi = (params: any) => {
   return request.get({ url: '/v1/order/hosted_order/export', params, responseType: 'blob' })
-} 
+}

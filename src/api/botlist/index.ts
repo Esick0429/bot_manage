@@ -125,4 +125,3 @@ export const getBotConsumptionRecordApi = (params: { pageSize: number; pageNum: 
 export const getCountEnergyConfigApi = (id: number) => {
   return request.get({ url: `/v1/bot/count-energy-config/${id}` })
 }
-
