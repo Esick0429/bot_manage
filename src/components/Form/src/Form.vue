@@ -291,7 +291,11 @@ export default defineComponent({
               ...setItemComponentSlots(componentSlots)
             }
             if (item.component === ComponentNameEnum.TAG) {
-              return <ElTag>{item.value}</ElTag>
+              if (typeof item.value === 'function') {
+                return <ElTag>{item.value(formModel.value)}</ElTag>
+              } else {
+                return <ElTag>{item.value}</ElTag>
+              }
             }
             // // 如果是select组件，并且没有自定义模板，自动渲染options
             if (item.component === ComponentNameEnum.SELECT) {
