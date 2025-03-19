@@ -21,12 +21,13 @@ const { formRegister, formMethods } = useForm()
 // 笔数能量价格表单
 const countEnergySchema = reactive<FormSchema[]>([
   {
-    field: 'countEnergyEnabled',
+    field: 'count_pay_type',
     component: 'Tag' as const,
     label: '笔数能量：',
-    value: '笔数能量',
-    formItemProps: {
-      rules: [{ required: true, message: '笔数能量是必填项' }]
+    value: (formData) => {
+      console.log('表单数据:', formData)
+
+      return formData.count_pay_type === 1 ? '账号代扣' : '购买笔数'
     }
   },
   {
@@ -73,30 +74,27 @@ const countEnergySchema = reactive<FormSchema[]>([
     field: 'notifyUser',
     component: 'Switch' as const,
     label: '地址笔数变更通知(用户)：',
-    value: 2,
+    value: false,
     componentProps: {
-      activeValue: 1,
-      inactiveValue: 2
+      disabled: true
     }
   },
   {
     field: 'notifyGroupOwner',
     component: 'Switch' as const,
     label: '地址笔数变更通知(群主)：',
-    value: 2,
+    value: false,
     componentProps: {
-      activeValue: 1,
-      inactiveValue: 2
+      disabled: true
     }
   },
   {
     field: 'notifyAdmin',
     component: 'Switch' as const,
     label: '地址笔数变更通知(机器人管理员)：',
-    value: 2,
+    value: false,
     componentProps: {
-      activeValue: 1,
-      inactiveValue: 2
+      disabled: true
     }
   }
 ])

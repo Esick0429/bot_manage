@@ -42,7 +42,7 @@
 
 <script setup lang="tsx">
 import { ref, onMounted, h, computed } from 'vue'
-import { dateUtil } from '@/utils/dateUtil'
+import { formatToDateTime } from '@/utils/dateUtil'
 import { ElButton, ElTag, ElMessage, ElTabs, ElTabPane } from 'element-plus'
 import { ContentWrap } from '@/components/ContentWrap'
 import { Dialog } from '@/components/Dialog'
@@ -73,7 +73,7 @@ const rechargeDetail = ref<any>({})
 // 订单详情schema
 const orderDetailSchema = computed(() => {
   const schema: DescriptionsSchema[] = [
-    { field: 'orderNo', label: '订单号' },
+    { field: 'order_id', label: '订单号' },
     {
       field: 'status',
       label: '订单状态',
@@ -84,50 +84,79 @@ const orderDetailSchema = computed(() => {
         }
       }
     },
-    { field: 'orderType', label: '订单类型' },
-    { field: 'tgUserId', label: 'TG用户ID' },
-    { field: 'tgUsername', label: 'TG用户名' },
-    { field: 'tgNickname', label: 'TG用户昵称' },
-    { field: 'botId', label: '机器人ID' },
-    { field: 'botName', label: '机器人名称' },
-    { field: 'rechargeAmount', label: '充值金额' },
-    { field: 'payAmount', label: '支付金额' },
-    { field: 'payMethod', label: '支付方式' },
-    { field: 'transactionId', label: '交易ID', span: 24 },
+    { field: 'order_type', label: '订单类型',
+      slots: {
+        default: (row: any) => {
+          return (
+            <>
+              <span style={{ color: '#409EFF', cursor: 'pointer' }}>
+                充值{row.order_type == 1 ? 'TRX' : 'USDT'}
+              </span>
+            </>
+          )
+        }
+      }
+    },
+    { field: 'tg_id', label: 'TG用户ID' },
+    { field: 'tg_name', label: 'TG用户名' },
+    { field: 'tg_nickname', label: 'TG用户昵称' },
+    { field: 'bot_id', label: '机器人ID' },
+    { field: 'bot_name', label: '机器人名称' },
     {
-      field: 'createTime',
+      field: 'in_mount',
+      label: '充值金额',
+      slots: {
+        default: (row: any) => {
+          if (!row || !row.in_mount) return h('span', '-')
+          return h('span', `${row.in_mount} ${row.in_unit || ''}`)
+        }
+      }
+    },
+    {
+      field: 'pay_mount',
+      label: '支付金额',
+      slots: {
+        default: (row: any) => {
+          if (!row || !row.pay_mount) return h('span', '-')
+          return h('span', `${row.pay_mount} ${row.pay_unit || ''}`)
+        }
+      }
+    },
+    { field: 'pay_unit', label: '支付单位' },
+    { field: 'describe', label: '描述', span: 24 },
+    {
+      field: 'create_time',
       label: '创建时间',
       span: 24,
       slots: {
         default: (row: any) => {
-          if (!row || !row.createTime) return h('span', '-')
-          return h('span', dateUtil(row.createTime).format('YYYY-MM-DD HH:mm:ss'))
+          if (!row || !row.create_time) return h('span', '-')
+          return h('span', formatToDateTime(row.create_time))
         }
       }
     },
     {
-      field: 'payTime',
+      field: 'pay_time',
       label: '支付时间',
       span: 24,
       slots: {
         default: (row: any) => {
-          if (!row || !row.payTime) return h('span', '-')
-          return h('span', dateUtil(row.payTime).format('YYYY-MM-DD HH:mm:ss'))
+          if (!row || !row.pay_time) return h('span', '-')
+          return h('span', formatToDateTime(row.pay_time))
         }
       }
     },
     {
-      field: 'finishTime',
+      field: 'finish_time',
       label: '完成时间',
       span: 24,
       slots: {
         default: (row: any) => {
-          if (!row || !row.finishTime) return h('span', '-')
-          return h('span', dateUtil(row.finishTime).format('YYYY-MM-DD HH:mm:ss'))
+          if (!row || !row.finish_time) return h('span', '-')
+          return h('span', formatToDateTime(row.finish_time))
         }
       }
-    },
-    { field: 'remark', label: '备注', span: 24 }
+    }
   ]
   return schema
 })
@@ -135,22 +164,23 @@ const orderDetailSchema = computed(() => {
 // 充值详情schema
 const rechargeDetailSchema = computed(() => {
   const schema: DescriptionsSchema[] = [
-    { field: 'depositAddress', label: '充值地址', span: 24 },
-    { field: 'paymentAddress', label: '支付地址', span: 24 },
-    { field: 'blockNumber', label: '区块号', span: 24 },
+    { field: 'to_address', label: '充值地址', span: 24 },
+    { field: 'owner_address', label: '支付地址', span: 24 },
+    { field: 'number', label: '区块号', span: 24 },
     {
-      field: 'transactionHash',
+      field: 'hash',
       label: '交易哈希',
       span: 24,
       slots: {
         default: (row: any) => {
+          if (!row || !row.hash) return h('span', '-')
           return (
             <ElLink
-              href={`https://tronscan.org/#/transaction/${row.transactionHash}`}
+              href={`https://tronscan.org/#/transaction/${row.hash}`}
               type="primary"
               target="_blank"
             >
-              {row.transactionHash}
+              {row.hash}
             </ElLink>
           )
         }
@@ -163,12 +193,12 @@ const rechargeDetailSchema = computed(() => {
 // 表格列配置
 const columns: TableColumn[] = [
   {
-    field: 'orderNo',
+    field: 'order_id',
     label: '订单号',
     width: 180
   },
   {
-    field: 'tgUsername',
+    field: 'tg_name',
     label: 'TG用户名',
     width: 120,
     slots: {
@@ -179,23 +209,23 @@ const columns: TableColumn[] = [
             onClick={() => {
               router.push({
                 path: `/bot_manage/bot_list`,
-                query: { tgUserId: row.tgUserId }
+                query: { tgUserId: row.tg_id }
               })
             }}
           >
-            {row.tgUsername || '-'}
+            {row.tg_name || '-'}
           </span>
         )
       }
     }
   },
   {
-    field: 'tgNickname',
+    field: 'tg_nickname',
     label: 'TG用户昵称',
     width: 120
   },
   {
-    field: 'botName',
+    field: 'bot_name',
     label: '机器人名称',
     width: 120,
     slots: {
@@ -206,30 +236,34 @@ const columns: TableColumn[] = [
             onClick={() => {
               router.push({
                 path: `/bot_manage/bot_list`,
-                query: { name: row.botName }
+                query: { name: row.bot_name }
               })
             }}
           >
-            {row.botName || '-'}
+            {row.bot_name || '-'}
           </span>
         )
       }
     }
   },
   {
-    field: 'orderType',
+    field: 'order_type_id',
     label: '充值订单类型',
-    width: 120
+    width: 120,
+    formatter: (row) => (row.order_type_id == 1 ? 'TRX' : 'USDT')
   },
   {
-    field: 'rechargeAmount',
+    field: 'in_mount',
     label: '充值金额',
-    width: 100
+    width: 100,
+    formatter: (row) => (row.in_mount ? `${row.in_mount} ${row.in_unit || 'TRX'}` : '-')
   },
   {
-    field: 'payAmount',
+    field: 'pay_mount',
     label: '支付金额',
-    width: 100
+    width: 100,
+    formatter: (row) =>
+      row.pay_mount && row.pay_mount !== '0' ? `${row.pay_mount} ${row.pay_unit || ''}` : '-'
   },
   {
     field: 'status',
@@ -244,24 +278,22 @@ const columns: TableColumn[] = [
     }
   },
   {
-    field: 'createTime',
+    field: 'create_time',
     label: '创建时间',
     width: 180,
-    formatter: (row) =>
-      row.createTime ? dateUtil(row.createTime).format('YYYY-MM-DD HH:mm:ss') : '-'
+    formatter: (row) => row.create_time ? formatToDateTime(row.create_time) : '-'
   },
   {
-    field: 'payTime',
+    field: 'pay_time',
     label: '支付时间',
     width: 180,
-    formatter: (row) => (row.payTime ? dateUtil(row.payTime).format('YYYY-MM-DD HH:mm:ss') : '-')
+    formatter: (row) => row.pay_time ? formatToDateTime(row.pay_time) : '-'
   },
   {
-    field: 'finishTime',
+    field: 'finish_time',
     label: '完成时间',
     width: 180,
-    formatter: (row) =>
-      row.finishTime ? dateUtil(row.finishTime).format('YYYY-MM-DD HH:mm:ss') : '-'
+    formatter: (row) => row.finish_time ? formatToDateTime(row.finish_time) : '-'
   },
   {
     field: 'action',
@@ -278,7 +310,7 @@ const columns: TableColumn[] = [
 // 搜索表单配置
 const searchSchema = [
   {
-    field: 'orderNo',
+    field: 'order_id',
     component: 'Input' as const,
     label: '订单号',
     componentProps: {
@@ -292,17 +324,15 @@ const searchSchema = [
     componentProps: {
       options: [
         { label: '全部', value: '' },
-        { label: '待支付', value: 0 },
-        { label: '支付中', value: 1 },
-        { label: '支付成功', value: 2 },
-        { label: '支付失败', value: 3 },
-        { label: '已取消', value: 4 }
+        { label: '待支付', value: 1 },
+        { label: '已完成', value: 2 },
+        { label: '已取消', value: 3 }
       ],
       placeholder: '请选择订单状态'
     }
   },
   {
-    field: 'tgUserId',
+    field: 'tg_id',
     component: 'Input' as const,
     label: 'TG用户ID',
     componentProps: {
@@ -314,11 +344,9 @@ const searchSchema = [
 // 获取订单状态显示类型
 const getStatusType = (status: number): 'success' | 'warning' | 'info' | 'danger' | 'primary' => {
   const statusMap: Record<number, 'success' | 'warning' | 'info' | 'danger' | 'primary'> = {
-    0: 'warning',
-    1: 'info',
-    2: 'success',
-    3: 'danger',
-    4: 'info'
+    1: 'warning', // 待支付
+    2: 'success', // 已完成
+    3: 'danger' // 已取消
   }
   return statusMap[status] || 'info'
 }
@@ -326,11 +354,9 @@ const getStatusType = (status: number): 'success' | 'warning' | 'info' | 'danger
 // 获取订单状态文本
 const getStatusText = (status: number): string => {
   const statusMap = {
-    0: '待支付',
-    1: '支付中',
-    2: '支付成功',
-    3: '支付失败',
-    4: '已取消'
+    1: '待支付',
+    2: '已完成',
+    3: '已取消'
   }
   return statusMap[status] || '未知状态'
 }
@@ -350,8 +376,15 @@ const fetchRechargeOrderList = async (params: any) => {
 const handleViewDetail = async (row: any) => {
   try {
     const response = await getRechargeOrderDetailApi(row.id)
-    orderDetail.value = response.data.orderDetail
-    rechargeDetail.value = response.data.rechargeDetail
+    console.log('response', response)
+    orderDetail.value = response.data.order_info || {}
+    rechargeDetail.value = response.data.recharge_info || {}
+
+    // 添加订单状态文本
+    if (orderDetail.value.status) {
+      orderDetail.value.statusText = getStatusText(orderDetail.value.status)
+    }
+
     dialogVisible.value = true
     activeTab.value = 'order'
   } catch (error) {
@@ -364,8 +397,10 @@ const handleViewDetail = async (row: any) => {
 const handleExport = async () => {
   try {
     // 获取当前搜索条件
-    const params = searchTableRef.value ? (searchTableRef.value.$attrs as any) : {}
-    await exportRechargeOrderApi(params)
+    const searchParams = searchTableRef.value
+      ? (searchTableRef.value.$attrs as any).params || {}
+      : {}
+    await exportRechargeOrderApi(searchParams)
     ElMessage.success('导出成功')
   } catch (error) {
     console.error('导出订单失败:', error)

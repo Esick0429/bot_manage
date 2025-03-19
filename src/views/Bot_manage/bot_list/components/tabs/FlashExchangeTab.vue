@@ -93,14 +93,12 @@ const flashExchangeSchema = reactive<FormSchema[]>([
       text: '启用库存不足提醒',
       tips: '当您的可兑换库存低于设置值时，将会发送通知机器人管理员'
     },
-    value: 2,
+    value: false,
     componentProps: {
-      activeValue: 1,
-      inactiveValue: 2,
       onChange: async (value) => {
         insufficientStockEnabled.value = value
         await formMethods.setValues({
-          insufficientStock: value
+          stock_notice: value
         })
       }
     }
@@ -129,7 +127,7 @@ const flashExchangeSchema = reactive<FormSchema[]>([
 // 更新启用状态
 const updateEnabled = async () => {
   const data = await formMethods.getFormData()
-  insufficientStockEnabled.value = data.insufficientStock || false
+  insufficientStockEnabled.value = data.stock_notice || false
 }
 
 // 初始化时更新状态

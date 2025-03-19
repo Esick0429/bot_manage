@@ -18,7 +18,7 @@ const managedModeSchema = reactive<FormSchema[]>([
   {
     field: 'delegate_price_trx',
     component: 'InputNumber' as const,
-    label: '笔数价格:',
+    label: '【托管模式】笔数价格（TRX）：',
     componentProps: {
       placeholder: '请输入笔数价格',
       min: 0,
@@ -31,7 +31,7 @@ const managedModeSchema = reactive<FormSchema[]>([
   {
     field: 'divider',
     component: 'Divider' as const,
-    label: '自定义笔数价格',
+    label: '自定义【托管模式】笔数价格（TRX）：',
     componentProps: {
       content: '自定义笔数价格',
       direction: 'horizontal'
@@ -44,11 +44,7 @@ const managedModeSchema = reactive<FormSchema[]>([
       text: '是否开启',
       tips: '可以自定义65000或131000能量使用的不同价格'
     },
-    value: 2,
-    componentProps: {
-      activeValue: 1,
-      inactiveValue: 2
-    },
+    value: false,
     colProps: {
       span: 24
     }

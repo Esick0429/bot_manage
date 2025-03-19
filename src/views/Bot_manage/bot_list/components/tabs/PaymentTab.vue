@@ -49,7 +49,7 @@ const paymentSchema = reactive<FormSchema[]>([
       tips: '如果不填则使用1小时能量闪租的收款钱包地址'
     },
     componentProps: {
-      placeholder: '请输入余额收款钱包地址',
+      placeholder: '请输入余额收款钱包地址'
       // disabled: true
     },
     formItemProps: {
@@ -63,11 +63,9 @@ const paymentSchema = reactive<FormSchema[]>([
       text: '订单通知机器人管理员',
       tips: '开启后，如果有新的订单，管理员将会接收到通知'
     },
-    value: 2,
+    value: false,
     componentProps: {
-      disabled: true,
-      activeValue: 1,
-      inactiveValue: 2
+      disabled: true
     }
   }
 ])

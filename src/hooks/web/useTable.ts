@@ -3,7 +3,7 @@ import { Table, TableExpose, TableProps, TableSetProps, TableColumn } from '@/co
 import { ElTable, ElMessageBox, ElMessage } from 'element-plus'
 import { ref, watch, unref, nextTick, onMounted } from 'vue'
 
-const { t } = useI18n()
+// const { t } = useI18n()
 
 interface UseTableConfig {
   /**
@@ -153,18 +153,19 @@ export const useTable = (config: UseTableConfig) => {
     // 删除数据
     delList: async (idsLength: number) => {
       const { fetchDelApi } = config
+      console.log('fetchDelApi', fetchDelApi)
       if (!fetchDelApi) {
         console.warn('fetchDelApi is undefined')
         return
       }
-      ElMessageBox.confirm(t('common.delMessage'), t('common.delWarning'), {
-        confirmButtonText: t('common.delOk'),
-        cancelButtonText: t('common.delCancel'),
+      ElMessageBox.confirm('是否删除所选中数据？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
         type: 'warning'
       }).then(async () => {
         const res = await fetchDelApi()
         if (res) {
-          ElMessage.success(t('common.delSuccess'))
+          ElMessage.success('删除成功')
 
           // 计算出临界点
           const current =

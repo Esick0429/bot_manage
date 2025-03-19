@@ -192,7 +192,7 @@ export function useBotConfig() {
             const countEnergyConfig = countEnergyConfigRes.data || {}
 
             const countEnergyValues = {
-              countEnergyEnabled: countEnergyConfig.enabled,
+              count_pay_type: countEnergyConfig.count_pay_type,
               count_price_trx: countEnergyConfig.count_price_trx || 0,
               count_price_usdt: countEnergyConfig.count_price_usdt || 0,
               notifyUser: countEnergyConfig.notifyUser || false,

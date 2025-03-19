@@ -1,5 +1,5 @@
 <template>
-  <Dialog v-model="dialogVisible" title="机器人配置" width="1000px">
+  <Dialog v-model="dialogVisible" title="机器人配置" width="1200px" max-height="600px">
     <div v-loading="loading">
       <ElTabs v-model="activeTab" @change="handleTabChange">
         <ElTabPane label="机器人信息" name="botInfo">
@@ -226,7 +226,7 @@ const submit = async () => {
   const success = await submitConfig(formMethodsToSubmit, activeTab.value)
 
   if (success) {
-    // dialogVisible.value = false
+    dialogVisible.value = false
     emit('success')
   }
 }

@@ -1,6 +1,6 @@
 <template>
   <Dialog v-model="dialogVisible" title="机器人续费" maxHeight="150px">
-    <div class="text-lg font-bold mb-4"> 机器人费用：{{ currentBot.fee }} PRX/月 </div>
+    <div class="text-lg font-bold mb-4"> 机器人费用：{{ currentBot.fee }} TRX/月 </div>
     <Form :schema="formSchema" @register="formRegister" />
     <template #footer>
       <div class="flex justify-end">

@@ -7,6 +7,9 @@ const DATE_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss'
 const DATE_FORMAT = 'YYYY-MM-DD'
 
 export function formatToDateTime(date?: dayjs.ConfigType, format = DATE_TIME_FORMAT): string {
+  if (typeof date === 'number' && String(date).length === 10) {
+    date = date * 1000 // 转换为毫秒级时间戳
+  }
   return dayjs(date).format(format)
 }
 

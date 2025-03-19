@@ -75,7 +75,7 @@ import BotConfig from './components/BotConfig.vue'
 import { getBotListApi, addBotApi, updateBotApi } from '@/api/botlist'
 import { Icon } from '@/components/Icon'
 import { Tips } from '@/components/Tips'
-import { dateUtil } from '@/utils/dateUtil'
+import { formatToDateTime } from '@/utils/dateUtil'
 import { useRoute } from 'vue-router'
 interface SearchTableInstance {
   reload: () => Promise<void>
@@ -167,12 +167,12 @@ const columns = [
   {
     field: 'createTime',
     label: '创建时间',
-    formatter: (row) => dateUtil(row.create_time).format('YYYY-MM-DD HH:mm:ss')
+    formatter: (row) => formatToDateTime(row.create_time)
   },
   {
     field: 'expireTime',
     label: '到期时间',
-    formatter: (row) => dateUtil(row.expire_time).format('YYYY-MM-DD HH:mm:ss'),
+    formatter: (row) => formatToDateTime(row.expire_time),
     slots: {
       header: () => {
         return (
@@ -265,12 +265,7 @@ const formSchema = reactive<FormSchema[]>([
     component: 'Input' as const,
     // label: '机器人token：',
     componentProps: {
-      placeholder: '请输入机器人token',
-      slots: {
-        suffix: () => {
-          return <span>123123</span>
-        }
-      }
+      placeholder: '请输入机器人token'
     },
     formItemProps: {
       rules: [required()],
@@ -279,7 +274,7 @@ const formSchema = reactive<FormSchema[]>([
           return (
             <div>
               机器人token
-              <Tips content="将会从您的账号扣费，请确保您的账户余额充足" />：
+              <Tips content="请输入BotFather返回的token" />：
             </div>
           )
         }

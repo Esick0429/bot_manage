@@ -147,22 +147,10 @@ export const useSearchTable = (config: UseSearchTableConfig) => {
   }
 
   // 删除行
-  const handleDelete = async (row: Recordable) => {
+  const handleDelete = (row: Recordable) => {
     currentRow.value = row
     if (config.fetchDelApi) {
-      try {
-        isLoading.value = true
-        console.log('开始删除...')
-        const result = await tableMethods.delList(1)
-        return result
-      } catch (error) {
-        console.error('删除操作失败:', error)
-        ElMessage.error('删除失败，请重试')
-        return false
-      } finally {
-        isLoading.value = false
-        console.log('删除完成')
-      }
+      return tableMethods.delList(1)
     }
     return Promise.resolve(false)
   }

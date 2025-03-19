@@ -19,14 +19,15 @@ import { ref } from 'vue'
 import { Dialog } from '@/components/Dialog'
 import { Table } from '@/components/Table'
 import { getBotConsumptionRecordApi } from '@/api/botlist'
-import { dateUtil } from '@/utils/dateUtil'
+import { formatToDateTime } from '@/utils/dateUtil'
 
 interface ConsumptionRecord {
   tg_bot_id: number
-  name: string
-  type: number
-  amount: number
-  createTime: string
+  firstname: string
+  charge_type: number
+  mount: number
+  describe: string
+  create_time: string
 }
 
 const dialogVisible = ref(false)
@@ -70,7 +71,7 @@ const columns = [
     field: 'create_time',
     label: '创建时间',
     width: 160,
-    formatter: (row) => dateUtil(row.create_time).format('YYYY-MM-DD HH:mm:ss')
+    formatter: (row) => formatToDateTime(row.create_time)
   }
 ]
 
