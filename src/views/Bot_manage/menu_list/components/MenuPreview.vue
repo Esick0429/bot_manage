@@ -44,40 +44,67 @@ const originalMenuList = ref<MenuItem[]>([])
 // 是否有未保存的更改
 const hasChanges = ref(false)
 
-// 将一维数组转换为4*3布局
+// 将一维数组转换为布局
 const convertToKeyboardLayout = (list: MenuItem[]) => {
   // 保存原始数据
   originalMenuList.value = [...list]
 
-  // 创建一个4*3的二维数组
-  const layout: MenuLayout = Array(4)
+  // 只过滤出类型为1的菜单项
+  const filteredList = list.filter((item) => item.type.toString() === '1')
+
+  // 固定使用三列布局
+  const columnCount = 3
+
+  // 计算需要的行数
+  const rowCount = Math.ceil(filteredList.length / columnCount)
+
+  // 创建一个rowCount * columnCount的二维数组
+  const layout: MenuLayout = Array(rowCount)
     .fill(null)
-    .map(() => Array(3).fill(null))
+    .map(() => Array(columnCount).fill(null))
 
   // 根据sort值将菜单项放入对应位置
-  list.forEach((item) => {
-    if (!item || !item.name) return
+  filteredList
+    .sort((a, b) => a.sort - b.sort)
+    .forEach((item, index) => {
+      if (!item || !item.name) return
 
-    const row = Math.floor((item.sort - 1) / 3)
-    const col = (item.sort - 1) % 3
+      const row = Math.floor(index / columnCount)
+      const col = index % columnCount
 
-    if (row < 4 && col < 3) {
-      layout[row][col] = {
-        ...item,
-        text: item.name,
-        span: 24
+      if (row < rowCount && col < columnCount) {
+        layout[row][col] = {
+          ...item,
+          text: item.name,
+          // 先设置一个默认的span值，稍后会根据每行的实际情况重新计算
+          span: 8
+        }
+      }
+    })
+
+  // 重新计算每行的span值，特别是最后一行的元素需要平分24的宽度
+  for (let rowIndex = 0; rowIndex < layout.length; rowIndex++) {
+    const row = layout[rowIndex]
+    // 计算当前行有多少个非空元素
+    const validItemCount = row.filter((item) => item !== null).length
+
+    if (validItemCount > 0) {
+      // 每个元素平分24的宽度
+      const span = 24 / validItemCount
+
+      // 更新当前行每个元素的span值
+      for (let colIndex = 0; colIndex < row.length; colIndex++) {
+        if (row[colIndex] !== null) {
+          row[colIndex]!.span = span
+        }
       }
     }
-  })
+  }
 
-  // 过滤掉全为null的行，并计算每行的span值
+  console.log('过滤后的数据:', filteredList)
+  console.log('布局数据:', layout)
+
   return layout
-    .filter((row) => row.some((item) => item !== null))
-    .map((row) => {
-      const validItems = row.filter((item) => item !== null)
-      const span = validItems.length === 0 ? 0 : 24 / validItems.length
-      return row.map((item) => (item ? { ...item, span } : null))
-    })
 }
 
 // 获取菜单数据

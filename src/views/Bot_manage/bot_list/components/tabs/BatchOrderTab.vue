@@ -16,7 +16,7 @@ const { formRegister, formMethods } = useForm()
 // 批量下单价格表单
 const batchOrderSchema = reactive<FormSchema[]>([
   {
-    field: 'energyPrice',
+    field: 'batch_energy_price',
     component: 'InputNumber' as const,
     label: '能量单价',
     componentProps: {
@@ -29,7 +29,7 @@ const batchOrderSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'activatePrice',
+    field: 'batch_active_price',
     component: 'InputNumber' as const,
     label: '激活地址单价',
     componentProps: {

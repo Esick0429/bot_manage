@@ -10,7 +10,9 @@
         ref="searchTableRef"
         @add="handleAdd"
         @search="onSearch"
-        @delete="handleTableDelete"
+        :pagination="{
+          total: total
+        }"
       >
         <!-- 自定义搜索按钮 -->
         <template #searchButtons>
@@ -306,10 +308,12 @@ const searchSchema = [
   }
 ]
 
+const total = ref(0)
 // API 封装
 const fetchMenuList = async (params: any) => {
   try {
     const response = await getMenuListApi(params)
+    total.value = response.data.total
     return response.data
   } catch (error) {
     console.error('获取菜单列表失败:', error)
@@ -319,21 +323,33 @@ const fetchMenuList = async (params: any) => {
 
 // 修改deleteMenu函数签名以满足接口要求
 const deleteMenu = async () => {
-  // 这个函数只需返回true，实际删除逻辑在delete调用时由组件内部处理
-  return true
+  // 获取当前选中行数据
+  const row = searchTableRef.value?.currentRow
+  if (row && row.id) {
+    try {
+      // 直接调用API删除菜单
+      const res = await deleteMenuApi(row.id)
+      // 返回删除操作的结果，useTable会根据此结果显示成功消息并刷新列表
+      return res
+    } catch (error) {
+      console.error('删除菜单失败:', error)
+      ElMessage.error('删除失败')
+      return false
+    }
+  } else {
+    console.error('当前选中行不存在或ID为空')
+    ElMessage.error('删除失败：数据不完整')
+    return false
+  }
 }
 
 // 处理删除按钮点击
 const handleDelete = (row: any) => {
-  ElMessageBox.confirm(`确定要删除 ${row.name} 吗？`, '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
-  })
-    .then(async () => {
-      searchTableRef.value?.delete(row)
-    })
-    .catch(() => {})
+  // 直接调用tableMethods.delList方法
+  if (searchTableRef.value) {
+    // 使用useSearchTable的handleDelete方法设置currentRow并调用delList
+    searchTableRef.value.delete(row)
+  }
 }
 
 // 事件处理函数
@@ -418,17 +434,8 @@ const onSearch = (params: any) => {
 const dialogVisible = ref(false)
 const dialogTitle = ref('添加菜单')
 
-// 处理表格组件的删除事件
-const handleTableDelete = async (row: any, result: boolean) => {
-  if (result) {
-    try {
-      await deleteMenuApi(row.id)
-      ElMessage.success('删除成功')
-    } catch (error) {
-      console.error('删除菜单失败:', error)
-      ElMessage.error('删除失败')
-    }
-  }
+const previewHandleClose = () => {
+  searchTableRef.value?.reload()
 }
 
 // 监听状态变化
@@ -451,10 +458,6 @@ watch(
   },
   { immediate: true }
 )
-
-const previewHandleClose = () => {
-  searchTableRef.value?.reload()
-}
 
 onMounted(() => {
   // 组件加载后自动调用首次查询

@@ -35,7 +35,7 @@ const { required, validateMinPrice } = useFormValidation(props.costPrices)
 // 时间能量价格表单
 const timeEnergySchema = reactive<FormSchema[]>([
   {
-    field: 'timeEnergyPrice',
+    field: 'flash_price',
     component: 'InputNumber' as const,
     label: {
       text: '【1小时】能量闪租价格（TRX ）（1笔6.5W能量）',
@@ -54,7 +54,7 @@ const timeEnergySchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'timeEnergyMultiplier',
+    field: 'flash_time_max_num',
     component: 'InputNumber' as const,
     label: {
       text: '【1小时】能量闪租最大倍数',
@@ -72,87 +72,87 @@ const timeEnergySchema = reactive<FormSchema[]>([
   {
     field: 'priceConfig',
     component: 'Divider' as const,
-    label: '按时间购买能量价格配置（1笔6.5W能量）：',
+    label: '按时间购买能量价格（1笔6.5W能量）：',
     componentProps: {
       contentPosition: 'left'
     }
   },
   {
-    field: 'timeEnergy1Hour',
+    field: 'hour_1_price',
     component: 'InputNumber' as const,
-    label: '1小时配置：',
+    label: '1小时价格：',
     componentProps: {
-      placeholder: '请输入1小时配置',
+      placeholder: '请输入1小时价格',
       min: 0,
       precision: 1
     },
     formItemProps: {
       rules: [
-        { required: true, message: '1小时配置是必填项' },
+        { required: true, message: '1小时价格是必填项' },
         { validator: validateMinPrice, trigger: 'blur' }
       ]
     }
   },
   {
-    field: 'timeEnergy1Day',
+    field: 'day_1_price',
     component: 'InputNumber' as const,
-    label: '1天配置：',
+    label: '1天价格：',
     componentProps: {
-      placeholder: '请输入1天配置',
+      placeholder: '请输入1天价格',
       min: 0,
       precision: 1
     },
     formItemProps: {
       rules: [
-        { required: true, message: '1天配置是必填项' },
+        { required: true, message: '1天价格是必填项' },
         { validator: validateMinPrice, trigger: 'blur' }
       ]
     }
   },
   {
-    field: 'timeEnergy3Days',
+    field: 'day_3_price',
     component: 'InputNumber' as const,
-    label: '3天配置：',
+    label: '3天价格：',
     componentProps: {
-      placeholder: '请输入3天配置',
+      placeholder: '请输入3天价格',
       min: 0,
       precision: 1
     },
     formItemProps: {
       rules: [
-        { required: true, message: '3天配置是必填项' },
+        { required: true, message: '3天价格是必填项' },
         { validator: validateMinPrice, trigger: 'blur' }
       ]
     }
   },
   {
-    field: 'timeEnergy7Days',
+    field: 'day_7_price',
     component: 'InputNumber' as const,
-    label: '7天配置：',
+    label: '7天价格：',
     componentProps: {
-      placeholder: '请输入7天配置',
+      placeholder: '请输入7天价格',
       min: 0,
       precision: 1
     },
     formItemProps: {
       rules: [
-        { required: true, message: '7天配置是必填项' },
+        { required: true, message: '7天价格是必填项' },
         { validator: validateMinPrice, trigger: 'blur' }
       ]
     }
   },
   {
-    field: 'timeEnergy15Days',
+    field: 'day_15_price',
     component: 'InputNumber' as const,
-    label: '15天配置：',
+    label: '15天价格：',
     componentProps: {
-      placeholder: '请输入15天配置',
+      placeholder: '请输入15天价格',
       min: 0,
       precision: 1
     },
     formItemProps: {
       rules: [
-        { required: true, message: '15天配置是必填项' },
+        { required: true, message: '15天价格是必填项' },
         { validator: validateMinPrice, trigger: 'blur' }
       ]
     }
