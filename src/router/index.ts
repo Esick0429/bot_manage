@@ -16,6 +16,10 @@ const userInfo = (() => {
     return { userInfo: { username: '' } }
   }
 })()
+
+// 获取环境变量中的系统类型
+const systemType = import.meta.env.VITE_SYSTEM_TYPE || 'Management'
+
 export const constantRouterMap: AppRouteRecordRaw[] = [
   {
     path: '/',
@@ -103,18 +107,17 @@ export const OperationRouterMap: AppRouteRecordRaw[] = [
     path: '/data_statistics',
     component: Layout,
     name: 'DataStatistics',
-    meta: {
-      hidden: userInfo.userInfo.username !== 'test'
-    },
+    redirect: '/data_statistics/index',
+    meta: {},
     children: [
       {
         path: 'index',
-        component: () => import('@/views/Operation/DataStatistics/Analysis.vue'),
+        component: () => import('@/operationView/DataStatistics/Analysis.vue'),
         name: 'Analysis',
         meta: {
           title: '数据统计',
-          icon: 'vi-mdi:chart-bar',
-        },
+          icon: 'vi-mdi:chart-bar'
+        }
       }
     ]
   }
@@ -292,7 +295,6 @@ export const OperationRouterMap: AppRouteRecordRaw[] = [
   // }
 ]
 
-
 // 新添加的路由（原来被注释的部分）
 export const ManageRouterMap: AppRouteRecordRaw[] = [
   // {
@@ -352,7 +354,7 @@ export const ManageRouterMap: AppRouteRecordRaw[] = [
         meta: {
           title: '关键词回复',
           icon: 'vi-bx:bx-message-square-dots',
-          hidden: userInfo.userInfo.username !== 'test'
+          hidden: userInfo.userInfo?.username !== 'test'
         }
       }
     ]
@@ -413,7 +415,7 @@ export const ManageRouterMap: AppRouteRecordRaw[] = [
         meta: {
           title: '能量订单',
           icon: 'vi-mdi:lightning-bolt',
-          hidden: userInfo.userInfo.username !== 'test'
+          hidden: userInfo.userInfo?.username !== 'test'
         }
       },
       {
@@ -423,7 +425,7 @@ export const ManageRouterMap: AppRouteRecordRaw[] = [
         meta: {
           title: '托管订单',
           icon: 'vi-mdi:server',
-          hidden: userInfo.userInfo.username !== 'test'
+          hidden: userInfo.userInfo?.username !== 'test'
         }
       },
       {
@@ -433,7 +435,7 @@ export const ManageRouterMap: AppRouteRecordRaw[] = [
         meta: {
           title: '兑换订单',
           icon: 'vi-mdi:swap-horizontal',
-          hidden: userInfo.userInfo.username !== 'test'
+          hidden: userInfo.userInfo?.username !== 'test'
         }
       }
     ]
@@ -479,7 +481,7 @@ export const ManageRouterMap: AppRouteRecordRaw[] = [
         }
       }
     ]
-  },
+  }
   // {
   //   path: '/system_notice',
   //   component: Layout,
@@ -501,12 +503,7 @@ export const ManageRouterMap: AppRouteRecordRaw[] = [
   //     }
   //   ]
   // }
-  ...OperationRouterMap
 ]
-
-
-
-
 
 // 原有的路由（未被注释的部分）
 export const asyncRouterMap: AppRouteRecordRaw[] = [
@@ -1161,10 +1158,17 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
   ...ManageRouterMap
 ]
 
+// 根据系统类型加载不同路由
+const routes = [
+  // 通用路由
+  ...constantRouterMap,
+  ...(systemType === 'Management' ? ManageRouterMap : OperationRouterMap)
+]
+
 const router = createRouter({
   history: createWebHashHistory(),
   strict: true,
-  routes: constantRouterMap as RouteRecordRaw[],
+  routes: routes as RouteRecordRaw[],
   scrollBehavior: () => ({ left: 0, top: 0 })
 })
 
