@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { asyncRouterMap, ManageRouterMap, constantRouterMap } from '@/router'
+import { asyncRouterMap, ManageRouterMap, OperationRouterMap, constantRouterMap } from '@/router'
 import {
   generateRoutesByFrontEnd,
   generateRoutesByServer,
@@ -42,16 +42,18 @@ export const usePermissionStore = defineStore('permission', {
       routers?: AppCustomRouteRecordRaw[] | string[]
     ): Promise<unknown> {
       return new Promise<void>((resolve) => {
+        const systemType = import.meta.env.VITE_SYSTEM_TYPE || 'Management'
+        const routerType = systemType === 'Management' ? ManageRouterMap : OperationRouterMap
         let routerMap: AppRouteRecordRaw[] = []
         if (type === 'server') {
           // 模拟后端过滤菜单
           routerMap = generateRoutesByServer(routers as AppCustomRouteRecordRaw[])
         } else if (type === 'frontEnd') {
           // 模拟前端过滤菜单
-          routerMap = generateRoutesByFrontEnd(cloneDeep(ManageRouterMap), routers as string[])
+          routerMap = generateRoutesByFrontEnd(cloneDeep(routerType), routers as string[])
         } else {
           // 直接读取静态路由表
-          routerMap = cloneDeep(ManageRouterMap)
+          routerMap = cloneDeep(routerType)
         }
         // 动态路由，404一定要放到最后面
         this.addRouters = routerMap.concat([

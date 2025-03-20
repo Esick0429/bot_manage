@@ -35,15 +35,20 @@ interface AppState {
   fixedMenu: boolean
 }
 
+// 获取环境变量
+const systemType = import.meta.env.VITE_SYSTEM_TYPE || 'Management'
+
+// 根据系统类型设置不同标题
+const getSystemTitle = () => {
+  return systemType === 'Management' ? '机器人后台管理系统' : '机器人后台运营系统'
+}
+
 export const useAppStore = defineStore('app', {
   state: (): AppState => {
     return {
       sizeMap: ['default', 'large', 'small'],
       mobile: false, // 是否是移动端
-      title:
-        import.meta.env.VITE_SYSTEM_TYPE === 'Management'
-          ? import.meta.env.VITE_APP_TITLE
-          : import.meta.env.VITE_APP_TITLE_OPERATION, // 标题
+      title: getSystemTitle(),
       pageLoading: false, // 路由跳转loading
       breadcrumb: true, // 面包屑
       breadcrumbIcon: true, // 面包屑图标
@@ -55,7 +60,7 @@ export const useAppStore = defineStore('app', {
       locale: false, // 多语言图标
       tagsView: true, // 标签页
       tagsViewIcon: true, // 是否显示标签图标
-      logo: false, // logo
+      logo: true, // logo
       fixedHeader: true, // 固定toolheader
       footer: true, // 显示页脚
       greyMode: false, // 是否开始灰色模式，用于特殊悼念日
@@ -330,7 +335,7 @@ export const useAppStore = defineStore('app', {
         valueLight: 'light'
       })
       isDark.value = this.getIsDark
-      const newTitle = import.meta.env.VITE_APP_TITLE
+      const newTitle = getSystemTitle()
       newTitle !== this.getTitle && this.setTitle(newTitle)
     }
   },

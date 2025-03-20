@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, provide } from 'vue'
 import { useAppStore } from '@/store/modules/app'
 import { ConfigGlobal } from '@/components/ConfigGlobal'
 import { useDesign } from '@/hooks/web/useDesign'
@@ -14,6 +14,14 @@ const appStore = useAppStore()
 const currentSize = computed(() => appStore.getCurrentSize)
 
 const greyMode = computed(() => appStore.getGreyMode)
+
+const systemType = import.meta.env.VITE_SYSTEM_TYPE || 'Management'
+
+// 可以提供给后代组件使用
+provide('systemType', systemType)
+
+// 可以在控制台输出当前系统类型（开发调试用）
+console.log('当前系统类型:', systemType)
 
 appStore.initTheme()
 
