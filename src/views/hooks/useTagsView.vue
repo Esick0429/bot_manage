@@ -3,6 +3,8 @@ import { ContentWrap } from '@/components/ContentWrap'
 import { useTagsView } from '@/hooks/web/useTagsView'
 import { useRouter } from 'vue-router'
 
+const homeUrl = '/bot_manage/bot_list'
+
 const { push } = useRouter()
 
 const { closeAll, closeLeft, closeRight, closeOther, closeCurrent, refreshPage, setTitle } =
@@ -10,7 +12,7 @@ const { closeAll, closeLeft, closeRight, closeOther, closeCurrent, refreshPage, 
 
 const closeAllTabs = () => {
   closeAll(() => {
-    push('/dashboard/analysis')
+    push(homeUrl)
   })
 }
 
@@ -32,7 +34,7 @@ const refresh = () => {
 
 const closeCurrentTab = () => {
   closeCurrent(undefined, () => {
-    push('/dashboard/analysis')
+    push(homeUrl)
   })
 }
 
@@ -41,7 +43,7 @@ const setTabTitle = () => {
 }
 
 const setAnalysisTitle = () => {
-  setTitle(`分析页-${new Date().getTime().toString()}`, '/dashboard/analysis')
+  setTitle(`分析页-${new Date().getTime().toString()}`, homeUrl)
 }
 </script>
 
