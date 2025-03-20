@@ -56,6 +56,12 @@ export const useSearchTable = (config: UseSearchTableConfig) => {
         }
       } catch (error) {
         console.error('搜索操作失败:', error)
+        hasError.value = true
+        // 添加返回值，确保即使出错也返回一个符合类型的结果
+        return {
+          list: [],
+          total: 0
+        }
       } finally {
         isLoading.value = false
       }
