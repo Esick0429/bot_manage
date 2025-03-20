@@ -4,26 +4,12 @@ import { ElRow, ElCol, ElButton, ElMessage } from 'element-plus'
 import { Dialog } from '@/components/Dialog'
 import { getMenuListApi, saveMenuApi } from '@/api/menu_list'
 import { useDraggable } from '@/hooks/event/useDraggable'
-
-// 定义菜单项接口
-interface MenuItem {
-  id: number
-  name: string
-  type: string
-  sort: number
-  other?: string
-  status: number
-  span?: number
-  text?: string
-}
+import { MenuItem, MenuLayout, InnerCallback } from '@/api/menu_list/types'
 
 // 定义预览内容区域的ref
 const previewRef = ref<HTMLElement | null>(null)
 // 加载状态
 const loading = ref(false)
-
-// 定义菜单布局类型
-type MenuLayout = (MenuItem | null)[][]
 
 const props = defineProps<{
   modelValue: boolean
@@ -50,7 +36,7 @@ const convertToKeyboardLayout = (list: MenuItem[]) => {
   originalMenuList.value = [...list]
 
   // 只过滤出类型为1的菜单项
-  const filteredList = list.filter((item) => item.type.toString() === '1')
+  const filteredList = list.filter((item) => item.menu_type === 1)
 
   // 固定使用三列布局
   const columnCount = 3
@@ -65,9 +51,9 @@ const convertToKeyboardLayout = (list: MenuItem[]) => {
 
   // 根据sort值将菜单项放入对应位置
   filteredList
-    .sort((a, b) => a.sort - b.sort)
+    .sort((a, b) => a.order_num - b.order_num)
     .forEach((item, index) => {
-      if (!item || !item.name) return
+      if (!item || !item.menu_name) return
 
       const row = Math.floor(index / columnCount)
       const col = index % columnCount
@@ -75,7 +61,7 @@ const convertToKeyboardLayout = (list: MenuItem[]) => {
       if (row < rowCount && col < columnCount) {
         layout[row][col] = {
           ...item,
-          text: item.name,
+          text: item.menu_name,
           // 先设置一个默认的span值，稍后会根据每行的实际情况重新计算
           span: 8
         }
@@ -167,34 +153,44 @@ const saveMenuOrder = async () => {
     loading.value = true
 
     // 从布局中提取更新后的菜单项
-    const updatedMenuItems: Array<{ id: number; sort: number }> = []
+    const updatedMenuItems: Array<{ id: number; order_num: number }> = []
 
     for (let rowIndex = 0; rowIndex < keyboardLayout.value.length; rowIndex++) {
       const row = keyboardLayout.value[rowIndex]
       for (let colIndex = 0; colIndex < row.length; colIndex++) {
         const item = row[colIndex]
         if (item) {
-          // 计算新的sort值
-          const sort = rowIndex * 3 + colIndex + 1
+          // 计算新的order_num值
+          const order_num = rowIndex * 3 + colIndex + 1
           updatedMenuItems.push({
             id: item.id,
-            sort: sort
+            order_num: order_num
           })
         }
       }
     }
 
-    // 为每个更改过的菜单项调用保存API
-    for (const item of updatedMenuItems) {
+    // 准备保存请求数组
+    const saveRequests = updatedMenuItems.map((item) => {
       // 查找原始数据
       const originalItem = originalMenuList.value.find((menu) => menu.id === item.id)
-      if (originalItem && originalItem.sort !== item.sort) {
-        await saveMenuApi({
-          ...originalItem,
-          sort: item.sort
+      if (originalItem && originalItem.order_num !== item.order_num) {
+        // 确保使用inner_value而不是value字段
+        return saveMenuApi({
+          id: originalItem.id,
+          menu_name: originalItem.menu_name,
+          menu_type: originalItem.menu_type,
+          order_num: item.order_num,
+          status: originalItem.status,
+          inner_type: originalItem.inner_type,
+          inner_value: originalItem.inner_value
         })
       }
-    }
+      return Promise.resolve() // 如果没有变化，返回一个已解决的Promise
+    })
+
+    // 使用Promise.all并行处理所有保存请求
+    await Promise.all(saveRequests)
 
     ElMessage.success('菜单排序已保存')
     hasChanges.value = false

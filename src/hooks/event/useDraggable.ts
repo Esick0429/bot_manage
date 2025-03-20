@@ -1,22 +1,10 @@
 import { ref, onMounted, onUnmounted } from 'vue'
+import { MenuItem, MenuLayout } from '@/api/menu_list/types'
 
 export interface Position {
   row: number
   col: number
 }
-
-export interface MenuItem {
-  id: number
-  name: string
-  type: string
-  sort: number
-  other?: string
-  status: number
-  span?: number
-  text?: string
-}
-
-export type MenuLayout = (MenuItem | null)[][]
 
 export interface DraggableOptions {
   // 放置元素后的回调，返回新的排序结果
@@ -135,9 +123,9 @@ export function useDraggable(options: DraggableOptions = {}) {
 
     // 如果有目标项，则交换sort值
     if (targetItem) {
-      const tempSort = draggedItem.sort
-      draggedItem.sort = targetItem.sort
-      targetItem.sort = tempSort
+      const tempSort = draggedItem.order_num
+      draggedItem.order_num = targetItem.order_num
+      targetItem.order_num = tempSort
 
       // 交换位置
       newLayout[startRow][startCol] = targetItem
@@ -145,7 +133,7 @@ export function useDraggable(options: DraggableOptions = {}) {
     } else {
       // 如果目标位置为空，则计算新的sort值
       const newSort = rowIndex * 3 + colIndex + 1
-      draggedItem.sort = newSort
+      draggedItem.order_num = newSort
 
       // 移动到新位置
       newLayout[startRow][startCol] = null
