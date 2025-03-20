@@ -7,6 +7,7 @@
         :fetch-data-api="fetchMenuList"
         :fetch-del-api="deleteMenu"
         :action-column="actionColumn"
+        @loaded="handleDataLoaded"
         ref="searchTableRef"
         @add="handleAdd"
         @search="onSearch"
@@ -39,7 +40,7 @@
 </template>
 
 <script setup lang="tsx">
-import { ref, onMounted, h, computed, watch, reactive } from 'vue'
+import { ref, onMounted, h, computed, watch, reactive, nextTick } from 'vue'
 import {
   ElButton,
   ElLink,
@@ -61,6 +62,7 @@ import { useI18n } from '@/hooks/web/useI18n'
 import type { TableColumn } from '@/components/Table'
 import type { FormSchema } from '@/components/Form'
 import { getMenuListApi, deleteMenuApi, saveMenuApi } from '@/api/menu_list'
+import { MenuItem } from '@/api/menu_list/types'
 import MenuPreview from './components/MenuPreview.vue'
 
 const { t } = useI18n()
@@ -68,36 +70,27 @@ const searchTableRef = ref<InstanceType<typeof SearchTable> | null>(null)
 const previewVisible = ref(false)
 const { formRegister, formMethods } = useForm()
 
-// 控制按钮类型相关表单项显示
-const isUrlType = ref(true)
+// 控制按钮类型相关表单项显示 - 转换为计算属性
+const isUrlType = computed(() => formValues.inner_type === 'url')
+
+const isLoaded = ref(false)
 
 // 添加formValues来跟踪表单值
 const formValues = reactive<{
-  type: number
-  buttonType: string
-  other: string
+  menu_type: number
+  inner_type: string
+  inner_value: string
   [key: string]: any
 }>({
-  type: 1,
-  buttonType: 'url',
-  other: ''
+  menu_type: 1,
+  inner_type: '',
+  inner_value: ''
 })
-
-// 表单数据接口
-interface FormData {
-  id?: number
-  name: string
-  type: number
-  buttonType: string
-  other: string
-  sort: number
-  status: number
-}
 
 // 表单配置
 const formSchema = reactive<FormSchema[]>([
   {
-    field: 'name',
+    field: 'menu_name',
     component: 'Input' as const,
     label: '菜单名称',
     componentProps: {
@@ -108,7 +101,7 @@ const formSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'sort',
+    field: 'order_num',
     component: 'InputNumber' as const,
     label: '排序',
     componentProps: {
@@ -120,7 +113,20 @@ const formSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'type',
+    field: 'status',
+    component: 'Switch' as const,
+    label: '状态',
+    value: 2,
+    componentProps: {
+      activeValue: 1,
+      inactiveValue: 2
+    },
+    formItemProps: {
+      rules: [{ required: true, message: '状态不能为空' }]
+    }
+  },
+  {
+    field: 'menu_type',
     component: 'Select' as const,
     label: '菜单类型',
     componentProps: {
@@ -130,10 +136,10 @@ const formSchema = reactive<FormSchema[]>([
       ],
       placeholder: '请选择菜单类型',
       onChange: async (value) => {
-        formValues.type = value
+        formValues.menu_type = value
         await formMethods.setValues({
-          type: value,
-          other: ''
+          menu_type: value,
+          inner_value: ''
         })
       }
     },
@@ -142,35 +148,35 @@ const formSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'buttonType',
+    field: 'inner_type',
     component: 'Select' as const,
-    label: '按钮类型',
+    label: '内联类型',
     componentProps: {
       options: [
         { label: 'URL链接', value: 'url' },
-        { label: '回调函数', value: 'callback' }
+        { label: '回调函数', value: 'call' }
       ],
-      placeholder: '请选择按钮类型',
+      placeholder: '请选择内联类型',
       onChange: async (value) => {
-        isUrlType.value = value === 'url'
-        formValues.buttonType = value
+        formValues.inner_type = value
         await formMethods.setValues({
-          buttonType: value
+          inner_type: value,
+          inner_value: '' // 切换类型时清空值
         })
       }
     },
     formItemProps: {
-      rules: [{ required: true, message: '按钮类型不能为空' }]
+      rules: [{ required: true, message: '内联类型不能为空' }]
     }
   },
   {
-    field: 'other',
+    field: 'inner_value',
     component: 'Input' as const,
-    label: '链接地址/回调函数',
+    label: '链接地址',
     componentProps: {
-      placeholder: '请输入链接地址或回调函数名称',
+      placeholder: '请输入链接地址',
       remark: () => {
-        if (formValues.buttonType === 'url') {
+        if (isUrlType.value) {
           return (
             <>
               <p>例如：https://www.123456789.com</p>
@@ -187,22 +193,6 @@ const formSchema = reactive<FormSchema[]>([
     },
     formItemProps: {
       rules: [{ required: true, message: '该字段不能为空' }]
-    },
-    colProps: {
-      span: 24
-    }
-  },
-  {
-    field: 'status',
-    component: 'Switch' as const,
-    label: '状态',
-    value: 2,
-    componentProps: {
-      activeValue: 1,
-      inactiveValue: 2
-    },
-    formItemProps: {
-      rules: [{ required: true, message: '状态不能为空' }]
     }
   }
 ])
@@ -210,11 +200,22 @@ const formSchema = reactive<FormSchema[]>([
 // 表格列配置
 const columns: TableColumn[] = [
   {
-    field: 'name',
-    label: '菜单名称'
+    field: 'menu_name',
+    label: '菜单名称',
+    slots: {
+      default: (data: any) => {
+        return h(
+          'span',
+          {
+            style: { color: '#333' }
+          },
+          data.row.menu_name
+        )
+      }
+    }
   },
   {
-    field: 'type',
+    field: 'menu_type',
     label: '类型',
     slots: {
       default: (data: any) => {
@@ -222,7 +223,7 @@ const columns: TableColumn[] = [
           1: { label: '菜单', type: 'success' },
           2: { label: '内联按钮', type: 'primary' }
         }
-        const type = typeMap[data.row.type] || { label: '-', type: 'info' }
+        const type = typeMap[data.row.menu_type] || { label: '-', type: 'info' }
         return h(
           ElTag,
           {
@@ -233,31 +234,58 @@ const columns: TableColumn[] = [
       }
     }
   },
-  { field: 'sort', label: '排序' },
-  { field: 'other', label: '其他' },
+  {
+    field: 'inner_type',
+    label: '内联类型',
+    slots: {
+      default: (data: any) => {
+        if (data.row.menu_type !== 2) {
+          return h('span', {}, '-')
+        }
+
+        const typeMap = {
+          url: { label: 'URL链接', type: 'warning' },
+          call: { label: '回调函数', type: 'info' }
+        }
+        const type = typeMap[data.row.inner_type] || { label: '-', type: 'info' }
+        return h(
+          ElTag,
+          {
+            type: type.type
+          },
+          () => type.label
+        )
+      }
+    }
+  },
+  {
+    field: 'other',
+    label: '其他'
+    // formatter: (row: any) => {
+    //   if (row.menu_type === 2) {
+    //     return row.inner_value || '-'
+    //   }
+    //   return '-'
+    // }
+  },
+  { field: 'order_num', label: '排序' },
   {
     field: 'status',
     label: '状态',
     slots: {
       default: (data: any) => {
-        return h(ElSwitch, {
-          modelValue: data.row.status === 1,
-          disabled: true,
-          activeColor: '#13ce66',
-          inactiveColor: '#ff4949'
-        })
+        return (
+          <>
+            <ElSwitch
+              v-model={data.row.status}
+              activeValue={1}
+              inactiveValue={2}
+              onChange={() => handleStatusChange(data.row)}
+            />
+          </>
+        )
       }
     }
-  },
-  {
-    field: 'createTime',
-    label: '创建时间',
-    formatter: (row: any) => row.createTime || '-'
-  },
-  {
-    field: 'updateTime',
-    label: '更新时间',
-    formatter: (row: any) => row.updateTime || '-'
   }
 ]
 
@@ -286,7 +314,7 @@ const actionColumn = {
 // 搜索表单配置
 const searchSchema = [
   {
-    field: 'name',
+    field: 'menu_name',
     component: 'Input' as const,
     label: '菜单名称',
     componentProps: {
@@ -294,7 +322,7 @@ const searchSchema = [
     }
   },
   {
-    field: 'type',
+    field: 'menu_type',
     component: 'Select' as const,
     label: '类型',
     componentProps: {
@@ -359,16 +387,13 @@ const handleAdd = () => {
 
   // 重置表单
   const defaultValues = {
-    name: '',
-    type: 1,
-    buttonType: 'url',
-    other: '',
-    sort: 0,
+    menu_name: '',
+    menu_type: 1,
+    inner_type: '',
+    inner_value: '',
+    order_num: 0,
     status: 1
   }
-
-  // 同步更新显示状态
-  isUrlType.value = true
 
   // 更新本地响应式数据
   Object.assign(formValues, defaultValues)
@@ -381,19 +406,19 @@ const handleEdit = (row: any) => {
   dialogVisible.value = true
   dialogTitle.value = '编辑菜单'
 
+  // 获取inner_type和相关值
+  const innerType = row.inner_type
+
   // 设置表单值
   const editValues = {
     id: row.id,
-    name: row.name,
-    type: row.type,
-    sort: row.sort,
+    menu_name: row.menu_name,
+    menu_type: row.menu_type,
+    order_num: row.order_num,
     status: row.status,
-    buttonType: row.buttonType || 'url',
-    other: row.other || ''
+    inner_type: innerType,
+    inner_value: row.inner_value || '' // 统一使用inner_value字段
   }
-
-  // 同步更新显示状态
-  isUrlType.value = (row.buttonType || 'url') === 'url'
 
   // 更新本地响应式数据
   Object.assign(formValues, editValues)
@@ -411,8 +436,10 @@ const handleSubmit = async () => {
     const formRef = ref()
     await formRef.value?.validate()
 
+    // 获取表单数据
     const values = await formMethods.getFormData()
 
+    // 调用保存API
     await saveMenuApi(values)
 
     ElMessage.success(values.id ? '更新成功' : '添加成功')
@@ -440,24 +467,67 @@ const previewHandleClose = () => {
 
 // 监听状态变化
 watch(
-  [() => formValues.type, isUrlType],
+  [() => formValues.menu_type, () => formValues.inner_type],
   () => {
     // 更新表单配置中的disabled和hidden属性
     formSchema.forEach((item) => {
-      if (item.field === 'buttonType') {
-        item.hidden = formValues.type !== 2
-      } else if (item.field === 'other') {
-        item.hidden = formValues.type !== 2
-        item.label = isUrlType.value ? '链接地址' : '回调函数'
-        item.componentProps = {
-          ...item.componentProps,
-          disabled: formValues.type !== 2
+      if (item.field === 'inner_type') {
+        item.hidden = formValues.menu_type !== 2
+      } else if (item.field === 'inner_value') {
+        item.hidden = formValues.menu_type !== 2
+
+        // 根据inner_type动态更新label和placeholder
+        if (formValues.inner_type === 'url') {
+          item.label = '链接地址'
+          if (item.componentProps) {
+            item.componentProps.placeholder = '请输入链接地址'
+          }
+          if (item.formItemProps && item.formItemProps.rules && item.formItemProps.rules[0]) {
+            item.formItemProps.rules[0].message = '链接地址不能为空'
+          }
+        } else {
+          item.label = '回调函数名称'
+          if (item.componentProps) {
+            item.componentProps.placeholder = '请输入回调函数名称'
+          }
+          if (item.formItemProps && item.formItemProps.rules && item.formItemProps.rules[0]) {
+            item.formItemProps.rules[0].message = '回调函数名称不能为空'
+          }
         }
       }
     })
   },
   { immediate: true }
 )
+
+// 数据加载完成回调
+const handleDataLoaded = ({ data, total, success }) => {
+  console.log('数据加载完成:', {
+    总条数: total,
+    成功: success,
+    数据: data,
+    条数: data?.length || 0
+  })
+  nextTick(() => {
+    isLoaded.value = true
+  })
+  if (data?.length === 0 && success) {
+    ElMessage.info('未查询到符合条件的数据')
+  }
+}
+// 状态切换
+const handleStatusChange = async (value) => {
+  if (!isLoaded.value) return
+  console.log('状态切换:', value)
+  // 调用API更新状态
+  const res = await saveMenuApi(value)
+  if (res.code === '000000') {
+    ElMessage.success('状态更新成功')
+  } else {
+    ElMessage.error('状态更新失败')
+  }
+  console.log('状态切换结果:', res)
+}
 
 onMounted(() => {
   // 组件加载后自动调用首次查询
