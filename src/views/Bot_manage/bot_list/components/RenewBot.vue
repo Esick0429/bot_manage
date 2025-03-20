@@ -32,7 +32,10 @@ const formSchema = reactive<FormSchema[]>([
   {
     field: 'month_num',
     component: 'InputNumber' as const,
-    label: '续费月数：',
+    label: {
+      text: '续费月数：',
+      tips: '1=30天'
+    },
     componentProps: {
       placeholder: '请输入续费月数',
       min: 1,
