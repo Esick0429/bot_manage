@@ -70,7 +70,7 @@ const columns = [
   {
     field: 'create_time',
     label: '创建时间',
-    width: 160,
+    minWidth: 120,
     formatter: (row) => formatToDateTime(row.create_time)
   }
 ]
