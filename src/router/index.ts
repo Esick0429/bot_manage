@@ -6,12 +6,21 @@ import { useI18n } from '@/hooks/web/useI18n'
 import { NO_RESET_WHITE_LIST } from '@/constants'
 
 const { t } = useI18n()
-
+//TODO:后期需删除
+// 获取用户信息，如果未登录或获取失败则提供默认值
+const userInfo = (() => {
+  try {
+    return JSON.parse(localStorage.getItem('user') || '{}')
+  } catch (error) {
+    console.warn('获取用户信息失败', error)
+    return { userInfo: { username: '' } }
+  }
+})()
 export const constantRouterMap: AppRouteRecordRaw[] = [
   {
     path: '/',
     component: Layout,
-    redirect: '/dashboard/analysis',
+    redirect: '/bot_manage/bot_list',
     name: 'Root',
     meta: {
       hidden: true
@@ -89,8 +98,203 @@ export const constantRouterMap: AppRouteRecordRaw[] = [
   }
 ]
 
+export const OperationRouterMap: AppRouteRecordRaw[] = [
+  {
+    path: '/data_statistics',
+    component: Layout,
+    name: 'DataStatistics',
+    meta: {
+      hidden: userInfo.userInfo.username !== 'test'
+    },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/Operation/DataStatistics/Analysis.vue'),
+        name: 'Analysis',
+        meta: {
+          title: '数据统计',
+          icon: 'vi-mdi:chart-bar',
+        },
+      }
+    ]
+  }
+  // {
+  //   path: '/exchange_rate',
+  //   component: Layout,
+  //   name: 'ExchangeRate',
+  //   meta: {
+  //     title: '实时汇率监听',
+  //     icon: 'vi-mdi:currency-usd'
+  //   }
+  // },
+  // {
+  //   path: '/operation_center',
+  //   component: Layout,
+  //   name: 'OperationCenter',
+  //   meta: {
+  //     title: '运营中心',
+  //     icon: 'vi-mdi:view-dashboard',
+  //     alwaysShow: true
+  //   },
+  //   children: [
+  //     {
+  //       path: 'energy_transaction',
+  //       component: () => import('@/views/OperationCenter/EnergyTransaction.vue'),
+  //       name: 'EnergyTransaction',
+  //       meta: {
+  //         title: '能量交易明细'
+  //       }
+  //     },
+  //     {
+  //       path: 'flash_exchange',
+  //       component: () => import('@/views/OperationCenter/FlashExchange.vue'),
+  //       name: 'FlashExchange',
+  //       meta: {
+  //         title: '闪兑明细'
+  //       }
+  //     },
+  //     {
+  //       path: 'custody_details',
+  //       component: () => import('@/views/OperationCenter/CustodyDetails.vue'),
+  //       name: 'CustodyDetails',
+  //       meta: {
+  //         title: '托管明细'
+  //       }
+  //     }
+  //   ]
+  // },
+  // {
+  //   path: '/marketing',
+  //   component: Layout,
+  //   name: 'Marketing',
+  //   meta: {
+  //     title: '营销管理',
+  //     icon: 'vi-mdi:bullhorn',
+  //     alwaysShow: true
+  //   },
+  //   children: [
+  //     {
+  //       path: 'agent_price',
+  //       component: () => import('@/views/Marketing/AgentPrice.vue'),
+  //       name: 'AgentPrice',
+  //       meta: {
+  //         title: '代理价格配置'
+  //       }
+  //     },
+  //     {
+  //       path: 'payment_config',
+  //       component: () => import('@/views/Marketing/PaymentConfig.vue'),
+  //       name: 'PaymentConfig',
+  //       meta: {
+  //         title: '收款配置'
+  //       }
+  //     }
+  //   ]
+  // },
+  // {
+  //   path: '/agent',
+  //   component: Layout,
+  //   name: 'Agent',
+  //   meta: {
+  //     title: '代理管理',
+  //     icon: 'vi-mdi:account-group',
+  //     alwaysShow: true
+  //   },
+  //   children: [
+  //     {
+  //       path: 'info',
+  //       component: () => import('@/views/Agent/Info.vue'),
+  //       name: 'AgentInfo',
+  //       meta: {
+  //         title: '代理信息'
+  //       }
+  //     },
+  //     {
+  //       path: 'robot_list',
+  //       component: () => import('@/views/Agent/RobotList.vue'),
+  //       name: 'RobotList',
+  //       meta: {
+  //         title: '机器人列表'
+  //       }
+  //     },
+  //     {
+  //       path: 'order',
+  //       component: () => import('@/views/Agent/Order.vue'),
+  //       name: 'Order',
+  //       meta: {
+  //         title: '订单管理'
+  //       }
+  //     },
+  //     {
+  //       path: 'ledger',
+  //       component: () => import('@/views/Agent/Ledger.vue'),
+  //       name: 'AgentLedger',
+  //       meta: {
+  //         title: '代理账本'
+  //       }
+  //     }
+  //   ]
+  // },
+  // {
+  //   path: '/system',
+  //   component: Layout,
+  //   name: 'System',
+  //   meta: {
+  //     title: '系统管理',
+  //     icon: 'vi-mdi:cog',
+  //     alwaysShow: true
+  //   },
+  //   children: [
+  //     {
+  //       path: 'role',
+  //       component: () => import('@/views/System/Role.vue'),
+  //       name: 'Role',
+  //       meta: {
+  //         title: '角色管理'
+  //       }
+  //     },
+  //     {
+  //       path: 'user',
+  //       component: () => import('@/views/System/User.vue'),
+  //       name: 'User',
+  //       meta: {
+  //         title: '用户管理'
+  //       }
+  //     }
+  //   ]
+  // },
+  // {
+  //   path: '/system_config',
+  //   component: Layout,
+  //   name: 'SystemConfig',
+  //   meta: {
+  //     title: '系统配置',
+  //     icon: 'vi-mdi:wrench'
+  //   }
+  // },
+  // {
+  //   path: '/resource_pool',
+  //   component: Layout,
+  //   name: 'ResourcePool',
+  //   meta: {
+  //     title: '资源池账户',
+  //     icon: 'vi-mdi:database'
+  //   }
+  // },
+  // {
+  //   path: '/system_notice',
+  //   component: Layout,
+  //   name: 'SystemNotice',
+  //   meta: {
+  //     title: '系统公告',
+  //     icon: 'vi-mdi:bell'
+  //   }
+  // }
+]
+
+
 // 新添加的路由（原来被注释的部分）
-export const newRouterMap: AppRouteRecordRaw[] = [
+export const ManageRouterMap: AppRouteRecordRaw[] = [
   // {
   //   path: '/real-time-data',
   //   component: Layout,
@@ -116,6 +320,7 @@ export const newRouterMap: AppRouteRecordRaw[] = [
     path: '/bot_manage',
     component: Layout,
     name: 'BotManage',
+    redirect: '/bot_manage/bot_list',
     meta: {
       title: '机器人管理',
       icon: 'lucide:bot',
@@ -138,6 +343,16 @@ export const newRouterMap: AppRouteRecordRaw[] = [
         meta: {
           title: '菜单列表',
           icon: 'vi-bx:bx-menu'
+        }
+      },
+      {
+        path: 'reply_list',
+        component: () => import('@/views/Bot_manage/reply_list/index.vue'),
+        name: 'ReplyList',
+        meta: {
+          title: '关键词回复',
+          icon: 'vi-bx:bx-message-square-dots',
+          hidden: userInfo.userInfo.username !== 'test'
         }
       }
     ]
@@ -197,7 +412,8 @@ export const newRouterMap: AppRouteRecordRaw[] = [
         name: 'EnergyOrder',
         meta: {
           title: '能量订单',
-          icon: 'vi-mdi:lightning-bolt'
+          icon: 'vi-mdi:lightning-bolt',
+          hidden: userInfo.userInfo.username !== 'test'
         }
       },
       {
@@ -206,7 +422,8 @@ export const newRouterMap: AppRouteRecordRaw[] = [
         name: 'HostedOrder',
         meta: {
           title: '托管订单',
-          icon: 'vi-mdi:server'
+          icon: 'vi-mdi:server',
+          hidden: userInfo.userInfo.username !== 'test'
         }
       },
       {
@@ -215,11 +432,12 @@ export const newRouterMap: AppRouteRecordRaw[] = [
         name: 'ExchangeOrder',
         meta: {
           title: '兑换订单',
-          icon: 'vi-mdi:swap-horizontal'
+          icon: 'vi-mdi:swap-horizontal',
+          hidden: userInfo.userInfo.username !== 'test'
         }
       }
     ]
-  }
+  },
   // {
   //   path: '/data_statistics',
   //   component: Layout,
@@ -241,27 +459,27 @@ export const newRouterMap: AppRouteRecordRaw[] = [
   //     }
   //   ]
   // },
-  // {
-  //   path: '/account_manage',
-  //   component: Layout,
-  //   name: 'AccountManage',
-  //   meta: {
-  //     title: '账户管理',
-  //     icon: 'vi-mdi:account-cog',
-  //     alwaysShow: true
-  //   },
-  //   children: [
-  //     {
-  //       path: 'account_list',
-  //       component: () => import('@/views/AccountManage/account_list/index.vue'),
-  //       name: 'AccountList',
-  //       meta: {
-  //         title: '账户列表',
-  //         icon: 'vi-mdi:format-list-bulleted'
-  //       }
-  //     }
-  //   ]
-  // },
+  {
+    path: '/account_manage',
+    component: Layout,
+    name: 'AccountManage',
+    meta: {
+      title: '账户管理',
+      icon: 'vi-mdi:account-cog',
+      alwaysShow: true
+    },
+    children: [
+      {
+        path: 'account_list',
+        component: () => import('@/views/AccountManage/account_list/index.vue'),
+        name: 'AccountList',
+        meta: {
+          title: '账户列表',
+          icon: 'vi-mdi:format-list-bulleted'
+        }
+      }
+    ]
+  },
   // {
   //   path: '/system_notice',
   //   component: Layout,
@@ -283,7 +501,12 @@ export const newRouterMap: AppRouteRecordRaw[] = [
   //     }
   //   ]
   // }
+  ...OperationRouterMap
 ]
+
+
+
+
 
 // 原有的路由（未被注释的部分）
 export const asyncRouterMap: AppRouteRecordRaw[] = [
@@ -935,7 +1158,7 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
       }
     ]
   },
-  ...newRouterMap
+  ...ManageRouterMap
 ]
 
 const router = createRouter({
