@@ -90,7 +90,10 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
           })
         : undefined,
       ViteEjsPlugin({
-        title: env.VITE_APP_TITLE
+        title:
+          env.VITE_SYSTEM_TYPE === 'Management'
+            ? env.VITE_APP_TITLE
+            : env.VITE_APP_TITLE_OPERATION
       }),
       UnoCSS()
     ],
