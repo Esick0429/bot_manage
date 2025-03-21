@@ -359,36 +359,36 @@ export const ManageRouterMap: AppRouteRecordRaw[] = [
       }
     ]
   },
-  // {
-  //   path: '/user_group',
-  //   component: Layout,
-  //   name: 'UserGroup',
-  //   meta: {
-  //     title: '用户群组',
-  //     icon: 'vi-ph:users-three-fill',
-  //     alwaysShow: true
-  //   },
-  //   children: [
-  //     {
-  //       path: 'user_list',
-  //       component: () => import('@/views/UserGroup/user_list/index.vue'),
-  //       name: 'UserList',
-  //       meta: {
-  //         title: '用户列表',
-  //         icon: 'vi-ph:user-list-fill'
-  //       }
-  //     },
-  //     {
-  //       path: 'group_list',
-  //       component: () => import('@/views/UserGroup/group_list/index.vue'),
-  //       name: 'GroupList',
-  //       meta: {
-  //         title: '群组列表',
-  //         icon: 'vi-clarity:group-solid'
-  //       }
-  //     }
-  //   ]
-  // },
+  {
+    path: '/user_group',
+    component: Layout,
+    name: 'UserGroup',
+    meta: {
+      title: '用户群组',
+      icon: 'vi-ph:users-three-fill',
+      alwaysShow: true
+    },
+    children: [
+      {
+        path: 'user_list',
+        component: () => import('@/views/UserGroup/user_list/index.vue'),
+        name: 'UserList',
+        meta: {
+          title: '用户列表',
+          icon: 'vi-ph:user-list-fill'
+        }
+      }
+      // {
+      //   path: 'group_list',
+      //   component: () => import('@/views/UserGroup/group_list/index.vue'),
+      //   name: 'GroupList',
+      //   meta: {
+      //     title: '群组列表',
+      //     icon: 'vi-clarity:group-solid'
+      //   }
+      // }
+    ]
+  },
   {
     path: '/order_manage',
     component: Layout,
