@@ -8,8 +8,8 @@
   "scripts": {
     "i": "pnpm install",
     "dev": "pnpm vite --mode base",
-    "dev:management": "cross-env VITE_SYSTEM_TYPE=Management pnpm vite --mode base",
-    "dev:operation": "cross-env VITE_SYSTEM_TYPE=Operation pnpm vite --mode base",
+    "dev:m": "cross-env VITE_SYSTEM_TYPE=Management pnpm vite --mode base",
+    "dev:o": "cross-env VITE_SYSTEM_TYPE=Operation pnpm vite --mode base",
     "ts:check": "pnpm vue-tsc --noEmit --skipLibCheck",
     "build:pro": "pnpm vite build --mode pro",
     "build:gitee": "pnpm vite build --mode gitee",
