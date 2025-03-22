@@ -24,7 +24,7 @@ export const constantRouterMap: AppRouteRecordRaw[] = [
   {
     path: '/',
     component: Layout,
-    redirect: '/bot_manage/bot_list',
+    redirect: systemType === 'Management' ? '/bot_manage/bot_list' : '/data_statistics/index',
     name: 'Root',
     meta: {
       hidden: true
@@ -120,16 +120,28 @@ export const OperationRouterMap: AppRouteRecordRaw[] = [
         }
       }
     ]
+  },
+  {
+    path: '/exchange_rate',
+    component: Layout,
+    name: 'ExchangeRate',
+    redirect: '/exchange_rate/index',
+    meta: {
+      title: '实时汇率监听',
+      icon: 'vi-mdi:currency-usd'
+    },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/operationView/ExchangeRate/index.vue'),
+        name: 'ExchangeRateIndex',
+        meta: {
+          title: '实时汇率监听',
+          icon: 'vi-mdi:currency-usd'
+        }
+      }
+    ]
   }
-  // {
-  //   path: '/exchange_rate',
-  //   component: Layout,
-  //   name: 'ExchangeRate',
-  //   meta: {
-  //     title: '实时汇率监听',
-  //     icon: 'vi-mdi:currency-usd'
-  //   }
-  // },
   // {
   //   path: '/operation_center',
   //   component: Layout,
