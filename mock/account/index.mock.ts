@@ -122,7 +122,7 @@ const generateRechargeRecords = (): RechargeRecord[] => {
 const rechargeRecords = generateRechargeRecords()
 
 export default [
-  // 获取账户列表
+  // 获取账户信息
   {
     url: '/mock/v1/account/list',
     method: 'get',
@@ -271,7 +271,7 @@ export default [
     }
   },
   
-  // 导出账户列表
+  // 导出账户信息
   {
     url: '/mock/v1/account/export',
     method: 'get',
