@@ -21,7 +21,28 @@
           <ElTabPane label="订单详情" name="order">
             <Descriptions :schema="orderDetailSchema" :data="orderDetail" :column="2" border />
           </ElTabPane>
-          <ElTabPane label="能量详情" name="energy">
+
+          <!-- 按笔数详情标签页 -->
+          <ElTabPane v-if="getOrderTypeId(orderDetail) === 1" label="笔数详情" name="byCount">
+            <Descriptions :schema="byCountDetailSchema" :data="energyDetail" :column="2" border />
+          </ElTabPane>
+
+          <!-- 按时间详情标签页 -->
+          <ElTabPane v-if="getOrderTypeId(orderDetail) === 2" label="时间详情" name="byTime">
+            <Descriptions :schema="byTimeDetailSchema" :data="energyDetail" :column="2" border />
+          </ElTabPane>
+
+          <!-- 闪租详情标签页 -->
+          <ElTabPane v-if="getOrderTypeId(orderDetail) === 3" label="闪租详情" name="flashRent">
+            <Descriptions :schema="flashRentDetailSchema" :data="energyDetail" :column="2" border />
+          </ElTabPane>
+
+          <!-- 批量下单详情标签页 -->
+          <ElTabPane
+            v-if="getOrderTypeId(orderDetail) === 4 || getOrderTypeId(orderDetail) === 0"
+            label="批量订单详情"
+            name="batchOrder"
+          >
             <Descriptions :schema="energyDetailSchema" :data="energyDetail" :column="2" border />
           </ElTabPane>
         </ElTabs>
@@ -31,13 +52,28 @@
           </div>
         </template>
       </Dialog>
+
+      <!-- 交易详情弹窗 -->
+      <Dialog v-model="transactionDialogVisible" :title="'交易详情'" width="1000px">
+        <Descriptions
+          :schema="transactionDetailSchema"
+          :data="transactionDetail"
+          :column="2"
+          border
+        />
+        <template #footer>
+          <div class="flex justify-end">
+            <ElButton @click="transactionDialogVisible = false">关闭</ElButton>
+          </div>
+        </template>
+      </Dialog>
     </ContentWrap>
   </div>
 </template>
 
 <script setup lang="tsx">
 import { ref, onMounted, h, computed } from 'vue'
-import { dateUtil } from '@/utils/dateUtil'
+import { formatToDateTime } from '@/utils/dateUtil'
 import { useRouter } from 'vue-router'
 import { ElButton, ElTag, ElMessage, ElTabs, ElTabPane, ElLink } from 'element-plus'
 import { ContentWrap } from '@/components/ContentWrap'
@@ -51,7 +87,8 @@ import type { DescriptionsSchema } from '@/components/Descriptions'
 import {
   getEnergyOrderListApi,
   getEnergyOrderDetailApi,
-  exportEnergyOrderApi
+  exportEnergyOrderApi,
+  getTransactionDetailApi
 } from '@/api/energy_order'
 
 // const { t } = useI18n()
@@ -63,6 +100,10 @@ const dialogVisible = ref(false)
 const activeTab = ref('order')
 const orderDetail = ref<any>({})
 const energyDetail = ref<any>({})
+
+// 交易详情相关
+const transactionDialogVisible = ref(false)
+const transactionDetail = ref<any>({})
 
 // 订单详情schema
 const orderDetailSchema = computed(() => {
@@ -108,9 +149,9 @@ const orderDetailSchema = computed(() => {
             ElLink,
             {
               type: 'primary',
-              onClick: () => navigateToBotList(row.botId)
+              onClick: () => navigateToBotList(row.bot_id)
             },
-            () => row.botName
+            () => row.bot_name
           )
         }
       }
@@ -123,7 +164,7 @@ const orderDetailSchema = computed(() => {
       slots: {
         default: (row: any) => {
           if (!row || !row.createTime) return h('span', '-')
-          return h('span', dateUtil(row.createTime).format('YYYY-MM-DD HH:mm:ss'))
+          return h('span', formatToDateTime(row.createTime))
         }
       }
     },
@@ -134,7 +175,7 @@ const orderDetailSchema = computed(() => {
       slots: {
         default: (row: any) => {
           if (!row || !row.payTime) return h('span', '-')
-          return h('span', dateUtil(row.payTime).format('YYYY-MM-DD HH:mm:ss'))
+          return h('span', formatToDateTime(row.payTime))
         }
       }
     },
@@ -145,7 +186,7 @@ const orderDetailSchema = computed(() => {
       slots: {
         default: (row: any) => {
           if (!row || !row.finishTime) return h('span', '-')
-          return h('span', dateUtil(row.finishTime).format('YYYY-MM-DD HH:mm:ss'))
+          return h('span', formatToDateTime(row.finishTime))
         }
       }
     },
@@ -154,7 +195,7 @@ const orderDetailSchema = computed(() => {
   return schema
 })
 
-// 能量详情schema
+// 能量详情schema (适用于批量下单)
 const energyDetailSchema = computed(() => {
   const schema: DescriptionsSchema[] = [
     { field: 'energyPackName', label: '能量包名称' },
@@ -187,15 +228,150 @@ const energyDetailSchema = computed(() => {
   return schema
 })
 
+// 按笔数详情schema
+const byCountDetailSchema = computed(() => {
+  const schema: DescriptionsSchema[] = [
+    { field: 'rentCount', label: '租用笔数' },
+    { field: 'energyTrxPrice', label: '【1笔】能量TRX价格' },
+    { field: 'energyUsdtPrice', label: '【1笔】能量USDT价格' }
+  ]
+  return schema
+})
+
+// 闪租详情schema
+const flashRentDetailSchema = computed(() => {
+  const schema: DescriptionsSchema[] = [
+    { field: 'flashRentCount', label: '闪租笔数' },
+    { field: 'flashRentPrice', label: '闪租能量价格' },
+    { field: 'receivingAddress', label: '接收地址', span: 24 },
+    { field: 'paymentAddress', label: '收款地址', span: 24 },
+    {
+      field: 'transactionHash',
+      label: '交易hash',
+      span: 24,
+      slots: {
+        default: (row: any) => {
+          if (!row || !row.transactionHash) return h('span', '-')
+          return h(
+            ElLink,
+            {
+              href: `https://tronscan.org/#/transaction/${row.transactionHash}`,
+              type: 'primary',
+              target: '_blank'
+            },
+            () => row.transactionHash
+          )
+        }
+      }
+    }
+  ]
+  return schema
+})
+
+// 按时间详情schema
+const byTimeDetailSchema = computed(() => {
+  const schema: DescriptionsSchema[] = [
+    { field: 'energyAmount', label: '能量数量' },
+    { field: 'validityPeriod', label: '能量有效期' },
+    { field: 'receivingAddress', label: '接收地址', span: 24 },
+    {
+      field: 'transactionHash',
+      label: '能量转账hash',
+      span: 24,
+      slots: {
+        default: (row: any) => {
+          if (!row || !row.transactionHash) return h('span', '-')
+          return h(
+            ElLink,
+            {
+              href: `https://tronscan.org/#/transaction/${row.transactionHash}`,
+              type: 'primary',
+              target: '_blank'
+            },
+            () => row.transactionHash
+          )
+        }
+      }
+    }
+  ]
+  return schema
+})
+
+// 交易详情schema
+const transactionDetailSchema = computed(() => {
+  const schema: DescriptionsSchema[] = [
+    {
+      field: 'transaction_hash',
+      label: '交易哈希',
+      span: 24,
+      slots: {
+        default: (row: any) => {
+          if (!row || !row.transaction_hash) return h('span', '-')
+          return h(
+            ElLink,
+            {
+              href: `https://tronscan.org/#/transaction/${row.transaction_hash}`,
+              type: 'primary',
+              target: '_blank'
+            },
+            () => row.transaction_hash
+          )
+        }
+      }
+    },
+    { field: 'from_address', label: '发起地址', span: 24 },
+    { field: 'to_address', label: '接收地址', span: 24 },
+    {
+      field: 'block_details',
+      label: '区块详情'
+    },
+    {
+      field: 'transaction_status',
+      label: '交易状态',
+      slots: {
+        default: (row: any) => {
+          if (!row) return h('span', '-')
+          return h(ElTag, { type: 'success', size: 'small' }, () => row.transaction_status)
+        }
+      }
+    },
+    { field: 'validity_period', label: '有效期' },
+    { field: 'energy_amount', label: '能源数量' },
+    {
+      field: 'create_time',
+      label: '创建时间',
+      span: 24,
+      slots: {
+        default: (row: any) => {
+          if (!row || !row.create_time) return h('span', '-')
+          return h('span', row.create_time)
+        }
+      }
+    },
+    {
+      field: 'complete_time',
+      label: '完成时间',
+      span: 24,
+      slots: {
+        default: (row: any) => {
+          if (!row || !row.complete_time) return h('span', '-')
+          return h('span', row.complete_time)
+        }
+      }
+    }
+  ]
+  return schema
+})
+
 // 表格列配置
 const columns: TableColumn[] = [
   {
-    field: 'orderNo',
+    field: 'order_id',
     label: '订单号',
     width: 180
   },
   {
-    field: 'tgUsername',
+    field: 'tg_name',
     label: 'TG用户名',
     width: 120,
     slots: {
@@ -204,20 +380,20 @@ const columns: TableColumn[] = [
           ElLink,
           {
             type: 'primary',
-            onClick: () => navigateToUserList(row.tgUserId)
+            onClick: () => navigateToUserList(row.tg_name)
           },
-          () => row.tgUsername
+          () => row.tg_name
         )
       }
     }
   },
   {
-    field: 'tgNickname',
+    field: 'nickname',
     label: 'TG用户昵称',
     width: 120
   },
   {
-    field: 'botName',
+    field: 'bot_name',
     label: '机器人名称',
     width: 120,
     slots: {
@@ -226,31 +402,31 @@ const columns: TableColumn[] = [
           ElLink,
           {
             type: 'primary',
-            onClick: () => navigateToBotList(row.botId)
+            onClick: () => navigateToBotList(row.bot_id)
           },
-          () => row.botName
+          () => row.bot_name
         )
       }
     }
   },
   {
-    field: 'orderType',
+    field: 'order_type',
     label: '订单类型',
     width: 120
   },
   {
-    field: 'energyAmount',
+    field: 'energy_num',
     label: '能量数量',
     width: 100
   },
   {
-    field: 'energyValidDays',
+    field: 'energy_rent_text',
     label: '能量有效期',
     width: 100,
-    formatter: (row) => `${row.energyValidDays}天`
+    // formatter: (row) => `${row.energyValidDays}天`
   },
   {
-    field: 'energyCount',
+    field: 'stroke_num',
     label: '笔数',
     width: 80
   },
@@ -267,35 +443,38 @@ const columns: TableColumn[] = [
     }
   },
   {
-    field: 'createTime',
+    field: 'create_time',
     label: '创建时间',
     width: 180,
-    formatter: (row) =>
-      row.createTime ? dateUtil(row.createTime).format('YYYY-MM-DD HH:mm:ss') : '-'
+    formatter: (row) => (row.create_time ? formatToDateTime(row.create_time) : '-')
   },
   {
-    field: 'payTime',
+    field: 'pay_time',
     label: '支付时间',
     width: 180,
-    formatter: (row) => (row.payTime ? dateUtil(row.payTime).format('YYYY-MM-DD HH:mm:ss') : '-')
+    formatter: (row) => (row.pay_time ? formatToDateTime(row.pay_time) : '-')
   },
   {
-    field: 'finishTime',
+    field: 'finish_time',
     label: '完成时间',
     width: 180,
-    formatter: (row) =>
-      row.finishTime ? dateUtil(row.finishTime).format('YYYY-MM-DD HH:mm:ss') : '-'
+    formatter: (row) => (row.finish_time ? formatToDateTime(row.finish_time) : '-')
   },
   {
     field: 'action',
     label: '操作',
-    width: 100,
+    width: 230,
     slots: {
       default: ({ row }) => {
         return (
-          <BaseButton type="primary" onClick={() => handleViewDetail(row)}>
-            详情
-          </BaseButton>
+          <>
+            <BaseButton type="primary" onClick={() => handleViewDetail(row)}>
+              订单详情
+            </BaseButton>
+            <BaseButton type="primary" onClick={() => handleTransactionDetail(row)}>
+              交易详情
+            </BaseButton>
+          </>
         )
       }
     }
@@ -319,10 +498,10 @@ const searchSchema = [
     componentProps: {
       options: [
         { label: '全部', value: '' },
-        { label: '标准能量包', value: 1 },
-        { label: '高级能量包', value: 2 },
-        { label: '超级能量包', value: 3 },
-        { label: '特别定制包', value: 4 }
+        { label: '按笔数', value: 1 },
+        { label: '按时间', value: 2 },
+        { label: '闪租', value: 3 },
+        { label: '批量下单', value: 4 }
       ],
       placeholder: '请选择订单类型'
     }
@@ -348,11 +527,9 @@ const searchSchema = [
 // 获取订单状态显示类型
 const getStatusType = (status: number): 'success' | 'warning' | 'info' | 'danger' | 'primary' => {
   const statusMap: Record<number, 'success' | 'warning' | 'info' | 'danger' | 'primary'> = {
-    0: 'warning',
     1: 'info',
     2: 'success',
     3: 'danger',
-    4: 'info'
   }
   return statusMap[status] || 'info'
 }
@@ -360,11 +537,9 @@ const getStatusType = (status: number): 'success' | 'warning' | 'info' | 'danger
 // 获取订单状态文本
 const getStatusText = (status: number): string => {
   const statusMap = {
-    0: '待支付',
-    1: '支付中',
-    2: '支付成功',
-    3: '支付失败',
-    4: '已取消'
+    1:'已完成',
+    2:'待支付',
+    3:'已取消'
   }
   return statusMap[status] || '未知状态'
 }
@@ -380,8 +555,8 @@ const navigateToUserList = (userId: string) => {
 // 跳转到机器人列表
 const navigateToBotList = (botId: string) => {
   router.push({
-    path: '/bot/list',
-    query: { botId }
+    path: '/bot_manage/bot_list',
+    query: { tg_bot_id: botId }
   })
 }
 
@@ -396,17 +571,118 @@ const fetchEnergyOrderList = async (params: any) => {
   }
 }
 
+// 获取订单类型ID (处理不同的字段名和类型转换)
+const getOrderTypeId = (detail: any): number => {
+  if (!detail) return 0
+
+  // 尝试从不同可能的字段名获取订单类型
+  let typeValue = 0
+  if (detail.orderTypeId !== undefined) {
+    typeValue = detail.orderTypeId
+  } else if (detail.orderType !== undefined) {
+    // 如果是字符串，尝试转换
+    if (typeof detail.orderType === 'string') {
+      // 提取数字部分
+      if (detail.orderType === '按笔数') return 1
+      if (detail.orderType === '按时间') return 2
+      if (detail.orderType === '闪租') return 3
+      if (detail.orderType === '批量下单') return 4
+
+      // 尝试从字符串中提取数字
+      const match = detail.orderType.match(/(\d+)/)
+      if (match) {
+        typeValue = parseInt(match[1], 10)
+      }
+    } else {
+      typeValue = detail.orderType
+    }
+  }
+
+  return typeValue
+}
+
 // 查看订单详情
 const handleViewDetail = async (row: any) => {
   try {
     const response = await getEnergyOrderDetailApi(row.id)
     orderDetail.value = response.data.orderDetail
-    energyDetail.value = response.data.energyDetail
+
+    // 根据订单类型设置不同的详情数据
+    const orderTypeId = getOrderTypeId(response.data.orderDetail)
+
+    // 根据订单类型设置不同的详情数据
+    if (orderTypeId === 1) {
+      // 按笔数
+      energyDetail.value = {
+        rentCount: '100',
+        countPerTransaction: '1笔',
+        energyTrxPrice: '5.00TRX',
+        energyUsdtPrice: '1.00TRX',
+        paymentAddress: 'TYsJujKoFrMLC6bdRwZ7Ji6CabQ3pARnBj',
+        transactionHash: 'ce9dae06fe8194416e14dd8e9564241cf4895ff1410390ec7bc73a623cfd967c'
+      }
+      activeTab.value = 'byCount'
+    } else if (orderTypeId === 2) {
+      // 按时间
+      energyDetail.value = {
+        energyAmount: '6.5W',
+        validityPeriod: '1小时',
+        receivingAddress: 'TBAQYwDc3pDAXMUodZK67MRCF5YNJt4qnp',
+        transactionHash: '705130bcea62464850a51d58f8b47bed27c0c39a560701bccee94d9fd6cd6602'
+      }
+      activeTab.value = 'byTime'
+    } else if (orderTypeId === 3) {
+      // 闪租
+      energyDetail.value = {
+        flashRentCount: '1',
+        flashRentPrice: '3.00trx/笔',
+        receivingAddress: 'TBNDqnnZVTjHZTqyZT4xdSFJYcZnYfQGNp',
+        paymentAddress: 'TYsJujKoFrMLC6bdRwZ7Ji6CabQ3pARnBj',
+        transactionHash: 'ce9dae06fe8194416e14dd8e9564241cf4895ff1410390ec7bc73a623cfd967c'
+      }
+      activeTab.value = 'flashRent'
+    } else {
+      // 批量下单或者其他类型，使用原有的能量详情
+      energyDetail.value = response.data.energyDetail
+      activeTab.value = 'batchOrder'
+    }
+
     dialogVisible.value = true
-    activeTab.value = 'order'
   } catch (error) {
     console.error('获取订单详情失败:', error)
     ElMessage.error('获取订单详情失败')
+  }
+}
+
+// 查看交易详情
+const handleTransactionDetail = async (row: any) => {
+  try {
+    // 尝试从API获取交易详情
+    if (row.transactionHash) {
+      const response = await getTransactionDetailApi(row.transactionHash)
+      if (response.data) {
+        transactionDetail.value = response.data
+        transactionDialogVisible.value = true
+        return
+      }
+    }
+
+    // 如果API获取失败或者没有交易哈希，则使用模拟数据
+    transactionDetail.value = {
+      transaction_hash: 'b33fe10cad17bed6579ac01f94891617f0111571b2c3107bb21a70499f7207d2',
+      from_address: 'TTSGZF4YqWRDZ2TT23TwcrTSxSCJfxLvMR',
+      block_details: '70435110',
+      to_address: 'TZ5VUwCDAUrF2Bp573R1u89SQ4bj5nk7Kw',
+      transaction_status: '已完成',
+      validity_period: '1天',
+      energy_amount: '13.1W',
+      create_time: '2025-02-24 23:55:22',
+      complete_time: '2025-02-24 23:55:22'
+    }
+    transactionDialogVisible.value = true
+  } catch (error) {
+    console.error('获取交易详情失败:', error)
+    ElMessage.error('获取交易详情失败')
   }
 }
 

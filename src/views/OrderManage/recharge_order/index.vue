@@ -84,7 +84,9 @@ const orderDetailSchema = computed(() => {
         }
       }
     },
-    { field: 'order_type', label: '订单类型',
+    {
+      field: 'order_type',
+      label: '订单类型',
       slots: {
         default: (row: any) => {
           return (
@@ -281,19 +283,19 @@ const columns: TableColumn[] = [
     field: 'create_time',
     label: '创建时间',
     width: 180,
-    formatter: (row) => row.create_time ? formatToDateTime(row.create_time) : '-'
+    formatter: (row) => (row.create_time ? formatToDateTime(row.create_time) : '-')
   },
   {
     field: 'pay_time',
     label: '支付时间',
     width: 180,
-    formatter: (row) => row.pay_time ? formatToDateTime(row.pay_time) : '-'
+    formatter: (row) => (row.pay_time ? formatToDateTime(row.pay_time) : '-')
   },
   {
     field: 'finish_time',
     label: '完成时间',
     width: 180,
-    formatter: (row) => row.finish_time ? formatToDateTime(row.finish_time) : '-'
+    formatter: (row) => (row.finish_time ? formatToDateTime(row.finish_time) : '-')
   },
   {
     field: 'action',
