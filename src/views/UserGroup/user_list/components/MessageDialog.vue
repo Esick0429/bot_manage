@@ -1,6 +1,6 @@
 <template>
-  <Dialog v-model="dialogVisible" :title="dialogTitle" width="600px">
-    <Form :schema="formSchema" @register="formRegister" />
+  <Dialog v-model="dialogVisible" :title="dialogTitle" width="1200px">
+    <Form :schema="formSchema" @register="messageFormRegister" />
     <template #footer>
       <div class="flex justify-end">
         <ElButton @click="handleCancel">取消</ElButton>
@@ -10,15 +10,15 @@
   </Dialog>
 </template>
 
-<script setup lang="ts">
+<script setup lang="tsx">
 import { ref, computed, reactive, watch, defineProps, defineEmits } from 'vue'
-import { ElButton, ElMessage } from 'element-plus'
+import { ElButton, ElMessage, ElCheckbox, ElCheckboxGroup } from 'element-plus'
 import { Dialog } from '@/components/Dialog'
 import { Form, FormSchema } from '@/components/Form'
 import { useForm } from '@/hooks/web/useForm'
 import { useValidator } from '@/hooks/web/useValidator'
 import { sendMessageToUserApi, massSendMessageApi } from '@/api/tgUser'
-
+import { useRouter } from 'vue-router'
 const props = defineProps({
   modelValue: {
     type: Boolean,
@@ -33,7 +33,7 @@ const props = defineProps({
     default: () => ({})
   },
   botList: {
-    type: Array,
+    type: Array as () => Array<{ label: string; value: number | string }>,
     default: () => []
   }
 })
@@ -48,31 +48,19 @@ const dialogVisible = computed({
   set: (value) => emit('update:modelValue', value)
 })
 
-const dialogTitle = computed(() => props.type === 'single' ? '发送消息' : '群发消息')
+const router = useRouter()
+
+const dialogTitle = computed(() => (props.type === 'single' ? '发送消息' : '群发消息'))
+
+const checkList = ref([])
 
 // 表单相关
-const { formRegister, formMethods } = useForm()
+const { formRegister: messageFormRegister, formMethods } = useForm()
+console.log('messageFormRegister', messageFormRegister)
 
 // 根据类型动态生成表单配置
 const formSchema = computed<FormSchema[]>(() => {
   const baseSchema: FormSchema[] = [
-    {
-      field: 'message_type',
-      component: 'Select',
-      label: '消息类型',
-      colProps: { span: 24 },
-      componentProps: {
-        options: [
-          { label: '文本消息', value: 'text' },
-          { label: '图片消息', value: 'image' },
-          { label: '视频消息', value: 'video' }
-        ],
-        placeholder: '请选择消息类型'
-      },
-      formItemProps: {
-        rules: [required()]
-      }
-    },
     {
       field: 'content',
       component: 'Input',
@@ -86,9 +74,38 @@ const formSchema = computed<FormSchema[]>(() => {
       formItemProps: {
         rules: [required()]
       }
+    },
+    {
+      field: 'inline_button',
+      component: 'Input',
+      label: '内联按钮',
+      colProps: { span: 12 },
+      formItemProps: {
+        slots: {
+          default: () => {
+            return (
+              <>
+                <div>
+                  <div>
+                    <button onClick={goToMenu}>去添加</button>
+                  </div>
+                  <ElCheckboxGroup v-model={checkList}>
+                    <ElCheckbox label="Option A" value="Value A" border />
+                    <ElCheckbox label="Option B" value="Value B" border />
+                    <ElCheckbox label="Option C" value="Value C" border />
+                  </ElCheckboxGroup>
+                </div>
+              </>
+            )
+          }
+        }
+      },
+      componentProps: {
+        placeholder: '内联按钮设置'
+      }
     }
   ]
-  
+
   // 群发消息时需要增加筛选条件
   if (props.type === 'mass') {
     return [
@@ -96,7 +113,7 @@ const formSchema = computed<FormSchema[]>(() => {
         field: 'bot_id',
         component: 'Select',
         label: '选择机器人',
-        colProps: { span: 24 },
+        colProps: { span: 12 },
         componentProps: {
           options: props.botList,
           placeholder: '请选择机器人'
@@ -107,20 +124,33 @@ const formSchema = computed<FormSchema[]>(() => {
       },
       {
         field: 'filter_type',
-        component: 'Select',
-        label: '筛选条件',
-        colProps: { span: 24 },
+        component: 'RadioGroup',
+        label: '接受用户',
+        value: 'custom',
+        colProps: { span: 12 },
         componentProps: {
           options: [
-            { label: '全部用户', value: 'all' },
-            { label: '活跃用户', value: 'active' },
-            { label: '新用户(7天内)', value: 'new' }
-          ],
-          placeholder: '请选择筛选条件'
+            { label: '自定义', value: 'custom' },
+            { label: '全部', value: 'all' }
+          ]
         },
         formItemProps: {
           rules: [required()]
         }
+      },
+      {
+        field: 'user_list',
+        component: 'Input',
+        label: 'TG用户id',
+        colProps: { span: 24 },
+        componentProps: {
+          type: 'text',
+          placeholder: '请输入TG用户id'
+        }
+        // hidden: (model: any) => model.filter_type !== 'custom',
+        // formItemProps: {
+        //   rules: [(model: any) => (model.filter_type === 'custom' ? required() : null)]
+        // }
       },
       ...baseSchema
     ]
@@ -128,24 +158,28 @@ const formSchema = computed<FormSchema[]>(() => {
     // 单发消息时设置用户信息（只读）
     return [
       {
-        field: 'tg_user_id',
+        field: 'firstname',
         component: 'Input',
-        label: 'TG用户ID',
-        colProps: { span: 24 },
-        componentProps: {
-          disabled: true,
-          modelValue: props.user?.tg_user_id || ''
-        }
+        label: '机器人用户名',
+        colProps: { span: 12 }
+      },
+      {
+        field: 'bot_name',
+        component: 'Input',
+        label: '机器人名称',
+        colProps: { span: 12 }
       },
       {
         field: 'tg_nickname',
         component: 'Input',
-        label: 'TG用户昵称',
-        colProps: { span: 24 },
-        componentProps: {
-          disabled: true,
-          modelValue: props.user?.tg_nickname || ''
-        }
+        label: 'TG用户ID',
+        colProps: { span: 12 }
+      },
+      {
+        field: 'tg_nickname',
+        component: 'Input',
+        label: 'TG用户名称',
+        colProps: { span: 12 }
       },
       ...baseSchema
     ]
@@ -167,16 +201,23 @@ watch(
 )
 
 // 监听对话框打开，获取机器人列表
-watch(() => dialogVisible.value, (val) => {
-  if (val && props.type === 'mass') {
-    // 不需要再调用fetchBotList
-    // 已通过props传入
+watch(
+  () => dialogVisible.value,
+  (val) => {
+    if (val && props.type === 'mass') {
+      // 不需要再调用fetchBotList
+      // 已通过props传入
+    }
   }
-})
+)
 
 // 取消操作
 const handleCancel = () => {
   dialogVisible.value = false
+}
+
+const goToMenu = () => {
+  router.push('/bot_manage/menu_list')
 }
 
 // 提交消息
@@ -206,7 +247,7 @@ const handleSubmit = async () => {
           content: formData.content
         })
       }
-      
+
       // 发送成功
       emit('success')
       // 重置表单 (使用正确的方法)
@@ -221,4 +262,4 @@ const handleSubmit = async () => {
     }
   })
 }
-</script> 
+</script>

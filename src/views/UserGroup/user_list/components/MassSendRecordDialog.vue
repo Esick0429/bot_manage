@@ -13,27 +13,7 @@
       <template #searchButtons>
         <!-- 可以在这里添加额外按钮 -->
       </template>
-      
-      <!-- 自定义发送类型列 -->
-      <template #send_type="{ row }">
-        <ElTag :type="row.send_type === 'all' ? 'success' : row.send_type === 'active' ? 'warning' : 'info'">
-          {{ formatSendType(row.send_type) }}
-        </ElTag>
-      </template>
-      
-      <!-- 自定义消息类型列 -->
-      <template #message_type="{ row }">
-        <ElTag :type="row.message_type === 'text' ? 'primary' : row.message_type === 'image' ? 'success' : 'warning'">
-          {{ formatMessageType(row.message_type) }}
-        </ElTag>
-      </template>
-      
-      <!-- 自定义操作列 -->
-      <template #action="{ row }">
-        <ElButton type="primary" link @click="viewDetail(row)">查看详情</ElButton>
-      </template>
     </SearchTable>
-
     <!-- 详情弹窗 -->
     <Dialog v-model="detailDialogVisible" title="群发详情" width="600px" append-to-body>
       <Descriptions :schema="detailSchema" :data="currentRecord" :column="1" border />
@@ -48,7 +28,9 @@
           <div class="text-gray-500">成功数量</div>
         </div>
         <div class="text-center">
-          <div class="text-xl font-bold text-danger">{{ currentRecord.total_count - currentRecord.success_count || 0 }}</div>
+          <div class="text-xl font-bold text-danger">{{
+            currentRecord.total_count - currentRecord.success_count || 0
+          }}</div>
           <div class="text-gray-500">失败数量</div>
         </div>
       </div>
@@ -82,7 +64,7 @@ const props = defineProps({
     default: false
   },
   botList: {
-    type: Array as () => Array<{label: string, value: number|string}>,
+    type: Array as () => Array<{ label: string; value: number | string }>,
     default: () => []
   }
 })
@@ -95,7 +77,7 @@ const dialogVisible = computed({
 })
 
 // 机器人选项
-const botOptions = computed<Array<{label: string, value: number|string}>>(() => props.botList)
+const botOptions = computed<Array<{ label: string; value: number | string }>>(() => props.botList)
 
 // SearchTable引用
 const searchTableRef = ref<InstanceType<typeof SearchTable> | null>(null)
@@ -149,14 +131,12 @@ const tableColumns: TableColumn[] = [
   {
     field: 'send_type',
     label: '发送类型',
-    width: 100,
-    slots: { default: 'send_type' as any }
+    width: 100
   },
   {
     field: 'message_type',
     label: '消息类型',
-    width: 100,
-    slots: { default: 'message_type' as any }
+    width: 100
   },
   {
     field: 'content',
@@ -167,7 +147,7 @@ const tableColumns: TableColumn[] = [
     field: 'status',
     label: '状态',
     width: 80,
-    formatter: (row) => row.status === 'success' ? '成功' : '失败'
+    formatter: (row) => (row.status === 'success' ? '成功' : '失败')
   },
   {
     field: 'total_count',
@@ -188,8 +168,7 @@ const tableColumns: TableColumn[] = [
     field: 'action',
     label: '操作',
     width: 120,
-    fixed: 'right',
-    slots: { default: 'action' as any }
+    fixed: 'right'
   }
 ]
 
@@ -234,7 +213,7 @@ const fetchMassSendRecords = async (params: any) => {
       pageSize: params.pageSize || 10,
       currentPage: params.currentPage || 1
     }
-    
+
     // 处理日期范围
     if (params.date_range && params.date_range.length === 2) {
       queryParams.start_date = params.date_range[0]
@@ -242,7 +221,7 @@ const fetchMassSendRecords = async (params: any) => {
       // 删除日期范围参数，避免传递给后端API
       delete queryParams.date_range
     }
-    
+
     // 调用API
     const response = await getMassSendRecordsApi(queryParams)
     return {
@@ -285,4 +264,4 @@ const open = () => {
 defineExpose({
   open
 })
-</script> 
+</script>

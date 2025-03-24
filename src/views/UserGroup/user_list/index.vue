@@ -6,11 +6,18 @@
         :search-schema="searchSchema"
         :fetch-data-api="fetchAccountList"
         ref="searchTableRef"
-        @search="onSearch"
       >
         <template #searchButtons>
-          <BaseButton type="primary" @click="openMassSendDialog()" style="margin-right: 10px">群发消息</BaseButton>
-          <BaseButton type="success" @click="openMassSendRecordDialog()">群发记录</BaseButton>
+          <BaseButton
+            type="primary"
+            disabled
+            @click="openMassSendDialog()"
+            style="margin-right: 10px"
+            >群发消息</BaseButton
+          >
+          <BaseButton type="success" disabled @click="openMassSendRecordDialog()"
+            >群发记录</BaseButton
+          >
         </template>
       </SearchTable>
 
@@ -44,18 +51,18 @@
       </Dialog>
 
       <!-- 发送消息弹窗 -->
-      <MessageDialog 
-        v-model="messageDialogVisible" 
-        :type="messageDialogType" 
-        :user="currentAccount" 
-        @success="handleMessageSent" 
+      <MessageDialog
+        v-model="messageDialogVisible"
+        :type="messageDialogType"
+        :user="currentAccount"
+        @success="handleMessageSent"
         :bot-list="botOptions"
       />
-      
+
       <!-- 群发记录弹窗 -->
-      <MassSendRecordDialog 
+      <MassSendRecordDialog
         v-model="massSendRecordDialogVisible"
-        ref="massSendRecordDialogRef" 
+        ref="massSendRecordDialogRef"
         :bot-list="botOptions"
       />
     </ContentWrap>
@@ -74,7 +81,12 @@ import { Form, FormSchema } from '@/components/Form'
 import { Descriptions } from '@/components/Descriptions'
 import type { TableColumn } from '@/components/Table'
 import type { DescriptionsSchema } from '@/components/Descriptions'
-import { getTgUserListApi, sendMessageToUserApi, rechargeUserBalanceApi, getUserBalanceRecordsApi } from '@/api/tgUser'
+import {
+  getTgUserListApi,
+  sendMessageToUserApi,
+  rechargeUserBalanceApi,
+  getUserBalanceRecordsApi
+} from '@/api/tgUser'
 import { getBotListApi } from '@/api/botlist'
 import { useForm } from '@/hooks/web/useForm'
 import { useValidator } from '@/hooks/web/useValidator'
@@ -89,9 +101,13 @@ const searchTableRef = ref<InstanceType<typeof SearchTable> | null>(null)
 const massSendRecordDialogRef = ref<InstanceType<typeof MassSendRecordDialog> | null>(null)
 
 // 机器人列表
-const botOptions = ref<{label: string, value: number|string}[]>([
-  { label: '全部', value: '' }
-])
+const botOptions = ref<{ label: string; value: number | string }[]>([{ label: '全部', value: '' }])
+
+// 创建一个botOptions的副本，避免响应式引用可能导致的问题
+const botOptionsForComponent = computed(() => {
+  // 转换成普通的JSON对象再转回来，彻底切断响应式引用
+  return JSON.parse(JSON.stringify(botOptions.value.filter((item) => item.value !== '')))
+})
 
 // 获取机器人列表
 const fetchBotList = async () => {
@@ -199,27 +215,32 @@ const columns: TableColumn[] = [
 ]
 
 // 搜索表单配置
-const searchSchema = computed(() => [
-  {
-    field: 'bot_id',
-    component: 'Select' as const,
-    label: '机器人',
-    componentProps: {
-      options: botOptions,
-      placeholder: '请选择机器人'
-    }
-  },
-  {
-    field: 'tg_id',
-    component: 'Input' as const,
-    label: 'TG用户ID',
-    componentProps: {
-      placeholder: '请输入TG用户ID'
-    }
-  }
-])
+const searchSchema = computed(() => {
+  // 创建一个新的选项数组，避免直接引用响应式对象
+  const options = JSON.parse(JSON.stringify(botOptions.value))
 
-// API 封装 - 获取账户列表
+  return [
+    {
+      field: 'bot_id',
+      component: 'Select' as const,
+      label: '机器人',
+      componentProps: {
+        options: options,
+        placeholder: '请选择机器人'
+      }
+    },
+    {
+      field: 'tg_id',
+      component: 'Input' as const,
+      label: 'TG用户ID',
+      componentProps: {
+        placeholder: '请输入TG用户ID'
+      }
+    }
+  ]
+})
+
+// API 封装 - 获取账户信息
 const fetchAccountList = async (params: any) => {
   try {
     const response = await getTgUserListApi(params)
