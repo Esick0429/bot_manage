@@ -141,43 +141,45 @@ export const OperationRouterMap: AppRouteRecordRaw[] = [
         }
       }
     ]
+  },
+  {
+    path: '/operation',
+    component: Layout,
+    name: 'Operation',
+    meta: {
+      title: '运营中心',
+      icon: 'vi-mdi:view-dashboard',
+      alwaysShow: true
+    },
+    children: [
+      {
+        path: 'energy-transaction',
+        component: () => import('@/operationView/OperationCenter/EnergyTransaction/index.vue'),
+        name: 'EnergyTransactionList',
+        meta: {
+          title: '能量交易订单',
+          icon: 'vi-mdi:flash'
+        }
+      },
+      {
+        path: 'flash_exchange',
+        component: () => import('@/operationView/OperationCenter/ExchangeTransaction/index.vue'),
+        name: 'FlashExchange',
+        meta: {
+          title: '闪兑明细',
+          icon: 'vi-mdi:flash'
+        }
+      }
+      // {
+      //   path: 'custody_details',
+      //   component: () => import('@/views/OperationCenter/CustodyDetails.vue'),
+      //   name: 'CustodyDetails',
+      //   meta: {
+      //     title: '托管明细'
+      //   }
+      // }
+    ]
   }
-  // {
-  //   path: '/operation_center',
-  //   component: Layout,
-  //   name: 'OperationCenter',
-  //   meta: {
-  //     title: '运营中心',
-  //     icon: 'vi-mdi:view-dashboard',
-  //     alwaysShow: true
-  //   },
-  //   children: [
-  //     {
-  //       path: 'energy_transaction',
-  //       component: () => import('@/views/OperationCenter/EnergyTransaction.vue'),
-  //       name: 'EnergyTransaction',
-  //       meta: {
-  //         title: '能量交易明细'
-  //       }
-  //     },
-  //     {
-  //       path: 'flash_exchange',
-  //       component: () => import('@/views/OperationCenter/FlashExchange.vue'),
-  //       name: 'FlashExchange',
-  //       meta: {
-  //         title: '闪兑明细'
-  //       }
-  //     },
-  //     {
-  //       path: 'custody_details',
-  //       component: () => import('@/views/OperationCenter/CustodyDetails.vue'),
-  //       name: 'CustodyDetails',
-  //       meta: {
-  //         title: '托管明细'
-  //       }
-  //     }
-  //   ]
-  // },
   // {
   //   path: '/marketing',
   //   component: Layout,
@@ -488,7 +490,7 @@ export const ManageRouterMap: AppRouteRecordRaw[] = [
         component: () => import('@/views/AccountManage/account_list/index.vue'),
         name: 'AccountList',
         meta: {
-          title: '账户列表',
+          title: '账户信息',
           icon: 'vi-mdi:format-list-bulleted'
         }
       }
