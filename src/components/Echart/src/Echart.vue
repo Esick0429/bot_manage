@@ -54,10 +54,14 @@ const styles = computed(() => {
   }
 })
 
+const emit = defineEmits(['init'])
+
 const initChart = () => {
   if (unref(elRef) && props.options) {
     echartRef = echarts.init(unref(elRef) as HTMLElement)
     echartRef?.setOption(unref(options))
+    
+    emit('init', echartRef)
   }
 }
 

@@ -16,7 +16,8 @@ import {
   PolarComponent,
   AriaComponent,
   ParallelComponent,
-  LegendComponent
+  LegendComponent,
+  DataZoomComponent
 } from 'echarts/components'
 
 import { CanvasRenderer } from 'echarts/renderers'
@@ -29,6 +30,7 @@ echarts.use([
   PolarComponent,
   AriaComponent,
   ParallelComponent,
+  DataZoomComponent,
   BarChart,
   LineChart,
   PieChart,

@@ -332,6 +332,7 @@ const filterDataByTimeRange = (startTimestamp: number, endTimestamp: number) => 
   
   // 如果图表已初始化，只调整dataZoom位置
   if (chartInstance.value) {
+    // 调整数据缩放区域
     chartInstance.value.dispatchAction({
       type: 'dataZoom',
       start: startPercent,
@@ -608,32 +609,28 @@ const chartOptions = computed<EChartsOption>(() => {
       axisPointer: {
         type: 'cross'
       },
+      show: true,
       formatter: function(params: any) {
-        if (params && params.length > 0) {
-          const dataIndex = params[0].dataIndex;
-          if (!allChartData.value || !allChartData.value[dataIndex]) return '';
-          
-          const data = allChartData.value[dataIndex];
-          // 处理时间显示 - API返回的时间戳是当天的结束时间
-          const timestamp = data.timestamp || data.time || 0;
-          const dateObj = new Date(timestamp);
-          // 格式化为YYYY-MM-DD，使用本地日期格式化
-          const formattedDate = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
-          
-          let priceChange = '0.00%';
-          const closePrice = typeof data.close === 'string' ? parseFloat(data.close) : (data.close || 0);
-          const openPrice = typeof data.open === 'string' ? parseFloat(data.open) : (data.open || 0);
-          
-          if (openPrice > 0) {
-            priceChange = ((closePrice - openPrice) / openPrice * 100).toFixed(2) + '%';
-          }
-          
-          return `
-            <div style="font-weight:bold;margin-bottom:5px;">${formattedDate}</div>
-            <div>收盘价: ${formatPrice(data.close)}</div>
-          `;
-        }
-        return '';
+        if (!params || !params.length) return '';
+        
+        const dataIndex = params[0].dataIndex;
+        if (dataIndex === undefined || !allChartData.value) return '';
+        
+        if (dataIndex >= allChartData.value.length) return '';
+        
+        const data = allChartData.value[dataIndex];
+        if (!data) return '';
+        
+        const timestamp = data.timestamp || data.time || 0;
+        const dateObj = new Date(timestamp);
+        const formattedDate = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
+        
+        const closePrice = typeof data.close === 'string' ? parseFloat(data.close) : (data.close || 0);
+        
+        return `<div style="padding:10px;font-size:14px;">
+                  <div style="font-weight:bold;color:#ff5200;margin-bottom:5px;">${formattedDate}</div>
+                  <div>收盘价: $${formatPrice(data.close)}</div>
+                </div>`;
       }
     },
     grid: {
@@ -773,11 +770,32 @@ const handleChartInit = (chart: any) => {
   
   // 如果数据已加载，则设置初始视图
   if (allChartData.value && allChartData.value.length > 0) {
+    // 完整设置图表选项
     chart.setOption(chartOptions.value, true);
     
     // 根据当前选择的时间范围调整dataZoom位置
     const { startTimestamp, endTimestamp } = timeUtils.getRangeByType(timeRange.value);
     filterDataByTimeRange(startTimestamp, endTimestamp);
+    
+    // 添加dataZoom事件监听器
+    chart.on('datazoom', function() {
+      console.log('数据缩放事件被触发');
+      // 延迟一点时间，等待缩放完成
+      setTimeout(() => {
+        // 确保tooltip仍然可用
+        const tooltipConfig = {
+          trigger: 'axis',
+          show: true,
+          axisPointer: {
+            type: 'cross'
+          }
+        };
+        // 重新设置tooltip
+        chart.setOption({
+          tooltip: tooltipConfig
+        }, false);
+      }, 100);
+    });
   }
 };
 
