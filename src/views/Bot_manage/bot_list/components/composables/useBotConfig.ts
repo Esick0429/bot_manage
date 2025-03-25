@@ -164,19 +164,19 @@ export function useBotConfig() {
         timeEnergy: async () => {
           try {
             // 获取运营后台配置的成本价
-            await loadCostPrices()
+            // await loadCostPrices()
 
             const timeEnergyConfigRes = await getBotTimeEnergyConfigApi(id)
             const timeEnergyConfig = timeEnergyConfigRes.data || {}
 
             formMethods.timeEnergy.setValues({
-              timeEnergyPrice: timeEnergyConfig.price || 0,
-              timeEnergyMultiplier: timeEnergyConfig.multiplier || 1,
-              timeEnergy1Hour: timeEnergyConfig.timeEnergy1Hour || costPrices.timeEnergy1Hour,
-              timeEnergy1Day: timeEnergyConfig.timeEnergy1Day || costPrices.timeEnergy1Day,
-              timeEnergy3Days: timeEnergyConfig.timeEnergy3Days || costPrices.timeEnergy3Days,
-              timeEnergy7Days: timeEnergyConfig.timeEnergy7Days || costPrices.timeEnergy7Days,
-              timeEnergy15Days: timeEnergyConfig.timeEnergy15Days || costPrices.timeEnergy15Days
+              flash_price: timeEnergyConfig.flash_price,
+              flash_time_max_num: timeEnergyConfig.flash_time_max_num,
+              hour_1_price: timeEnergyConfig.hour_1_price ,
+              day_1_price: timeEnergyConfig.day_1_price,
+              day_3_price: timeEnergyConfig.day_3_price,
+              day_7_price: timeEnergyConfig.day_7_price,
+              day_15_price: timeEnergyConfig.day_15_price
             })
             return true
           } catch (error) {

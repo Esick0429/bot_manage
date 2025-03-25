@@ -487,6 +487,7 @@ onMounted(() => {
   setTimeout(() => {
     if (searchTableRef.value) {
       searchTableRef.value.setSearchParams({
+        tg_bot_id: query.tg_bot_id,
         name: query.name
       })
       console.log('手动触发数据刷新')

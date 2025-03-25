@@ -7,16 +7,16 @@ export function useFormValidation(costPrices: Record<string, number>) {
   // 成本价验证函数
   const validateMinPrice = (rule: any, value: any, callback: any) => {
     const field = rule.field
+    // Todo:后期需要根据运营后台配置的成本价进行验证
+    // if (value === null || value === undefined || value === '') {
+    //   return callback(new Error('该项不能为空'))
+    // }
 
-    if (value === null || value === undefined || value === '') {
-      return callback(new Error('该项不能为空'))
-    }
+    // const minCost = costPrices[field] || 0
 
-    const minCost = costPrices[field] || 0
-
-    if (value < minCost) {
-      return callback(new Error(`价格不能低于运营后台配置的成本价`))
-    }
+    // if (value < minCost) {
+    //   return callback(new Error(`价格不能低于运营后台配置的成本价`))
+    // }
 
     callback()
   }

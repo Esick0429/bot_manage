@@ -36,7 +36,7 @@ const convertToKeyboardLayout = (list: MenuItem[]) => {
   originalMenuList.value = [...list]
 
   // 只过滤出类型为1的菜单项
-  const filteredList = list.filter((item) => item.menu_type === 1)
+  const filteredList = list.filter((item) => item.menu_type === 1 && item.status === 1)
 
   // 固定使用三列布局
   const columnCount = 3
@@ -51,7 +51,7 @@ const convertToKeyboardLayout = (list: MenuItem[]) => {
 
   // 根据sort值将菜单项放入对应位置
   filteredList
-    .sort((a, b) => a.order_num - b.order_num)
+    .sort((a, b) => b.order_num - a.order_num)
     .forEach((item, index) => {
       if (!item || !item.menu_name) return
 
