@@ -376,11 +376,12 @@ const total = ref(0)
 const fetchMenuList = async (params: any) => {
   try {
     const response = await getMenuListApi(params)
-    total.value = response.data.total
+    console.log(response)
+    total.value = response.data.totalCount
     return response.data
   } catch (error) {
     console.error('获取菜单列表失败:', error)
-    return { list: [], total: 0 }
+    return { list: [], totalCount: 0 }
   }
 }
 
