@@ -442,7 +442,7 @@ const columns: TableColumn[] = [
     label: '能量数量',
     width: 100,
     formatter: (row) => {
-      if (!row.energy_num) return '-'
+      if (!row.energy_num || row.order_type === 1) return '-'
       return row.energy_num >= 10000 
         ? (row.energy_num / 10000).toFixed(1) + 'w' 
         : row.energy_num

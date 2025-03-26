@@ -66,6 +66,9 @@ import { getMenuListApi, deleteMenuApi, saveMenuApi } from '@/api/menu_list'
 import { MenuItem } from '@/api/menu_list/types'
 import { useValidator } from '@/hooks/web/useValidator'
 import MenuPreview from './components/MenuPreview.vue'
+import { formatToDateTime } from '@/utils/dateUtil'
+
+
 
 const { t } = useI18n()
 const { required } = useValidator()
@@ -269,30 +272,30 @@ const columns: TableColumn[] = [
       }
     }
   },
-  {
-    field: 'inner_type',
-    label: '内联类型',
-    slots: {
-      default: (data: any) => {
-        if (data.row.menu_type !== 2) {
-          return h('span', {}, '-')
-        }
+  // {
+  //   field: 'inner_type',
+  //   label: '内联类型',
+  //   slots: {
+  //     default: (data: any) => {
+  //       if (data.row.menu_type !== 2) {
+  //         return h('span', {}, '-')
+  //       }
 
-        const typeMap = {
-          url: { label: 'URL链接', type: 'warning' },
-          call: { label: '回调函数', type: 'info' }
-        }
-        const type = typeMap[data.row.inner_type] || { label: '-', type: 'info' }
-        return h(
-          ElTag,
-          {
-            type: type.type
-          },
-          () => type.label
-        )
-      }
-    }
-  },
+  //       const typeMap = {
+  //         url: { label: 'URL链接', type: 'warning' },
+  //         call: { label: '回调函数', type: 'info' }
+  //       }
+  //       const type = typeMap[data.row.inner_type] || { label: '-', type: 'info' }
+  //       return h(
+  //         ElTag,
+  //         {
+  //           type: type.type
+  //         },
+  //         () => type.label
+  //       )
+  //     }
+  //   }
+  // },
   {
     field: 'other',
     label: '其他'
@@ -320,6 +323,16 @@ const columns: TableColumn[] = [
           </>
         )
       }
+    }
+  },
+  { field: 'create_time', label: '创建时间',
+    formatter: (row: any) => {
+      return formatToDateTime(row.create_time)
+    }
+   },
+  { field: 'update_time', label: '更新时间',
+    formatter: (row: any) => {
+      return formatToDateTime(row.update_time)
     }
   }
 ]

@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, defineExpose } from 'vue'
+import { reactive, defineExpose, ref, onMounted } from 'vue'
 import { Form, FormSchema } from '@/components/Form'
 import { useForm } from '@/hooks/web/useForm'
 import { useFormValidation } from '../composables'
@@ -14,6 +14,15 @@ import { useFormValidation } from '../composables'
 const { formRegister, formMethods } = useForm()
 const { required } = useFormValidation({})
 
+// 存储用户名
+const username = ref('')
+
+// 初始化时获取表单数据
+onMounted(async () => {
+  const formData = await formMethods.getFormData()
+  username.value = formData.username || ''
+})
+
 // 收款配置表单
 const paymentSchema = reactive<FormSchema[]>([
   {
@@ -21,7 +30,8 @@ const paymentSchema = reactive<FormSchema[]>([
     component: 'Input' as const,
     label: '用户名：',
     componentProps: {
-      placeholder: '请输入用户名'
+      placeholder: username.value,
+      disabled: true
     },
     formItemProps: {
       rules: [{ required: true, message: '用户名是必填项' }],
