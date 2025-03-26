@@ -24,7 +24,7 @@
       <!-- 表单弹窗 -->
       <Dialog v-model="dialogVisible" :title="dialogTitle">
         <!-- 表单内容 -->
-        <Form ref="formRef" :schema="formSchema" @register="formRegister" />
+        <Form ref="formRef" :schema="formSchema" @register="formRegister"  @validate="formValidate"/>
         <template #footer>
           <div class="flex justify-end">
             <ElButton @click="dialogVisible = false">取消</ElButton>
@@ -50,7 +50,8 @@ import {
   ElSwitch,
   ElRow,
   ElCol,
-  ElInput
+  ElInput,
+  FormItemProp
 } from 'element-plus'
 import { ContentWrap } from '@/components/ContentWrap'
 import { Dialog } from '@/components/Dialog'
@@ -63,12 +64,17 @@ import type { TableColumn } from '@/components/Table'
 import type { FormSchema } from '@/components/Form'
 import { getMenuListApi, deleteMenuApi, saveMenuApi } from '@/api/menu_list'
 import { MenuItem } from '@/api/menu_list/types'
+import { useValidator } from '@/hooks/web/useValidator'
 import MenuPreview from './components/MenuPreview.vue'
 
 const { t } = useI18n()
+const { required } = useValidator()
 const searchTableRef = ref<InstanceType<typeof SearchTable> | null>(null)
 const previewVisible = ref(false)
 const { formRegister, formMethods } = useForm()
+const {
+  getElFormExpose
+} = formMethods
 
 // 控制按钮类型相关表单项显示 - 转换为计算属性
 const isUrlType = computed(() => formValues.inner_type === 'url')
@@ -97,7 +103,7 @@ const formSchema = reactive<FormSchema[]>([
       placeholder: '请输入菜单名称'
     },
     formItemProps: {
-      rules: [{ required: true, message: '菜单名称不能为空' }]
+      rules: required('菜单名称不能为空')
     }
   },
   {
@@ -109,7 +115,7 @@ const formSchema = reactive<FormSchema[]>([
       min: 0
     },
     formItemProps: {
-      rules: [{ required: true, message: '排序不能为空' }]
+      rules: required('排序不能为空')
     }
   },
   {
@@ -122,7 +128,7 @@ const formSchema = reactive<FormSchema[]>([
       inactiveValue: 2
     },
     formItemProps: {
-      rules: [{ required: true, message: '状态不能为空' }]
+      rules: required('状态不能为空')
     }
   },
   {
@@ -144,7 +150,7 @@ const formSchema = reactive<FormSchema[]>([
       }
     },
     formItemProps: {
-      rules: [{ required: true, message: '菜单类型不能为空' }]
+      rules: required('菜单类型不能为空')
     }
   },
   {
@@ -166,7 +172,20 @@ const formSchema = reactive<FormSchema[]>([
       }
     },
     formItemProps: {
-      rules: [{ required: true, message: '内联类型不能为空' }]
+      // 动态规则：只有当菜单类型为内联按钮(2)时才需要验证
+      rules: [
+        { 
+          required: true, 
+          message: '内联类型不能为空',
+          validator: (rule, value, callback) => {
+            if (formValues.menu_type === 2 && !value) {
+              callback(new Error('内联类型不能为空'))
+            } else {
+              callback()
+            }
+          }
+        }
+      ]
     }
   },
   {
@@ -192,7 +211,23 @@ const formSchema = reactive<FormSchema[]>([
       }
     },
     formItemProps: {
-      rules: [{ required: true, message: '该字段不能为空' }]
+      // 动态规则：只有当菜单类型为内联按钮(2)时才需要验证
+      rules: [
+        { 
+          required: true, 
+          message: '该字段不能为空',
+          validator: (rule, value, callback) => {
+            if (formValues.menu_type === 2 && !value) {
+              const errorMsg = formValues.inner_type === 'url' 
+                ? '链接地址不能为空' 
+                : '回调函数名称不能为空'
+              callback(new Error(errorMsg))
+            } else {
+              callback()
+            }
+          }
+        }
+      ]
     }
   }
 ])
@@ -431,22 +466,39 @@ const handlePreview = () => {
   previewVisible.value = true
 }
 
+const formValidate = (prop: FormItemProp, isValid: boolean, message: string) => {
+  console.log(prop, isValid, message)
+}
+
 const handleSubmit = async () => {
   try {
-    const formRef = ref()
-    await formRef.value?.validate()
-
-    // 获取表单数据
-    const values = await formMethods.getFormData()
-
-    // 调用保存API
-    await saveMenuApi(values)
-
-    ElMessage.success(values.id ? '更新成功' : '添加成功')
-    dialogVisible.value = false
-
-    // 刷新列表
-    searchTableRef.value?.reload()
+    const formRef = await getElFormExpose()
+    
+    // 使用Promise方式处理表单验证
+    try {
+      // 添加非空检查
+      if (!formRef) {
+        ElMessage.error('表单实例获取失败')
+        return
+      }
+      
+      await formRef.validate()
+      
+      // 校验通过后获取表单数据
+      const values = await formMethods.getFormData()
+      
+      // 调用保存API
+      await saveMenuApi(values)
+      
+      ElMessage.success(values.id ? '更新成功' : '添加成功')
+      dialogVisible.value = false
+      
+      // 刷新列表
+      searchTableRef.value?.reload()
+    } catch (validationError) {
+      console.error('表单验证失败:', validationError)
+      ElMessage.error('表单验证失败，请检查填写内容')
+    }
   } catch (error) {
     console.error('保存失败:', error)
     ElMessage.error('保存失败')
@@ -462,6 +514,7 @@ const dialogVisible = ref(false)
 const dialogTitle = ref('添加菜单')
 
 const previewHandleClose = () => {
+  previewVisible.value = false
   searchTableRef.value?.reload()
 }
 

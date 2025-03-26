@@ -10,16 +10,40 @@
 </template>
 
 <script setup lang="tsx">
-import { reactive, defineExpose, ref, watch } from 'vue'
-import { Form, FormSchema } from '@/components/Form'
+import { reactive, defineExpose, ref, watchEffect, onMounted } from 'vue'
+import { Form, FormSchema, FormSetProps } from '@/components/Form'
 import { useForm } from '@/hooks/web/useForm'
-import { ElInputNumber } from 'element-plus'
+import { ElInputNumber, ElCheckbox } from 'element-plus'
+import Tips from '@/components/Tips/src/Tips.vue'
 
 // 表单相关
 const { formRegister, formMethods } = useForm()
 
-// 创建内部状态管理开关值
-const insufficientStockEnabled = ref(2)
+// 告警功能是否启用（true=启用，false=禁用）
+const isAlertEnabled = ref(false)
+
+// 初始化状态
+onMounted(async () => {
+  const data = await formMethods.getFormData()
+  // 如果有值则启用
+  isAlertEnabled.value = data.stock_notice_trx_amount > 0
+  
+  // 更新输入框状态
+  formMethods.setSchema([{
+    field: 'stock_notice_trx_amount',
+    path: 'componentProps.disabled',
+    value: !isAlertEnabled.value
+  }])
+})
+
+// 监听状态变化自动更新输入框禁用状态
+watchEffect(() => {
+  formMethods.setSchema([{
+    field: 'stock_notice_trx_amount',
+    path: 'componentProps.disabled',
+    value: !isAlertEnabled.value
+  }])
+})
 
 // 闪兑配置表单
 const flashExchangeSchema = reactive<FormSchema[]>([
@@ -54,8 +78,8 @@ const flashExchangeSchema = reactive<FormSchema[]>([
     field: 'profit_usdt_to_trx',
     component: 'InputNumber' as const,
     label: {
-      text: 'USDT兑TRX利润',
-      tips: '每笔兑换的利润金额'
+      text: 'USDT兑TRX利润（百分比）',
+      tips: '例如，输入15，就是15%'
     },
     componentProps: {
       placeholder: '请输入利润金额',
@@ -87,51 +111,47 @@ const flashExchangeSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'stock_notice',
-    component: 'Switch' as const,
-    label: {
-      text: '启用库存不足提醒',
-      tips: '当您的可兑换库存低于设置值时，将会发送通知机器人管理员'
-    },
-    value: false,
-    componentProps: {
-      onChange: async (value) => {
-        insufficientStockEnabled.value = value
-        await formMethods.setValues({
-          stock_notice: value
-        })
-      }
-    }
-  },
-  {
     field: 'stock_notice_trx_amount',
     component: 'InputNumber' as const,
     label: '库存告警值',
     componentProps: {
       placeholder: '请输入库存告警值',
       min: 0,
-      precision: 2
+      precision: 2,
     },
-    hidden: () => insufficientStockEnabled.value === 2,
     formItemProps: {
-      rules: [
-        {
-          required: true,
-          message: '库存告警值是必填项'
+      slots: {
+        label: () => {
+          return (
+            <>
+              <ElCheckbox 
+                modelValue={isAlertEnabled.value}
+                onUpdate:modelValue={(val: boolean) => {
+                  isAlertEnabled.value = val
+                  // 如果禁用，清空值
+                  if (!val) {
+                    formMethods.setValues({
+                      stock_notice_trx_amount: undefined
+                    })
+                  }
+                  // 记录状态
+                  formMethods.setValues({
+                    stock_notice: val
+                  })
+                }}
+              >
+                <span>库存告警值</span>
+                <Tips 
+                  content="当您的可兑换库存低于设置值时，将会发送通知机器人管理员"
+                />
+              </ElCheckbox>
+            </>
+          )
         }
-      ]
+      }
     }
   }
 ])
-
-// 更新启用状态
-const updateEnabled = async () => {
-  const data = await formMethods.getFormData()
-  insufficientStockEnabled.value = data.stock_notice || false
-}
-
-// 初始化时更新状态
-setTimeout(updateEnabled, 100)
 
 // 暴露表单方法
 defineExpose({

@@ -6,6 +6,9 @@
         :search-schema="searchSchema"
         :fetch-data-api="fetchEnergyOrderList"
         :showAddButton="false"
+        :pagination="{
+          total: totalCount
+        }"
         ref="searchTableRef"
         @search="onSearch"
       >
@@ -94,6 +97,8 @@ import {
 // const { t } = useI18n()
 const router = useRouter()
 const searchTableRef = ref<InstanceType<typeof SearchTable> | null>(null)
+const totalCount = ref(0)
+
 
 // 订单详情相关
 const dialogVisible = ref(false)
@@ -412,12 +417,36 @@ const columns: TableColumn[] = [
   {
     field: 'order_type',
     label: '订单类型',
-    width: 120
+    width: 120,
+    formatter: (row) => {
+      const typeMap = {
+        1: '按笔数',
+        2: '按时间',
+        3: '闪租',
+        4: '批量下单'
+      }
+      return typeMap[row.order_type] || '-'
+    }
   },
+  {
+    field:'order_amount',
+    label: '订单金额',
+    width: 100,
+    formatter: (row) => {
+      return row.order_amount + row.pay_unit
+    }
+  },
+  
   {
     field: 'energy_num',
     label: '能量数量',
-    width: 100
+    width: 100,
+    formatter: (row) => {
+      if (!row.energy_num) return '-'
+      return row.energy_num >= 10000 
+        ? (row.energy_num / 10000).toFixed(1) + 'w' 
+        : row.energy_num
+    }
   },
   {
     field: 'energy_rent_text',
@@ -464,6 +493,7 @@ const columns: TableColumn[] = [
     field: 'action',
     label: '操作',
     width: 230,
+    fixed: 'right',
     slots: {
       default: ({ row }) => {
         return (
@@ -484,7 +514,7 @@ const columns: TableColumn[] = [
 // 搜索表单配置
 const searchSchema = [
   {
-    field: 'orderNo',
+    field: 'order_id',
     component: 'Input' as const,
     label: '订单号',
     componentProps: {
@@ -492,7 +522,7 @@ const searchSchema = [
     }
   },
   {
-    field: 'orderType',
+    field: 'order_type',
     component: 'Select' as const,
     label: '订单类型',
     componentProps: {
@@ -500,8 +530,8 @@ const searchSchema = [
         { label: '全部', value: '' },
         { label: '按笔数', value: 1 },
         { label: '按时间', value: 2 },
-        { label: '闪租', value: 3 },
-        { label: '批量下单', value: 4 }
+        { label: '批量下单', value: 3 },
+        { label: '闪租', value: 4 }
       ],
       placeholder: '请选择订单类型'
     }
@@ -513,11 +543,9 @@ const searchSchema = [
     componentProps: {
       options: [
         { label: '全部', value: '' },
-        { label: '待支付', value: 0 },
-        { label: '支付中', value: 1 },
-        { label: '支付成功', value: 2 },
-        { label: '支付失败', value: 3 },
-        { label: '已取消', value: 4 }
+        { label: '已完成', value: 1 },
+        { label: '待支付', value: 2 },
+        { label: '已取消', value: 3 }
       ],
       placeholder: '请选择订单状态'
     }
@@ -564,6 +592,7 @@ const navigateToBotList = (botId: string) => {
 const fetchEnergyOrderList = async (params: any) => {
   try {
     const response = await getEnergyOrderListApi(params)
+    totalCount.value = response.data.totalCount
     return response.data
   } catch (error) {
     console.error('获取能量订单列表失败:', error)
