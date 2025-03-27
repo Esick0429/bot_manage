@@ -7,7 +7,8 @@ import {
   ElTooltipProps,
   ElImage,
   ElEmpty,
-  ElCard
+  ElCard,
+  ElLink
 } from 'element-plus'
 import { defineComponent, PropType, ref, computed, unref, watch, onMounted } from 'vue'
 import { propTypes } from '@/utils/propTypes'
@@ -460,6 +461,28 @@ export default defineComponent({
               selectable={v.selectable}
               width="50"
             ></ElTableColumn>
+          )
+        } else if (v.type === 'link') {
+          return (
+            <ElTableColumn
+              align={v.align || align}
+              headerAlign={v.headerAlign || headerAlign}
+              label={v.label}
+              prop={v.field}
+            >
+              {{
+                default: (scope) => {
+                  const value = get(scope.row, v.field)
+                  const url = v.url ? (typeof v.url === 'function' ? v.url(scope.row) : v.url) : value
+                  
+                  return (
+                    <ElLink href={url} target="_blank" type="primary">
+                      {value}
+                    </ElLink>
+                  )
+                }
+              }}
+            </ElTableColumn>
           )
         } else {
           const props = { ...v } as any

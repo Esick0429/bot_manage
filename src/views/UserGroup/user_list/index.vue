@@ -146,7 +146,9 @@ const columns: TableColumn[] = [
   },
   {
     field: 'tg_name',
-    label: 'TG用户名'
+    label: 'TG用户名',
+    type:'link',
+    url: (row) => `https://t.me/${row.tg_name}`
   },
   {
     field: 'bot_id',
