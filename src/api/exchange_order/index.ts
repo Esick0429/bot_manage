@@ -6,8 +6,8 @@ export const getExchangeOrderListApi = (params: any) => {
 }
 
 // 获取兑换订单详情
-export const getExchangeOrderDetailApi = (id: number) => {
-  return request.get({ url: '/v1/order/exchange_order/detail', params: { id } })
+export const getExchangeOrderDetailApi = (id: Number) => {
+  return request.get({ url: `/v1/order/exchange_order/detail/${id}` })
 }
 
 // 获取交易详情

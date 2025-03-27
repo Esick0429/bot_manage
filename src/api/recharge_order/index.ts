@@ -7,7 +7,7 @@ export const getRechargeOrderListApi = (params: any) => {
 
 // 获取充值订单详情
 export const getRechargeOrderDetailApi = (id: number) => {
-  return request.get({ url: '/v1/order/inorder/detail', params: { id } })
+  return request.get({ url: `/v1/order/inorder/detail/${id}` })
 }
 
 // 导出充值订单
