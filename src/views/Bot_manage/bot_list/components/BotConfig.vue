@@ -226,7 +226,7 @@ const submit = async () => {
   const success = await submitConfig(formMethodsToSubmit, activeTab.value)
 
   if (success) {
-    dialogVisible.value = false
+    // dialogVisible.value = false
     emit('success')
   }
 }

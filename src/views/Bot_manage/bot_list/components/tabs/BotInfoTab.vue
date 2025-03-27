@@ -47,18 +47,19 @@ const botInfoSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'name',
+    field: 'firstname',
     component: 'Input' as const,
     label: '机器人昵称：',
     componentProps: {
-      placeholder: '请输入机器人昵称'
+      // placeholder: '请输入机器人昵称',
+      disabled: true
     },
     formItemProps: {
       rules: [required()]
     }
   },
   {
-    field: 'firstname',
+    field: 'name',
     component: 'Input' as const,
     label: '机器人用户名：',
     componentProps: {
