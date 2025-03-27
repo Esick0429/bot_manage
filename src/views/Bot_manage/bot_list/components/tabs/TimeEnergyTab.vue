@@ -77,22 +77,22 @@ const timeEnergySchema = reactive<FormSchema[]>([
       contentPosition: 'left'
     }
   },
-  {
-    field: 'hour_1_price',
-    component: 'InputNumber' as const,
-    label: '1小时价格：',
-    componentProps: {
-      placeholder: '请输入1小时价格',
-      min: 0,
-      precision: 1
-    },
-    formItemProps: {
-      rules: [
-        { required: true, message: '1小时价格是必填项' },
-        { validator: validateMinPrice, trigger: 'blur' }
-      ]
-    }
-  },
+  // {
+  //   field: 'hour_1_price',
+  //   component: 'InputNumber' as const,
+  //   label: '1小时价格：',
+  //   componentProps: {
+  //     placeholder: '请输入1小时价格',
+  //     min: 0,
+  //     precision: 1
+  //   },
+  //   formItemProps: {
+  //     rules: [
+  //       { required: true, message: '1小时价格是必填项' },
+  //       { validator: validateMinPrice, trigger: 'blur' }
+  //     ]
+  //   }
+  // },
   {
     field: 'day_1_price',
     component: 'InputNumber' as const,

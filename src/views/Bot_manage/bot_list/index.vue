@@ -300,7 +300,10 @@ const formSchema = reactive<FormSchema[]>([
       placeholder: '请输入管理员TG账号'
     },
     formItemProps: {
-      rules: [required()]
+      rules: [required(), {
+          pattern: /^@.+$/,
+          message: 'TG账号必须以@开头'
+        }]
     }
   },
   {
