@@ -11,9 +11,6 @@
         ref="searchTableRef"
         @add="handleAdd"
         @search="onSearch"
-        :pagination="{
-          total: total
-        }"
       >
         <!-- 自定义搜索按钮 -->
         <template #searchButtons>
@@ -384,13 +381,10 @@ const searchSchema = [
   }
 ]
 
-const total = ref(0)
 // API 封装
 const fetchMenuList = async (params: any) => {
   try {
     const response = await getMenuListApi(params)
-    console.log(response)
-    total.value = response.data.totalCount
     return response.data
   } catch (error) {
     console.error('获取菜单列表失败:', error)

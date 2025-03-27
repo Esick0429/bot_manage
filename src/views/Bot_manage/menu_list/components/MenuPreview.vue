@@ -155,16 +155,20 @@ const saveMenuOrder = async () => {
     // 从布局中提取更新后的菜单项
     const updatedMenuItems: Array<{ id: number; order_num: number }> = []
 
+    // 计算菜单总数，用于反向排序（确保大数字在前面）
+    const totalItems = keyboardLayout.value.length * 3
+
     for (let rowIndex = 0; rowIndex < keyboardLayout.value.length; rowIndex++) {
       const row = keyboardLayout.value[rowIndex]
       for (let colIndex = 0; colIndex < row.length; colIndex++) {
         const item = row[colIndex]
         if (item) {
-          // 计算新的order_num值
-          const order_num = rowIndex * 3 + colIndex + 1
+          // 修改计算逻辑，使数字大的在前面
+          // 反向计算排序值，第一行第一个有最大的值
+          const order_num = totalItems - (rowIndex * 3 + colIndex)
           updatedMenuItems.push({
             id: item.id,
-            order_num: order_num
+            order_num
           })
         }
       }
@@ -174,6 +178,7 @@ const saveMenuOrder = async () => {
     const saveRequests = updatedMenuItems.map((item) => {
       // 查找原始数据
       const originalItem = originalMenuList.value.find((menu) => menu.id === item.id)
+      // 确保originalItem存在，并且排序确实有变化才发送请求
       if (originalItem && originalItem.order_num !== item.order_num) {
         // 确保使用inner_value而不是value字段
         return saveMenuApi({
@@ -188,9 +193,10 @@ const saveMenuOrder = async () => {
       }
       return Promise.resolve() // 如果没有变化，返回一个已解决的Promise
     })
-
+    
     // 使用Promise.all并行处理所有保存请求
-    await Promise.all(saveRequests)
+    let res = await Promise.all(saveRequests)
+    console.log('res', res)
 
     ElMessage.success('菜单排序已保存')
     hasChanges.value = false

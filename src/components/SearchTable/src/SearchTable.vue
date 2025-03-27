@@ -44,12 +44,18 @@
     <Table
       :pageSize="unref(tableState.pageSize)"
       :currentPage="unref(tableState.currentPage)"
-      @update:pageSize="tableState.pageSize = $event"
-      @update:currentPage="tableState.currentPage = $event"
+      @update:pageSize="handlePageSizeChange"
+      @update:currentPage="handlePageChange"
       :data="dataList"
       :loading="loading"
-      :pagination="pagination"
+      :pagination="{
+        total: unref(tableState.total),
+        currentPage: unref(tableState.currentPage),
+        pageSize: unref(tableState.pageSize),
+        ...(pagination || {})
+      }"
       @register="tableRegister"
+      :scrollbar-always-on="true"
       v-bind="tableProps"
     >
       <template v-for="item in slotKeys" :key="item" #[item]="data">
@@ -117,7 +123,7 @@ const props = defineProps({
   // 分页配置
   pagination: {
     type: Object,
-    default: () => ({ total: 0 })
+    default: () => ({})
   },
   // Search组件额外属性
   searchProps: {
@@ -173,6 +179,16 @@ const {
   actionColumn: props.actionColumn
 })
 console.log('tableState', tableState)
+
+const handlePageChange = (page: number) => {
+  tableState.currentPage.value = page
+  tableMethods.getList()
+}
+
+const handlePageSizeChange = (size: number) => {
+  tableState.pageSize.value = size
+  tableMethods.getList()
+}
 
 // 搜索
 const handleSearch = async () => {
