@@ -197,7 +197,7 @@ const columns: TableColumn[] = [
   {
     field: 'order_id',
     label: '订单号',
-    width: 180
+    minWidth: 120
   },
   {
     field: 'tg_name',
@@ -282,19 +282,19 @@ const columns: TableColumn[] = [
   {
     field: 'create_time',
     label: '创建时间',
-    width: 180,
+    minWidth: 180,
     formatter: (row) => (row.create_time ? formatToDateTime(row.create_time) : '-')
   },
   {
     field: 'pay_time',
     label: '支付时间',
-    width: 180,
+    minWidth: 180,
     formatter: (row) => (row.pay_time ? formatToDateTime(row.pay_time) : '-')
   },
   {
     field: 'finish_time',
     label: '完成时间',
-    width: 180,
+    minWidth: 180,
     formatter: (row) => (row.finish_time ? formatToDateTime(row.finish_time) : '-')
   },
   {

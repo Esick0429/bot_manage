@@ -93,7 +93,7 @@ import { useValidator } from '@/hooks/web/useValidator'
 import { useClipboard } from '@/hooks/web/useClipboard'
 import MessageDialog from './components/MessageDialog.vue'
 import MassSendRecordDialog from './components/MassSendRecordDialog.vue'
-
+import { useRoute } from 'vue-router'
 // 表单校验
 const { required } = useValidator()
 
@@ -400,7 +400,18 @@ onMounted(() => {
   // 获取机器人列表
   fetchBotList()
   // 组件加载后自动调用首次查询
-  searchTableRef.value?.reload()
+  const query = useRoute().query
+  console.log('query', query)
+  // 确保组件挂载后可以访问表格实例
+  setTimeout(() => {
+    if (searchTableRef.value) {
+      searchTableRef.value.setSearchParams({
+        tg_id: query.tg_id,
+      })
+      console.log('手动触发数据刷新')
+      searchTableRef.value.reload()
+    }
+  }, 100)
 })
 </script>
 

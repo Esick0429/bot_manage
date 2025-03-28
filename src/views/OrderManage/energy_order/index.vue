@@ -4,6 +4,7 @@
       <SearchTable
         :columns="columns"
         :search-schema="searchSchema"
+        :action-column="actionColumn"
         :fetch-data-api="fetchEnergyOrderList"
         :showAddButton="false"
         :pagination="{
@@ -385,7 +386,7 @@ const columns: TableColumn[] = [
           ElLink,
           {
             type: 'primary',
-            onClick: () => navigateToUserList(row.tg_name)
+            onClick: () => navigateToUserList(row.tg_id)
           },
           () => row.tg_name
         )
@@ -400,7 +401,7 @@ const columns: TableColumn[] = [
   {
     field: 'bot_name',
     label: '机器人名称',
-    width: 120,
+    minWidth: 160,
     slots: {
       default: ({ row }) => {
         return h(
@@ -488,28 +489,31 @@ const columns: TableColumn[] = [
     label: '完成时间',
     width: 180,
     formatter: (row) => (row.finish_time ? formatToDateTime(row.finish_time) : '-')
-  },
-  {
-    field: 'action',
-    label: '操作',
-    width: 230,
-    fixed: 'right',
-    slots: {
-      default: ({ row }) => {
-        return (
-          <>
-            <BaseButton type="primary" onClick={() => handleViewDetail(row)}>
-              订单详情
-            </BaseButton>
-            <BaseButton type="primary" onClick={() => handleTransactionDetail(row)}>
-              交易详情
-            </BaseButton>
-          </>
-        )
-      }
-    }
   }
 ]
+
+const actionColumn = {
+  field: 'action',
+  label: '操作',
+  width: 240,
+  fixed: 'right',
+  slots: {
+    default: (data: any) => {
+      const row = data.row
+      return (
+        <>
+          <BaseButton type="primary" onClick={() => handleViewDetail(row)}>
+            订单详情
+          </BaseButton>
+          <BaseButton type="primary" onClick={() => handleTransactionDetail(row)}>
+            交易详情
+          </BaseButton>
+        </>
+      )
+    }
+  }
+}
+
 
 // 搜索表单配置
 const searchSchema = [
@@ -575,8 +579,8 @@ const getStatusText = (status: number): string => {
 // 跳转到用户列表
 const navigateToUserList = (userId: string) => {
   router.push({
-    path: '/user/list',
-    query: { userId }
+    path: '/user_group/user_list',
+    query: { tg_id: userId }
   })
 }
 
