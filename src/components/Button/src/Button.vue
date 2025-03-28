@@ -8,6 +8,8 @@ const appStore = useAppStore()
 
 const getTheme = computed(() => appStore.getTheme)
 
+const currentSize = computed(() => appStore.currentSize)
+
 const { getPrefixCls } = useDesign()
 
 const prefixCls = getPrefixCls('button')
@@ -15,7 +17,6 @@ const prefixCls = getPrefixCls('button')
 const props = defineProps({
   size: {
     type: String as PropType<ComponentSize>,
-    default: 'small'
   },
   type: {
     type: String as PropType<ButtonType>,
@@ -104,12 +105,14 @@ const style = computed(() => {
   }
   return ''
 })
+
+const size = computed(() => props.size || currentSize.value)
 </script>
 
 <template>
   <ElButton
     :class="`${prefixCls} color-#fff`"
-    v-bind="{ ...props }"
+    v-bind="{ ...props, size }"
     :color="color"
     :style="style"
     @click="() => emits('click')"

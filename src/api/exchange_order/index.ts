@@ -11,14 +11,14 @@ export const getExchangeOrderDetailApi = (id: Number) => {
 }
 
 // 获取交易详情
-export const getTransactionDetailApi = (transaction_hash: string) => {
-  return request.get({ url: '/v1/order/transaction/detail', params: { transaction_hash } })
+export const getTransactionDetailApi = (id: Number) => {
+  return request.get({ url: `/v1/order/exchange_order/tx_detail/${id}` })
 }
 
 // 获取转入详情
-export const getTransferInDetailApi = (transaction_hash: string) => {
-  return request.get({ url: '/v1/order/transfer-in/detail', params: { transaction_hash } })
-}
+// export const getTransferInDetailApi = (id: Number) => {
+//   return request.get({ url: `/v1/order/exchange_order/tx_detail/${id}` })
+// }
 
 // 导出兑换订单
 export const exportExchangeOrderApi = (params: any) => {
