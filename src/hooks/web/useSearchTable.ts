@@ -33,34 +33,34 @@ export const useSearchTable = (config: UseSearchTableConfig) => {
   const hasError = ref(false)
   // 是否正在加载
   const isLoading = ref(false)
-  
+
   // 参数适配器 - 将前端分页参数转换为后端API期望的格式
   const adaptRequestParams = (params: Recordable): Recordable => {
     // 创建一个新对象来避免修改原始对象
     const adaptedParams = { ...params }
-    
+
     // 确保当前页码和每页数量参数存在（从tableState获取）
     if (!adaptedParams.currentPage && tableState.currentPage) {
       adaptedParams.currentPage = unref(tableState.currentPage)
       console.log('从tableState添加currentPage:', adaptedParams.currentPage)
     }
-    
+
     if (!adaptedParams.pageSize && tableState.pageSize) {
       adaptedParams.pageSize = unref(tableState.pageSize)
       console.log('从tableState添加pageSize:', adaptedParams.pageSize)
     }
-    
+
     // 转换分页参数名称
     if (adaptedParams.currentPage !== undefined) {
       adaptedParams.current_page = adaptedParams.currentPage
       delete adaptedParams.currentPage
     }
-    
+
     if (adaptedParams.pageSize !== undefined) {
       adaptedParams.page_size = adaptedParams.pageSize
       delete adaptedParams.pageSize
     }
-    
+
     console.log('适配后的请求参数:', adaptedParams)
     return adaptedParams
   }
@@ -70,7 +70,7 @@ export const useSearchTable = (config: UseSearchTableConfig) => {
     const list = result.list || []
     // 优先使用totalCount作为总数
     const total = result.totalCount || result.total || 0
-    
+
     console.log('适配后的响应数据:', { list, total })
     return { list, total }
   }
@@ -87,13 +87,13 @@ export const useSearchTable = (config: UseSearchTableConfig) => {
         if (config.handleSearchInfoFn) {
           params = config.handleSearchInfoFn(params)
         }
-        
+
         // 使用参数适配器转换请求参数
         const adaptedParams = adaptRequestParams(params)
 
         const result = await config.fetchDataApi(adaptedParams)
         console.log('API返回结果:', result)
-        
+
         // 使用响应适配器处理返回数据
         return adaptResponseData(result)
       } catch (error) {
@@ -126,14 +126,14 @@ export const useSearchTable = (config: UseSearchTableConfig) => {
       // 确保保留分页参数
       const currentPage = unref(tableState.currentPage)
       const pageSize = unref(tableState.pageSize)
-      
-      searchParams.value = { 
+
+      searchParams.value = {
         ...form,
         currentPage,
         pageSize
       }
       console.log('查询参数(含分页):', searchParams.value)
-      
+
       await tableMethods.getList()
       return form
     } catch (error) {

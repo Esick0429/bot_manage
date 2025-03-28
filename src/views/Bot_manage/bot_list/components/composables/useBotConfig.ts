@@ -365,10 +365,12 @@ export function useBotConfig() {
           try {
             const timeEnergyData = await formMethods.timeEnergy.getFormData()
             // 检查所有带有price的字段，确保它们不为0
-            const hasPriceFieldWithZero = Object.keys(timeEnergyData).some(key => {
-              return key.includes('price') && (timeEnergyData[key] === 0 || timeEnergyData[key] === '0')
+            const hasPriceFieldWithZero = Object.keys(timeEnergyData).some((key) => {
+              return (
+                key.includes('price') && (timeEnergyData[key] === 0 || timeEnergyData[key] === '0')
+              )
             })
-            
+
             if (hasPriceFieldWithZero) {
               ElMessage.error('价格不能为0，请检查配置')
               return false

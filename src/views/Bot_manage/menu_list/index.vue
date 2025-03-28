@@ -21,7 +21,12 @@
       <!-- 表单弹窗 -->
       <Dialog v-model="dialogVisible" :title="dialogTitle">
         <!-- 表单内容 -->
-        <Form ref="formRef" :schema="formSchema" @register="formRegister"  @validate="formValidate"/>
+        <Form
+          ref="formRef"
+          :schema="formSchema"
+          @register="formRegister"
+          @validate="formValidate"
+        />
         <template #footer>
           <div class="flex justify-end">
             <ElButton @click="dialogVisible = false">取消</ElButton>
@@ -65,16 +70,12 @@ import { useValidator } from '@/hooks/web/useValidator'
 import MenuPreview from './components/MenuPreview.vue'
 import { formatToDateTime } from '@/utils/dateUtil'
 
-
-
 const { t } = useI18n()
 const { required } = useValidator()
 const searchTableRef = ref<InstanceType<typeof SearchTable> | null>(null)
 const previewVisible = ref(false)
 const { formRegister, formMethods } = useForm()
-const {
-  getElFormExpose
-} = formMethods
+const { getElFormExpose } = formMethods
 
 // 控制按钮类型相关表单项显示 - 转换为计算属性
 const isUrlType = computed(() => formValues.inner_type === 'url')
@@ -174,8 +175,8 @@ const formSchema = reactive<FormSchema[]>([
     formItemProps: {
       // 动态规则：只有当菜单类型为内联按钮(2)时才需要验证
       rules: [
-        { 
-          required: true, 
+        {
+          required: true,
           message: '内联类型不能为空',
           validator: (rule, value, callback) => {
             if (formValues.menu_type === 2 && !value) {
@@ -213,14 +214,13 @@ const formSchema = reactive<FormSchema[]>([
     formItemProps: {
       // 动态规则：只有当菜单类型为内联按钮(2)时才需要验证
       rules: [
-        { 
-          required: true, 
+        {
+          required: true,
           message: '该字段不能为空',
           validator: (rule, value, callback) => {
             if (formValues.menu_type === 2 && !value) {
-              const errorMsg = formValues.inner_type === 'url' 
-                ? '链接地址不能为空' 
-                : '回调函数名称不能为空'
+              const errorMsg =
+                formValues.inner_type === 'url' ? '链接地址不能为空' : '回调函数名称不能为空'
               callback(new Error(errorMsg))
             } else {
               callback()
@@ -322,12 +322,16 @@ const columns: TableColumn[] = [
       }
     }
   },
-  { field: 'create_time', label: '创建时间',
+  {
+    field: 'create_time',
+    label: '创建时间',
     formatter: (row: any) => {
       return formatToDateTime(row.create_time)
     }
-   },
-  { field: 'update_time', label: '更新时间',
+  },
+  {
+    field: 'update_time',
+    label: '更新时间',
     formatter: (row: any) => {
       return formatToDateTime(row.update_time)
     }
@@ -481,7 +485,7 @@ const formValidate = (prop: FormItemProp, isValid: boolean, message: string) => 
 const handleSubmit = async () => {
   try {
     const formRef = await getElFormExpose()
-    
+
     // 使用Promise方式处理表单验证
     try {
       // 添加非空检查
@@ -489,18 +493,18 @@ const handleSubmit = async () => {
         ElMessage.error('表单实例获取失败')
         return
       }
-      
+
       await formRef.validate()
-      
+
       // 校验通过后获取表单数据
       const values = await formMethods.getFormData()
-      
+
       // 调用保存API
       await saveMenuApi(values)
-      
+
       ElMessage.success(values.id ? '更新成功' : '添加成功')
       dialogVisible.value = false
-      
+
       // 刷新列表
       searchTableRef.value?.reload()
     } catch (validationError) {

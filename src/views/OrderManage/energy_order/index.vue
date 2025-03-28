@@ -100,7 +100,6 @@ const router = useRouter()
 const searchTableRef = ref<InstanceType<typeof SearchTable> | null>(null)
 const totalCount = ref(0)
 
-
 // 订单详情相关
 const dialogVisible = ref(false)
 const activeTab = ref('order')
@@ -430,29 +429,27 @@ const columns: TableColumn[] = [
     }
   },
   {
-    field:'order_amount',
+    field: 'order_amount',
     label: '订单金额',
     width: 100,
     formatter: (row) => {
       return row.order_amount + row.pay_unit
     }
   },
-  
+
   {
     field: 'energy_num',
     label: '能量数量',
     width: 100,
     formatter: (row) => {
       if (!row.energy_num || row.order_type === 1) return '-'
-      return row.energy_num >= 10000 
-        ? (row.energy_num / 10000).toFixed(1) + 'w' 
-        : row.energy_num
+      return row.energy_num >= 10000 ? (row.energy_num / 10000).toFixed(1) + 'w' : row.energy_num
     }
   },
   {
     field: 'energy_rent_text',
     label: '能量有效期',
-    width: 100,
+    width: 100
     // formatter: (row) => `${row.energyValidDays}天`
   },
   {
@@ -514,7 +511,6 @@ const actionColumn = {
   }
 }
 
-
 // 搜索表单配置
 const searchSchema = [
   {
@@ -561,7 +557,7 @@ const getStatusType = (status: number): 'success' | 'warning' | 'info' | 'danger
   const statusMap: Record<number, 'success' | 'warning' | 'info' | 'danger' | 'primary'> = {
     1: 'info',
     2: 'success',
-    3: 'danger',
+    3: 'danger'
   }
   return statusMap[status] || 'info'
 }
@@ -569,9 +565,9 @@ const getStatusType = (status: number): 'success' | 'warning' | 'info' | 'danger
 // 获取订单状态文本
 const getStatusText = (status: number): string => {
   const statusMap = {
-    1:'已完成',
-    2:'待支付',
-    3:'已取消'
+    1: '已完成',
+    2: '待支付',
+    3: '已取消'
   }
   return statusMap[status] || '未知状态'
 }

@@ -29,13 +29,26 @@
       <Dialog v-model="transactionDialogVisible" :title="'交易详情'" width="800px">
         <ElTabs v-model="activeTransactionTab" class="transaction-tabs">
           <ElTabPane name="in" label="转入详情">
-            <Descriptions :schema="transactionInSchema" :data="transactionDetail" :column="1" border />
+            <Descriptions
+              :schema="transactionInSchema"
+              :data="transactionDetail"
+              :column="1"
+              border
+            />
           </ElTabPane>
           <ElTabPane name="out" label="转出详情">
-            <Descriptions :schema="transactionOutSchema" :data="transactionDetail" :column="1" border />
+            <Descriptions
+              :schema="transactionOutSchema"
+              :data="transactionDetail"
+              :column="1"
+              border
+            />
           </ElTabPane>
         </ElTabs>
-        <div v-if="!transactionDetail.in_txid && !transactionDetail.out_txid" class="empty-transaction">
+        <div
+          v-if="!transactionDetail.in_txid && !transactionDetail.out_txid"
+          class="empty-transaction"
+        >
           <ElEmpty description="暂无交易数据" />
         </div>
         <template #footer>
@@ -99,15 +112,21 @@ const exchangeDetailSchema = computed(() => {
         }
       }
     },
-    { field: 'order_type', label: '订单类型', slots: {
-      default: (row: any) => {
-        if (!row) return h('span', '-')
-        return h('span', row.order_type === 1 ? '兑换TRX' : '兑换USDT')
+    {
+      field: 'order_type',
+      label: '订单类型',
+      slots: {
+        default: (row: any) => {
+          if (!row) return h('span', '-')
+          return h('span', row.order_type === 1 ? '兑换TRX' : '兑换USDT')
+        }
       }
-    }},
+    },
     { field: 'bot_name', label: '机器人名称' },
     { field: 'nickname', label: 'TG用户昵称' },
-    { field: 'exchange_amount', label: '兑换金额',
+    {
+      field: 'exchange_amount',
+      label: '兑换金额',
       slots: {
         default: (row: any) => {
           if (!row) return h('span', '-')
@@ -121,7 +140,9 @@ const exchangeDetailSchema = computed(() => {
       slots: {
         default: (row: any) => {
           if (!row) return h('span', '-')
-          return h(ElTag, { type: getStatusType(row.status), size: 'small' }, () => getStatusText(row.status))
+          return h(ElTag, { type: getStatusType(row.status), size: 'small' }, () =>
+            getStatusText(row.status)
+          )
         }
       }
     },
@@ -143,8 +164,8 @@ const exchangeDetailSchema = computed(() => {
 
 // 转入详情Schema
 const transactionInSchema = computed<DescriptionsSchema[]>(() => [
-  { 
-    field: 'in_txid', 
+  {
+    field: 'in_txid',
     label: '转入交易Hash',
     span: 24,
     slots: {
@@ -166,7 +187,7 @@ const transactionInSchema = computed<DescriptionsSchema[]>(() => [
   { field: 'in_to_address', label: '接收人', span: 24 },
   {
     field: 'in_number',
-    label: '区块号', 
+    label: '区块号',
     span: 24,
     slots: {
       default: (row: any) => {
@@ -201,11 +222,10 @@ const transactionInSchema = computed<DescriptionsSchema[]>(() => [
   }
 ])
 
-
 // 转出详情Schema
 const transactionOutSchema = computed<DescriptionsSchema[]>(() => [
-  { 
-    field: 'out_txid', 
+  {
+    field: 'out_txid',
     label: '转出交易Hash',
     span: 24,
     slots: {
@@ -256,7 +276,7 @@ const transactionOutSchema = computed<DescriptionsSchema[]>(() => [
 const columns: TableColumn[] = [
   {
     field: 'order_id',
-    label: '订单号',
+    label: '订单号'
   },
   // {
   //   field: 'tg_name',
@@ -308,7 +328,7 @@ const columns: TableColumn[] = [
   },
   {
     field: 'trx_price',
-    label: '兑换汇率',
+    label: '兑换汇率'
   },
   {
     field: 'status',
@@ -324,7 +344,7 @@ const columns: TableColumn[] = [
   },
   {
     field: 'describe',
-    label: '备注',
+    label: '备注'
   },
   {
     field: 'create_time',
@@ -421,9 +441,9 @@ const getStatusText = (status: number): string => {
 const navigateToBotList = (botId: string) => {
   router.push({
     path: '/bot_manage/bot_list',
-    query: { 
+    query: {
       tg_bot_id: botId
-     }
+    }
   })
 }
 
@@ -468,7 +488,7 @@ const handleTransactionDetail = async (row: any) => {
         // 没有任何交易数据
         ElMessage.info('暂无交易数据')
       }
-      
+
       transactionDialogVisible.value = true
     } else {
       ElMessage.info('暂无交易数据')

@@ -473,8 +473,12 @@ export default defineComponent({
               {{
                 default: (scope) => {
                   const value = get(scope.row, v.field)
-                  const url = v.url ? (typeof v.url === 'function' ? v.url(scope.row) : v.url) : value
-                  
+                  const url = v.url
+                    ? typeof v.url === 'function'
+                      ? v.url(scope.row)
+                      : v.url
+                    : value
+
                   return (
                     <ElLink href={url} target="_blank" type="primary">
                       {value}

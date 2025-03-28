@@ -16,7 +16,7 @@ const prefixCls = getPrefixCls('button')
 
 const props = defineProps({
   size: {
-    type: String as PropType<ComponentSize>,
+    type: String as PropType<ComponentSize>
   },
   type: {
     type: String as PropType<ButtonType>,

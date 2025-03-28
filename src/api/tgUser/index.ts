@@ -92,4 +92,4 @@ export const rechargeUserBalanceApi = (data: {
   currency_type: 'TRX' | 'USDT'
 }) => {
   return request.post({ url: '/v1/user/bot/tg_user/balance/recharge', data })
-} 
+}

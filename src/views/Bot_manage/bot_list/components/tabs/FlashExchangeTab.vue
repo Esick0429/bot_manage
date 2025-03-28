@@ -27,22 +27,26 @@ onMounted(async () => {
   const data = await formMethods.getFormData()
   // 如果有值则启用
   isAlertEnabled.value = data.stock_notice_trx_amount > 0
-  
+
   // 更新输入框状态
-  formMethods.setSchema([{
-    field: 'stock_notice_trx_amount',
-    path: 'componentProps.disabled',
-    value: !isAlertEnabled.value
-  }])
+  formMethods.setSchema([
+    {
+      field: 'stock_notice_trx_amount',
+      path: 'componentProps.disabled',
+      value: !isAlertEnabled.value
+    }
+  ])
 })
 
 // 监听状态变化自动更新输入框禁用状态
 watchEffect(() => {
-  formMethods.setSchema([{
-    field: 'stock_notice_trx_amount',
-    path: 'componentProps.disabled',
-    value: !isAlertEnabled.value
-  }])
+  formMethods.setSchema([
+    {
+      field: 'stock_notice_trx_amount',
+      path: 'componentProps.disabled',
+      value: !isAlertEnabled.value
+    }
+  ])
 })
 
 // 闪兑配置表单
@@ -117,14 +121,14 @@ const flashExchangeSchema = reactive<FormSchema[]>([
     componentProps: {
       placeholder: '请输入库存告警值',
       min: 0,
-      precision: 2,
+      precision: 2
     },
     formItemProps: {
       slots: {
         label: () => {
           return (
             <>
-              <ElCheckbox 
+              <ElCheckbox
                 modelValue={isAlertEnabled.value}
                 onUpdate:modelValue={(val: boolean) => {
                   isAlertEnabled.value = val
@@ -141,9 +145,7 @@ const flashExchangeSchema = reactive<FormSchema[]>([
                 }}
               >
                 <span>库存告警值</span>
-                <Tips 
-                  content="当您的可兑换库存低于设置值时，将会发送通知机器人管理员"
-                />
+                <Tips content="当您的可兑换库存低于设置值时，将会发送通知机器人管理员" />
               </ElCheckbox>
             </>
           )

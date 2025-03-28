@@ -196,7 +196,7 @@ const getBotOptions = async () => {
   try {
     const res = await getBotListApi({})
     if (res?.data?.list) {
-      return res.data.list.map(item => ({
+      return res.data.list.map((item) => ({
         label: item.username,
         value: item.id
       }))
@@ -243,7 +243,7 @@ const fetchDataApi = async (params: any) => {
     queryParams.endDate = params.dateRange[1]
     delete queryParams.dateRange
   }
-  
+
   try {
     // 调用API获取数据
     const res = await getBotSummaryApi({
@@ -251,7 +251,7 @@ const fetchDataApi = async (params: any) => {
       pageNum: params.pageNum || 1,
       ...queryParams
     })
-    
+
     return {
       list: res.data.list,
       total: res.data.total

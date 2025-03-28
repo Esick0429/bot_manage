@@ -147,7 +147,7 @@ const columns: TableColumn[] = [
   {
     field: 'tg_name',
     label: 'TG用户名',
-    type:'link',
+    type: 'link',
     url: (row) => `https://t.me/${row.tg_name}`
   },
   {
@@ -406,7 +406,7 @@ onMounted(() => {
   setTimeout(() => {
     if (searchTableRef.value) {
       searchTableRef.value.setSearchParams({
-        tg_id: query.tg_id,
+        tg_id: query.tg_id
       })
       console.log('手动触发数据刷新')
       searchTableRef.value.reload()

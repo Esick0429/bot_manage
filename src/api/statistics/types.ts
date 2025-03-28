@@ -38,7 +38,7 @@ export interface BotSummaryItem {
   date: string
   botId: string
   botUsername: string
-  
+
   // 金额相关字段（将显示在表格中）
   trxCost: number
   trxProfit: number
@@ -48,7 +48,7 @@ export interface BotSummaryItem {
   energyOrderUsdtAmount: number
   hostedOrderTrxAmount: number
   hostedOrderUsdtAmount: number
-  
+
   // 笔数相关字段（将显示在详情中）
   newUserCount: number
   rechargeOrderCount: number

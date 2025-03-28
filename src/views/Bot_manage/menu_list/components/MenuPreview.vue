@@ -193,7 +193,7 @@ const saveMenuOrder = async () => {
       }
       return Promise.resolve() // 如果没有变化，返回一个已解决的Promise
     })
-    
+
     // 使用Promise.all并行处理所有保存请求
     let res = await Promise.all(saveRequests)
     console.log('res', res)
