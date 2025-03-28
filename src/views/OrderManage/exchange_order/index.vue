@@ -25,32 +25,22 @@
         </template>
       </Dialog>
 
-      <!-- 交易详情弹窗 -->
-      <Dialog v-model="transactionDialogVisible" :title="'转出详情'" width="1000px">
-        <Descriptions
-          :schema="transactionDetailSchema"
-          :data="transactionDetail"
-          :column="2"
-          border
-        />
+      <!-- 交易详情弹窗 - 综合版 -->
+      <Dialog v-model="transactionDialogVisible" :title="'交易详情'" width="800px">
+        <ElTabs v-model="activeTransactionTab" class="transaction-tabs">
+          <ElTabPane name="in" label="转入详情">
+            <Descriptions :schema="transactionInSchema" :data="transactionDetail" :column="1" border />
+          </ElTabPane>
+          <ElTabPane name="out" label="转出详情">
+            <Descriptions :schema="transactionOutSchema" :data="transactionDetail" :column="1" border />
+          </ElTabPane>
+        </ElTabs>
+        <div v-if="!transactionDetail.in_txid && !transactionDetail.out_txid" class="empty-transaction">
+          <ElEmpty description="暂无交易数据" />
+        </div>
         <template #footer>
           <div class="flex justify-end">
             <ElButton @click="transactionDialogVisible = false">关闭</ElButton>
-          </div>
-        </template>
-      </Dialog>
-
-      <!-- 转入详情弹窗 -->
-      <Dialog v-model="transferInDialogVisible" :title="'转入详情'" width="1000px">
-        <Descriptions
-          :schema="transferInDetailSchema"
-          :data="transferInDetail"
-          :column="2"
-          border
-        />
-        <template #footer>
-          <div class="flex justify-end">
-            <ElButton @click="transferInDialogVisible = false">关闭</ElButton>
           </div>
         </template>
       </Dialog>
@@ -62,7 +52,7 @@
 import { ref, onMounted, h, computed } from 'vue'
 import { formatToDateTime } from '@/utils/dateUtil'
 import { useRouter } from 'vue-router'
-import { ElButton, ElTag, ElMessage, ElTabs, ElTabPane, ElLink } from 'element-plus'
+import { ElButton, ElTag, ElMessage, ElTabs, ElTabPane, ElLink, ElEmpty } from 'element-plus'
 import { ContentWrap } from '@/components/ContentWrap'
 import { Dialog } from '@/components/Dialog'
 import { SearchTable } from '@/components/SearchTable'
@@ -75,8 +65,7 @@ import {
   getExchangeOrderListApi,
   getExchangeOrderDetailApi,
   exportExchangeOrderApi,
-  getTransactionDetailApi,
-  getTransferInDetailApi
+  getTransactionDetailApi
 } from '@/api/exchange_order'
 
 // const { t } = useI18n()
@@ -90,10 +79,7 @@ const orderDetail = ref<any>({})
 // 交易详情相关
 const transactionDialogVisible = ref(false)
 const transactionDetail = ref<any>({})
-
-// 转入详情相关
-const transferInDialogVisible = ref(false)
-const transferInDetail = ref<any>({})
+const activeTransactionTab = ref('in')
 
 // 兑换详情Schema
 const exchangeDetailSchema = computed(() => {
@@ -155,170 +141,122 @@ const exchangeDetailSchema = computed(() => {
   return schema
 })
 
-// 交易详情schema
-const transactionDetailSchema = computed(() => {
-  const schema: DescriptionsSchema[] = [
-    {
-      field: 'transaction_hash',
-      label: '交易hash',
-      span: 24,
-      slots: {
-        default: (row: any) => {
-          if (!row || !row.transaction_hash) return h('span', '-')
-          return h(
-            ElLink,
-            {
-              href: `https://tronscan.org/#/transaction/${row.transaction_hash}`,
-              type: 'primary',
-              target: '_blank'
-            },
-            () => row.transaction_hash
-          )
-        }
-      }
-    },
-    { field: 'sender', label: '发送人', span: 24 },
-    { field: 'receiver', label: '接收人', span: 24 },
-    {
-      field: 'block_details',
-      label: '区块详情',
-      slots: {
-        default: (row: any) => {
-          if (!row || !row.block_details) return h('span', '-')
-          return h(
-            ElLink,
-            {
-              href: `https://tronscan.org/#/block/${row.block_details}`,
-              type: 'primary',
-              target: '_blank'
-            },
-            () => row.block_details
-          )
-        }
-      }
-    },
-    {
-      field: 'transaction_status',
-      label: '交易状态',
-      slots: {
-        default: (row: any) => {
-          if (!row) return h('span', '-')
-          return h(ElTag, { type: 'success', size: 'small' }, () => row.transaction_status)
-        }
-      }
-    },
-    { field: 'trx_amount', label: 'TRX数量' },
-    {
-      field: 'create_time',
-      label: '创建时间',
-      span: 24,
-      slots: {
-        default: (row: any) => {
-          if (!row || !row.create_time) return h('span', '-')
-          return h('span', row.create_time)
-        }
-      }
-    },
-    {
-      field: 'complete_time',
-      label: '完成时间',
-      span: 24,
-      slots: {
-        default: (row: any) => {
-          if (!row || !row.complete_time) return h('span', '-')
-          return h('span', row.complete_time)
-        }
+// 转入详情Schema
+const transactionInSchema = computed<DescriptionsSchema[]>(() => [
+  { 
+    field: 'in_txid', 
+    label: '转入交易Hash',
+    span: 24,
+    slots: {
+      default: (row: any) => {
+        if (!row || !row.in_txid) return h('span', '-')
+        return h(
+          ElLink,
+          {
+            href: `https://tronscan.org/#/transaction/${row.in_txid}`,
+            type: 'primary',
+            target: '_blank'
+          },
+          () => row.in_txid
+        )
       }
     }
-  ]
-  return schema
-})
+  },
+  { field: 'in_from_address', label: '发送人', span: 24 },
+  { field: 'in_to_address', label: '接收人', span: 24 },
+  {
+    field: 'in_number',
+    label: '区块号', 
+    span: 24,
+    slots: {
+      default: (row: any) => {
+        return h(
+          ElLink,
+          {
+            href: `https://tronscan.org/#/block/${row.in_number}`,
+            type: 'primary',
+            target: '_blank'
+          },
+          () => row.in_number
+        )
+      }
+    }
+  },
+  {
+    field: 'user_get_amount',
+    label: 'TRX数量',
+    formatter: (row) => {
+      return row.user_get_amount
+    }
+  },
+  {
+    field: 'in_time',
+    label: '转入时间',
+    slots: {
+      default: (row: any) => {
+        console.log('row', row)
+        return h('span', formatToDateTime(row.in_time * 1000))
+      }
+    }
+  }
+])
 
-// 转入详情schema
-const transferInDetailSchema = computed(() => {
-  const schema: DescriptionsSchema[] = [
-    {
-      field: 'transaction_hash',
-      label: '交易hash',
-      span: 24,
-      slots: {
-        default: (row: any) => {
-          if (!row || !row.transaction_hash) return h('span', '-')
-          return h(
-            ElLink,
-            {
-              href: `https://tronscan.org/#/transaction/${row.transaction_hash}`,
-              type: 'primary',
-              target: '_blank'
-            },
-            () => row.transaction_hash
-          )
-        }
-      }
-    },
-    { field: 'sender', label: '发送人', span: 24 },
-    { field: 'receiver', label: '接收人', span: 24 },
-    {
-      field: 'block_details',
-      label: '区块详情',
-      slots: {
-        default: (row: any) => {
-          if (!row || !row.block_details) return h('span', '-')
-          return h(
-            ElLink,
-            {
-              href: `https://tronscan.org/#/block/${row.block_details}`,
-              type: 'primary',
-              target: '_blank'
-            },
-            () => row.block_details
-          )
-        }
-      }
-    },
-    {
-      field: 'transaction_status',
-      label: '交易状态',
-      slots: {
-        default: (row: any) => {
-          if (!row) return h('span', '-')
-          return h(ElTag, { type: 'success', size: 'small' }, () => row.transaction_status)
-        }
-      }
-    },
-    { field: 'usdt_amount', label: 'USDT数量' },
-    {
-      field: 'create_time',
-      label: '创建时间',
-      span: 24,
-      slots: {
-        default: (row: any) => {
-          if (!row || !row.create_time) return h('span', '-')
-          return h('span', row.create_time)
-        }
-      }
-    },
-    {
-      field: 'complete_time',
-      label: '完成时间',
-      span: 24,
-      slots: {
-        default: (row: any) => {
-          if (!row || !row.complete_time) return h('span', '-')
-          return h('span', row.complete_time)
-        }
+
+// 转出详情Schema
+const transactionOutSchema = computed<DescriptionsSchema[]>(() => [
+  { 
+    field: 'out_txid', 
+    label: '转出交易Hash',
+    span: 24,
+    slots: {
+      default: (row: any) => {
+        if (!row || !row.out_txid) return h('span', '-')
+        return h(
+          ElLink,
+          {
+            href: `https://tronscan.org/#/transaction/${row.out_txid}`,
+            type: 'primary',
+            target: '_blank'
+          },
+          () => row.out_txid
+        )
       }
     }
-  ]
-  return schema
-})
+  },
+  { field: 'out_from_address', label: '发送人', span: 24 },
+  { field: 'out_to_address', label: '接收人', span: 24 },
+  {
+    field: 'agent_out_amount',
+    label: 'USDT数量',
+    formatter: (row) => {
+      if (!row.agent_out_amount) return '0'
+      return row.agent_out_amount
+    }
+  },
+  {
+    field: 'out_number',
+    label: '区块号',
+    formatter: (row) => {
+      if (!row.out_number) return '0'
+      return row.out_number
+    }
+  },
+  {
+    field: 'out_time',
+    label: '转出时间',
+    slots: {
+      default: (row: any) => {
+        return h('span', formatToDateTime(row.out_time * 1000))
+      }
+    }
+  }
+])
 
 // 表格列配置
 const columns: TableColumn[] = [
   {
     field: 'order_id',
     label: '订单号',
-    width: 180
   },
   // {
   //   field: 'tg_name',
@@ -345,7 +283,6 @@ const columns: TableColumn[] = [
   {
     field: 'bot_name',
     label: '机器人名称',
-    width: 120,
     slots: {
       default: ({ row }) => {
         return h(
@@ -362,18 +299,16 @@ const columns: TableColumn[] = [
   {
     field: 'order_amount',
     label: '支付金额',
-    width: 100
+    formatter: (row) => (row.order_amount ? `${row.order_amount} ${row.pay_unit}` : '-')
   },
   {
     field: 'exchange_amount',
     label: '兑换金额',
-    width: 100,
     formatter: (row) => (row.exchange_amount ? `${row.exchange_amount} ${row.exchange_unit}` : '-')
   },
   {
     field: 'trx_price',
     label: '兑换汇率',
-    width: 100
   },
   {
     field: 'status',
@@ -388,39 +323,38 @@ const columns: TableColumn[] = [
     }
   },
   {
+    field: 'describe',
+    label: '备注',
+  },
+  {
     field: 'create_time',
     label: '创建时间',
-    width: 180,
     formatter: (row) => (row.create_time ? formatToDateTime(row.create_time * 1000) : '-')
   },
   {
     field: 'pay_time',
     label: '支付时间',
-    width: 180,
     formatter: (row) => (row.pay_time ? formatToDateTime(row.pay_time * 1000) : '-')
   },
-  {
-    field: 'finish_time',
-    label: '完成时间',
-    width: 180,
-    formatter: (row) => (row.finish_time ? formatToDateTime(row.finish_time * 1000) : '-')
-  },
+  // {
+  //   field: 'finish_time',
+  //   label: '完成时间',
+  //   width: 180,
+  //   formatter: (row) => (row.finish_time ? formatToDateTime(row.finish_time * 1000) : '-')
+  // },
   {
     field: 'action',
     label: '操作',
-    width: 330,
+    width: 180,
     slots: {
       default: ({ row }) => {
         return (
           <div>
-            <BaseButton type="primary" onClick={() => handleViewDetail(row)}>
+            <BaseButton size="small" type="primary" onClick={() => handleViewDetail(row)}>
               兑换详情
             </BaseButton>
-            <BaseButton type="success" onClick={() => handleTransactionDetail(row)}>
-              转出详情
-            </BaseButton>
-            <BaseButton type="warning" onClick={() => handleTransferInDetail(row)}>
-              转入详情
+            <BaseButton size="small" type="success" onClick={() => handleTransactionDetail(row)}>
+              交易详情
             </BaseButton>
           </div>
         )
@@ -476,18 +410,20 @@ const getStatusText = (status: number): string => {
 }
 
 // 跳转到用户列表
-const navigateToUserList = (userId: string) => {
-  router.push({
-    path: '/user/list',
-    query: { userId }
-  })
-}
+// const navigateToUserList = (userId: string) => {
+//   router.push({
+//     path: '/user/list',
+//     query: { userId }
+//   })
+// }
 
 // 跳转到机器人列表
 const navigateToBotList = (botId: string) => {
   router.push({
-    path: '/bot/list',
-    query: { botId }
+    path: '/bot_manage/bot_list',
+    query: { 
+      tg_bot_id: botId
+     }
   })
 }
 
@@ -517,62 +453,31 @@ const handleViewDetail = async (row: any) => {
 // 查看交易详情
 const handleTransactionDetail = async (row: any) => {
   try {
-    // 尝试从API获取交易详情
-    if (row.transactionHash) {
-      const response = await getTransactionDetailApi(row.transactionHash)
-      if (response.data) {
-        transactionDetail.value = response.data
-        transactionDialogVisible.value = true
-        return
+    const response = await getTransactionDetailApi(row.id)
+    if (response.data) {
+      transactionDetail.value = response.data
+      console.log('transactionDetail.value', transactionDetail.value)
+      // 设置默认活动标签页
+      if (response.data.in_txid && response.data.out_txid) {
+        activeTransactionTab.value = 'in' // 如果都有，默认显示转入
+      } else if (response.data.in_txid) {
+        activeTransactionTab.value = 'in' // 只有转入
+      } else if (response.data.out_txid) {
+        activeTransactionTab.value = 'out' // 只有转出
+      } else {
+        // 没有任何交易数据
+        ElMessage.info('暂无交易数据')
       }
+      
+      transactionDialogVisible.value = true
+    } else {
+      ElMessage.info('暂无交易数据')
+      transactionDetail.value = { order_id: row.order_id } // 至少保留订单号
+      transactionDialogVisible.value = true
     }
-
-    // 如果API获取失败或者没有交易哈希，则使用模拟数据
-    transactionDetail.value = {
-      transaction_hash: 'b33fe10cad17bed6579ac01f94891617f0111571b2c3107bb21a704997207d2',
-      sender: 'TTSGZF4YqWRDZ2TT23TwcrTSxSCJfxLvMR',
-      receiver: 'TZ5VUwCDAUrF2Bp573R1u89SQ4bj5nk7Kw',
-      block_details: '70435203',
-      transaction_status: '已完成',
-      trx_amount: '176 TRX',
-      create_time: '2025-02-24 23:55:22',
-      complete_time: '2025-02-24 23:55:22'
-    }
-    transactionDialogVisible.value = true
   } catch (error) {
-    console.error('获取转出详情失败:', error)
-    ElMessage.error('获取转出详情失败')
-  }
-}
-
-// 查看转入详情
-const handleTransferInDetail = async (row: any) => {
-  try {
-    // 尝试从API获取转入详情
-    if (row.transactionHash) {
-      const response = await getTransferInDetailApi(row.transactionHash)
-      if (response.data) {
-        transferInDetail.value = response.data
-        transferInDialogVisible.value = true
-        return
-      }
-    }
-
-    // 如果API获取失败或者没有交易哈希，则使用模拟数据
-    transferInDetail.value = {
-      transaction_hash: 'b33fe10cad17bed6579ac01f94891617f0111571b2c3107bb21a70499f7207d2',
-      sender: 'TYqkhCsrs64vQ3DeGVM3UmZB7gUfZ5ZJEH',
-      receiver: 'TAP7VvoVUTE1A3UBJh7kkWRDLUWUVrDLGc',
-      block_details: '70435203',
-      transaction_status: '已完成',
-      usdt_amount: '176 USDT',
-      create_time: '2025-02-24 23:55:22',
-      complete_time: '2025-02-24 23:55:22'
-    }
-    transferInDialogVisible.value = true
-  } catch (error) {
-    console.error('获取转入详情失败:', error)
-    ElMessage.error('获取转入详情失败')
+    console.error('获取交易详情失败:', error)
+    ElMessage.error('获取交易详情失败')
   }
 }
 
@@ -602,5 +507,20 @@ onMounted(() => {
 <style scoped>
 .app-container {
   padding: 20px;
+}
+
+.transaction-tabs {
+  margin-bottom: 20px;
+}
+
+.empty-transaction {
+  padding: 30px 0;
+  display: flex;
+  justify-content: center;
+}
+
+/* 交易哈希长文本处理 */
+:deep(.el-descriptions-item__content) {
+  word-break: break-all;
 }
 </style>

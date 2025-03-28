@@ -24,9 +24,62 @@
       </ElDescriptions>
 
       <!-- 修改密码弹窗 -->
-      <Dialog v-model="passwordDialogVisible" title="修改密码" width="500px">
-        <Descriptions :schema="passwordSchema" :data="userData" :column="1" border />
-        <Form :schema="passwordFormSchema" @register="passwordFormRegister" class="mt-4" />
+      <Dialog v-model="passwordDialogVisible" title="修改密码" width="600px">
+        <div class="pw-reset-container">
+          <h3 class="text-lg font-bold mb-4">账户信息</h3>
+          <ElDescriptions :column="1" border>
+            <ElDescriptionsItem label="账户ID">{{ userData.id }}</ElDescriptionsItem>
+            <ElDescriptionsItem label="账户名">{{ userData.username }}</ElDescriptionsItem>
+          </ElDescriptions>
+          
+          <ElForm 
+            ref="resetFormRef"
+            :model="resetForm" 
+            :rules="resetRules"
+            label-position="top"
+            class="mt-4"
+          >
+            <ElFormItem prop="phone" label="手机号">
+              <ElInput v-model="resetForm.phone" placeholder="请输入手机号码"></ElInput>
+            </ElFormItem>
+            
+            <!-- 验证码 -->
+            <ElFormItem prop="code" label="验证码">
+              <div class="flex">
+                <ElInput v-model="resetForm.code" placeholder="请输入验证码"></ElInput>
+                <ElButton 
+                  type="primary" 
+                  class="ml-2 w-[120px]" 
+                  :disabled="isCounting" 
+                  @click="sendVerificationCode"
+                >
+                  {{ isCounting ? `${countdown}秒` : '获取验证码' }}
+                </ElButton>
+              </div>
+            </ElFormItem>
+            
+            <!-- 新密码 -->
+            <ElFormItem prop="password" label="新密码">
+              <ElInput 
+                v-model="resetForm.password" 
+                type="password" 
+                placeholder="请输入新密码"
+                show-password
+              ></ElInput>
+            </ElFormItem>
+            
+            <!-- 确认密码 -->
+            <ElFormItem prop="confirmPassword" label="确认密码">
+              <ElInput 
+                v-model="resetForm.confirmPassword" 
+                type="password" 
+                placeholder="请再次输入新密码"
+                show-password
+              ></ElInput>
+            </ElFormItem>
+          </ElForm>
+        </div>
+        
         <template #footer>
           <div class="flex justify-end">
             <ElButton @click="passwordDialogVisible = false">取消</ElButton>
@@ -80,7 +133,11 @@
 <script setup lang="tsx">
 import { ref, onMounted, computed, reactive } from 'vue'
 import { formatToDateTime } from '@/utils/dateUtil'
-import { ElButton, ElTag, ElMessage, ElDescriptions, ElDescriptionsItem, ElDivider, ElSkeleton, ElButtonGroup } from 'element-plus'
+import { 
+  ElButton, ElTabs, ElTabPane, ElForm, ElFormItem, ElInput,
+  ElTag, ElMessage, ElDescriptions, ElDescriptionsItem, ElDivider, 
+  ElSkeleton, ElButtonGroup 
+} from 'element-plus'
 import { ContentWrap } from '@/components/ContentWrap'
 import { Dialog } from '@/components/Dialog'
 import { Form, FormSchema } from '@/components/Form'
@@ -93,6 +150,8 @@ import { useValidator } from '@/hooks/web/useValidator'
 import RechargeRecordDialog from './components/RechargeRecordDialog.vue'
 import DeductionRecordDialog from './components/DeductionRecordDialog.vue'
 import { useClipboard } from '@/hooks/web/useClipboard'
+import { changePasswordApi, sendPhoneCodeApi } from '@/api/login'
+
 
 // 表单校验
 const { required } = useValidator()
@@ -162,63 +221,99 @@ const fetchAccountList = async (params: any) => {
   }
 }
 
-// 密码修改相关
-const passwordSchema = computed(() => {
-  return [
-    { field: 'id', label: '账户ID' },
-    { field: 'username', label: '账户名' }
-  ] as DescriptionsSchema[]
+// ========== 密码修改相关 ==========
+const resetFormRef = ref()
+
+// 重置密码表单
+const resetForm = reactive({
+  phone: '',
+  code: '',
+  password: '',
+  confirmPassword: ''
 })
 
-const { formRegister: passwordFormRegister, formMethods: passwordFormMethods } = useForm()
-const passwordFormSchema = reactive<FormSchema[]>([
-  {
-    field: 'password',
-    component: 'InputPassword',
-    label: '新密码:',
-    colProps: {
-      span: 24
-    },
-    componentProps: {
-      placeholder: '请输入新密码'
-    },
-    formItemProps: {
-      rules: [required(), { min: 6, message: '密码长度不能少于6位' }]
-    }
-  },
-  {
-    field: 'confirmPassword',
-    component: 'InputPassword',
-    label: '确认密码:',
-    colProps: {
-      span: 24
-    },
-    componentProps: {
-      placeholder: '请再次输入新密码'
-    },
-    formItemProps: {
-      rules: [
-        required(),
-        {
-          validator: (rule, value, callback) => {
-            const formEl = document.querySelector('form')
-            const passwordInput = formEl?.querySelector(
-              'input[name="password"]'
-            ) as HTMLInputElement
-            const password = passwordInput?.value
-
-            if (value !== password) {
-              callback(new Error('两次输入密码不一致'))
-            } else {
-              callback()
-            }
-          },
-          trigger: 'blur'
-        }
-      ]
-    }
+// 表单校验规则
+const resetRules = computed(() => {
+  return {
+    phone: [
+      { required: true, message: '请输入手机号', trigger: 'blur' },
+      { 
+        validator: (rule, value, callback) => {
+          if (value && !/^1[3-9]\d{9}$/.test(value)) {
+            callback(new Error('请输入正确的手机号码'))
+          } else {
+            callback()
+          }
+        }, 
+        trigger: 'blur' 
+      }
+    ],
+    code: [
+      { required: true, message: '请输入验证码', trigger: 'blur' }
+    ],
+    password: [
+      { required: true, message: '请输入新密码', trigger: 'blur' },
+      { min: 6, message: '密码长度不能少于6位', trigger: 'blur' }
+    ],
+    confirmPassword: [
+      { required: true, message: '请再次输入新密码', trigger: 'blur' },
+      { 
+        validator: (rule, value, callback) => {
+          if (value !== resetForm.password) {
+            callback(new Error('两次输入密码不一致'))
+          } else {
+            callback()
+          }
+        }, 
+        trigger: 'blur' 
+      }
+    ]
   }
-])
+})
+
+// 倒计时相关
+const countdown = ref(0)
+const isCounting = computed(() => countdown.value > 0)
+let timer: number | null = null
+
+// 开始倒计时
+const startCountdown = () => {
+  countdown.value = 60
+  timer = window.setInterval(() => {
+    countdown.value--
+    if (countdown.value <= 0) {
+      clearInterval(timer!)
+      timer = null
+    }
+  }, 1000)
+}
+
+// 发送验证码
+const sendVerificationCode = async () => {
+  try {
+    // 验证手机号
+    await resetFormRef.value.validateField('phone')
+    
+    if (!resetForm.phone) {
+      ElMessage.warning('请输入手机号')
+      return
+    }
+    
+    // 发送手机验证码
+    await sendPhoneCodeApi({
+      mobile: resetForm.phone,
+      channel: 'change_passwd'
+    })
+    
+    ElMessage.success('验证码已发送到手机')
+    
+    // 启动倒计时
+    startCountdown()
+  } catch (error) {
+    console.error('发送验证码失败:', error)
+    ElMessage.error('发送验证码失败，请稍后重试')
+  }
+}
 
 // 打开修改密码弹窗
 const openPasswordDialog = () => {
@@ -226,6 +321,11 @@ const openPasswordDialog = () => {
     ElMessage.warning('账户信息不完整，请刷新页面后重试')
     return
   }
+  
+  // 重置表单
+  Object.keys(resetForm).forEach(key => {
+    resetForm[key] = ''
+  })
   
   passwordDialogVisible.value = true
 }
@@ -237,18 +337,23 @@ const handleUpdatePassword = async () => {
     return
   }
   
-  const elForm = await passwordFormMethods.getElFormExpose()
-  await elForm?.validate(async (valid) => {
+  // 表单验证
+  resetFormRef.value.validate(async (valid) => {
     if (!valid) return
-
-    const formData = await passwordFormMethods.getFormData()
+    
     submitting.value = true
-
+    
     try {
-      await updateAccountApi({
+      // 构建请求参数
+      const params = {
         id: userData.value.id,
-        password: formData.password
-      })
+        password: resetForm.password,
+        verify_code: resetForm.code,
+        phone: resetForm.phone
+      }
+      
+      // 调用修改密码API
+      await changePasswordApi(params)
       ElMessage.success('密码修改成功')
       passwordDialogVisible.value = false
     } catch (error) {
@@ -317,5 +422,8 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.pw-reset-container {
+  width: 100%;
 }
 </style>

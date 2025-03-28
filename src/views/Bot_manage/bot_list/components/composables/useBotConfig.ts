@@ -172,7 +172,7 @@ export function useBotConfig() {
             formMethods.timeEnergy.setValues({
               flash_price: timeEnergyConfig.flash_price,
               flash_time_max_num: timeEnergyConfig.flash_time_max_num,
-              hour_1_price: timeEnergyConfig.hour_1_price ,
+              // hour_1_price: timeEnergyConfig.hour_1_price ,
               day_1_price: timeEnergyConfig.day_1_price,
               day_3_price: timeEnergyConfig.day_3_price,
               day_7_price: timeEnergyConfig.day_7_price,
