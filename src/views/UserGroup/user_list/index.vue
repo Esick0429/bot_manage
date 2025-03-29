@@ -72,7 +72,7 @@
 <script setup lang="tsx">
 import { ref, onMounted, h, computed, reactive, nextTick } from 'vue'
 import { formatToDateTime } from '@/utils/dateUtil'
-import { ElButton, ElTag, ElMessage } from 'element-plus'
+import { ElButton, ElTag, ElMessage, ElLink } from 'element-plus'
 import { ContentWrap } from '@/components/ContentWrap'
 import { Dialog } from '@/components/Dialog'
 import { SearchTable } from '@/components/SearchTable'
@@ -93,7 +93,9 @@ import { useValidator } from '@/hooks/web/useValidator'
 import { useClipboard } from '@/hooks/web/useClipboard'
 import MessageDialog from './components/MessageDialog.vue'
 import MassSendRecordDialog from './components/MassSendRecordDialog.vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+
+const router = useRouter()
 // 表单校验
 const { required } = useValidator()
 
@@ -153,7 +155,12 @@ const columns: TableColumn[] = [
   {
     field: 'bot_id',
     label: '机器人ID',
-    width: 100
+    width: 100,
+    slots: {
+      default: ({ row }) => {
+        return <ElLink type="primary" onClick={() => openBotList(row.bot_info.tg_bot_id)}>{row.bot_id}</ElLink>
+      }
+    }
   },
   {
     field: 'bot_info.bot_name',
@@ -258,6 +265,17 @@ const onSearch = (params: any) => {
   console.log('搜索参数:', params)
   // 搜索表格组件内部会自动处理搜索逻辑
 }
+
+
+const openBotList = (botId: number) => {
+  router.push({
+    path: '/bot_manage/bot_list',
+    query: {
+      tg_bot_id: botId
+    }
+  })
+}
+
 
 // 密码修改相关
 const passwordDialogVisible = ref(false)
