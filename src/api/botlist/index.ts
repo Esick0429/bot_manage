@@ -118,7 +118,7 @@ export const updateBotAllConfigsApi = (data: any) => {
 }
 
 // 获取机器人消费记录
-export const getBotConsumptionRecordApi = (params: { pageSize: number; pageNum: number }) => {
+export const getBotConsumptionRecordApi = (params: { page_size: number; current_page: number }) => {
   return request.get({ url: '/v1/bot/charge_record/list', params })
 }
 

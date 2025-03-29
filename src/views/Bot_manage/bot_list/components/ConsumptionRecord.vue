@@ -9,13 +9,12 @@
       :pagination="{
         total: total
       }"
-      @pagination-change="getList"
     />
   </Dialog>
 </template>
 
 <script setup lang="tsx">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { Dialog } from '@/components/Dialog'
 import { Table } from '@/components/Table'
 import { getBotConsumptionRecordApi } from '@/api/botlist'
@@ -45,7 +44,7 @@ const columns = [
     field: 'charge_type',
     label: '类型',
     slots: {
-      default: ({ row }) => (
+      default: ({ row }: { row: ConsumptionRecord }) => (
         <span style={{ color: row.charge_type === 1 ? 'red' : 'green' }}>
           {row.charge_type === 1 ? '支出' : '收入'}
         </span>
@@ -56,22 +55,19 @@ const columns = [
     field: 'mount',
     label: '费用',
     slots: {
-      default: ({ row }) => (
+      default: ({ row }: { row: ConsumptionRecord }) => (
         <span style={{ color: row.charge_type === 1 ? 'red' : 'green' }}>
           {row.charge_type === 1 ? `-${row.mount}TRX` : `${row.mount}TRX`}
         </span>
       )
     }
   },
-  {
-    field: 'describe',
-    label: '描述'
-  },
+  { field: 'describe', label: '描述' },
   {
     field: 'create_time',
     label: '创建时间',
     minWidth: 120,
-    formatter: (row) => formatToDateTime(row.create_time)
+    formatter: (row: ConsumptionRecord) => formatToDateTime(row.create_time)
   }
 ]
 
@@ -80,8 +76,8 @@ const getList = async () => {
   loading.value = true
   try {
     const params = {
-      pageSize: pageSize.value,
-      pageNum: currentPage.value
+      page_size: pageSize.value,
+      current_page: currentPage.value
     }
     const res = await getBotConsumptionRecordApi(params)
     if (res?.data) {
@@ -93,9 +89,30 @@ const getList = async () => {
   }
 }
 
+// Watch for pagination changes
+watch(currentPage, (newPage, oldPage) => {
+  if (newPage !== oldPage) {
+    getList()
+  }
+})
+
+watch(pageSize, (newPageSize, oldPageSize) => {
+  if (newPageSize !== oldPageSize) {
+    if (currentPage.value !== 1) {
+      currentPage.value = 1
+    } else {
+      getList()
+    }
+  }
+})
+
 // 打开弹窗方法
-const open = () => {
+const open = (botId?: number) => {
+  currentPage.value = 1
+  pageSize.value = 10
   dialogVisible.value = true
+  dataList.value = []
+  total.value = 0
   getList()
 }
 
