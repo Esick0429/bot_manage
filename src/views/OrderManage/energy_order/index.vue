@@ -422,8 +422,9 @@ const columns: TableColumn[] = [
       const typeMap = {
         1: '按笔数',
         2: '按时间',
-        3: '闪租',
-        4: '批量下单'
+        3: '批量下单',
+        4: '闪租',
+        5: '激活'
       }
       return typeMap[row.order_type] || '-'
     }
@@ -531,7 +532,8 @@ const searchSchema = [
         { label: '按笔数', value: 1 },
         { label: '按时间', value: 2 },
         { label: '批量下单', value: 3 },
-        { label: '闪租', value: 4 }
+        { label: '闪租', value: 4 },
+        { label: '激活', value: 5 }
       ],
       placeholder: '请选择订单类型'
     }
