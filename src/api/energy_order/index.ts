@@ -7,7 +7,7 @@ export const getEnergyOrderListApi = (params: any) => {
 
 // 获取能量订单详情
 export const getEnergyOrderDetailApi = (id: number) => {
-  return request.get({ url: '/v1/order/energy_order/detail', params: { id } })
+  return request.get({ url: `/v1/order/energy_order/${id}` })
 }
 
 // 获取交易详情
