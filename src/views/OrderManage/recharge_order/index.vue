@@ -197,12 +197,12 @@ const columns: TableColumn[] = [
   {
     field: 'order_id',
     label: '订单号',
-    minWidth: 120
+    // minWidth: 150
   },
   {
     field: 'tg_name',
     label: 'TG用户名',
-    width: 120,
+    // minWidth: 150,
     slots: {
       default: ({ row }) => {
         return (
@@ -224,12 +224,12 @@ const columns: TableColumn[] = [
   {
     field: 'tg_nickname',
     label: 'TG用户昵称',
-    width: 120
+    // width: 150
   },
   {
     field: 'bot_name',
     label: '机器人名称',
-    width: 120,
+    // width: 150,
     slots: {
       default: ({ row }) => {
         return (
@@ -251,26 +251,26 @@ const columns: TableColumn[] = [
   {
     field: 'order_type_id',
     label: '充值订单类型',
-    width: 120,
+    // width: 150,
     formatter: (row) => (row.order_type_id == 1 ? 'TRX' : 'USDT')
   },
   {
     field: 'in_mount',
     label: '充值金额',
-    width: 100,
+    // width: 150,
     formatter: (row) => (row.in_mount ? `${row.in_mount} ${row.in_unit || 'TRX'}` : '-')
   },
   {
     field: 'pay_mount',
     label: '支付金额',
-    width: 100,
+    // width: 150,
     formatter: (row) =>
       row.pay_mount && row.pay_mount !== '0' ? `${row.pay_mount} ${row.pay_unit || ''}` : '-'
   },
   {
     field: 'status',
     label: '订单状态',
-    width: 100,
+    // width: 150,
     slots: {
       default: ({ row }) => {
         const type = getStatusType(row.status)
@@ -282,25 +282,25 @@ const columns: TableColumn[] = [
   {
     field: 'create_time',
     label: '创建时间',
-    minWidth: 180,
+    minWidth: 120,
     formatter: (row) => (row.create_time ? formatToDateTime(row.create_time) : '-')
   },
-  {
-    field: 'pay_time',
-    label: '支付时间',
-    minWidth: 180,
-    formatter: (row) => (row.pay_time ? formatToDateTime(row.pay_time) : '-')
-  },
+  // {
+  //   field: 'pay_time',
+  //   label: '支付时间',
+  //   // minWidth: 180,
+  //   formatter: (row) => (row.pay_time ? formatToDateTime(row.pay_time) : '-')
+  // },
   {
     field: 'finish_time',
     label: '完成时间',
-    minWidth: 180,
+    minWidth: 120,
     formatter: (row) => (row.finish_time ? formatToDateTime(row.finish_time) : '-')
   },
   {
     field: 'action',
     label: '操作',
-    width: 100,
+    // width: 100,
     slots: {
       default: ({ row }) => {
         return <BaseButton onClick={() => handleViewDetail(row)}>详情</BaseButton>
@@ -334,11 +334,11 @@ const searchSchema = [
     }
   },
   {
-    field: 'tg_id',
+    field: 'tg_user_info',
     component: 'Input' as const,
-    label: 'TG用户ID',
+    label: 'TG用户信息',
     componentProps: {
-      placeholder: '请输入TG用户ID'
+      placeholder: '请输入TG用户ID或TG用户名'
     }
   }
 ]
