@@ -124,8 +124,8 @@ const orderDetailSchema = computed(() => {
         }
       }
     },
-    { field: 'pay_unit', label: '支付单位' },
-    { field: 'describe', label: '描述', span: 24 },
+    // { field: 'pay_unit', label: '支付单位' },
+    { field: 'describe', label: '备注', span: 24 },
     {
       field: 'create_time',
       label: '创建时间',
@@ -196,7 +196,7 @@ const rechargeDetailSchema = computed(() => {
 const columns: TableColumn[] = [
   {
     field: 'order_id',
-    label: '订单号',
+    label: '订单号'
     // minWidth: 150
   },
   {
@@ -223,7 +223,7 @@ const columns: TableColumn[] = [
   },
   {
     field: 'tg_nickname',
-    label: 'TG用户昵称',
+    label: 'TG用户昵称'
     // width: 150
   },
   {
@@ -249,10 +249,10 @@ const columns: TableColumn[] = [
     }
   },
   {
-    field: 'order_type_id',
+    field: 'order_type',
     label: '充值订单类型',
     // width: 150,
-    formatter: (row) => (row.order_type_id == 1 ? 'TRX' : 'USDT')
+    formatter: (row) => (row.order_type == 1 ? 'TRX' : 'USDT')
   },
   {
     field: 'in_mount',
@@ -280,6 +280,10 @@ const columns: TableColumn[] = [
     }
   },
   {
+    field: 'describe',
+    label: '备注'
+  },
+  {
     field: 'create_time',
     label: '创建时间',
     minWidth: 120,
@@ -303,7 +307,7 @@ const columns: TableColumn[] = [
     // width: 100,
     slots: {
       default: ({ row }) => {
-        return <BaseButton onClick={() => handleViewDetail(row)}>详情</BaseButton>
+        return <BaseButton type="primary" onClick={() => handleViewDetail(row)}>充值详情</BaseButton>
       }
     }
   }
@@ -338,7 +342,7 @@ const searchSchema = [
     component: 'Input' as const,
     label: 'TG用户信息',
     componentProps: {
-      placeholder: '请输入TG用户ID或TG用户名'
+      placeholder: '请输入TG用户名或TG用户昵称'
     }
   }
 ]

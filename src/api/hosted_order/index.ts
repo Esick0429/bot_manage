@@ -7,7 +7,7 @@ export const getHostedOrderListApi = (params: any) => {
 
 // 获取托管订单详情
 export const getHostedOrderDetailApi = (id: number) => {
-  return request.get({ url: '/v1/order/hosted_order/detail', params: { id } })
+  return request.get({ url: `/v1/order/hosted_order/detail/${id}` })
 }
 
 // 获取交易详情

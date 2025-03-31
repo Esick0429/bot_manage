@@ -4,6 +4,7 @@
       <SearchTable
         :columns="columns"
         :search-schema="searchSchema"
+        :action-column="actionColumn"
         :fetch-data-api="fetchExchangeOrderList"
         :showAddButton="false"
         ref="searchTableRef"
@@ -100,7 +101,16 @@ const exchangeDetailSchema = computed(() => {
     { field: 'order_id', label: '订单号' },
     { field: 'tg_bot_id', label: '机器人ID' },
     { field: 'tg_name', label: 'TG用户名' },
-    { field: 'order_amount', label: '支付金额' },
+    {
+      field: 'order_amount',
+      label: '支付金额',
+      slots: {
+        default: (row: any) => {
+          if (!row || !row.order_amount) return h('span', '-')
+          return h('span', row.order_amount + row.pay_unit)
+        }
+      }
+    },
     { field: 'trx_price', label: '兑换汇率' },
     {
       field: 'create_time',
@@ -333,7 +343,6 @@ const columns: TableColumn[] = [
   {
     field: 'status',
     label: '订单状态',
-    width: 100,
     slots: {
       default: ({ row }) => {
         const type = getStatusType(row.status)
@@ -355,33 +364,35 @@ const columns: TableColumn[] = [
     field: 'pay_time',
     label: '支付时间',
     formatter: (row) => (row.pay_time ? formatToDateTime(row.pay_time * 1000) : '-')
-  },
+  }
   // {
   //   field: 'finish_time',
   //   label: '完成时间',
   //   width: 180,
   //   formatter: (row) => (row.finish_time ? formatToDateTime(row.finish_time * 1000) : '-')
   // },
-  {
-    field: 'action',
-    label: '操作',
-    width: 180,
-    slots: {
-      default: ({ row }) => {
-        return (
-          <div>
-            <BaseButton size="small" type="primary" onClick={() => handleViewDetail(row)}>
-              兑换详情
-            </BaseButton>
-            <BaseButton size="small" type="success" onClick={() => handleTransactionDetail(row)}>
-              交易详情
-            </BaseButton>
-          </div>
-        )
-      }
+]
+
+const actionColumn: TableColumn = {
+  field: 'action',
+  label: '操作',
+  width: 240,
+  fixed: 'right',
+  slots: {
+    default: ({ row }) => {
+      return (
+        <div>
+          <BaseButton type="primary" onClick={() => handleViewDetail(row)}>
+            兑换详情
+          </BaseButton>
+          <BaseButton type="success" onClick={() => handleTransactionDetail(row)}>
+            交易详情
+          </BaseButton>
+        </div>
+      )
     }
   }
-]
+}
 
 // 搜索表单配置
 const searchSchema = [
