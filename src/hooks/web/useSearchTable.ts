@@ -151,7 +151,9 @@ export const useSearchTable = (config: UseSearchTableConfig) => {
       }
       await tableMethods.setProps({ columns: setupActionColumn() })
       if (config.immediate !== false) {
-        setTimeout(() => { loadData() }, 0)
+        setTimeout(() => {
+          loadData()
+        }, 0)
       }
     } catch (error) {
       console.error('SearchTable initialization failed:', error)

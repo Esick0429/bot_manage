@@ -9,14 +9,17 @@ export const useForm = () => {
 
   const elFormRef = shallowRef<ComponentRef<typeof ElForm> | null>(null)
 
-  let _resolveFormReady: (value: boolean) => void;
-  const formReadyPromise = new Promise<boolean>(resolve => {
-    _resolveFormReady = resolve;
-  });
+  let _resolveFormReady: (value: boolean) => void
+  const formReadyPromise = new Promise<boolean>((resolve) => {
+    _resolveFormReady = resolve
+  })
 
-  const register = (refInstance: typeof Form & FormExpose, elRefInstance: ComponentRef<typeof ElForm>) => {
+  const register = (
+    refInstance: typeof Form & FormExpose,
+    elRefInstance: ComponentRef<typeof ElForm>
+  ) => {
     if (formRef.value || elFormRef.value) {
-        console.warn('Form seems to be registered already. Overwriting existing refs.');
+      console.warn('Form seems to be registered already. Overwriting existing refs.')
     }
     formRef.value = refInstance
     elFormRef.value = elRefInstance
@@ -35,14 +38,14 @@ export const useForm = () => {
   }
 
   const getElFormInstance = async (): Promise<ComponentRef<typeof ElForm>> => {
-      await formReadyPromise
-      await nextTick()
-      const elForm = unref(elFormRef)
-      if (!elForm) {
-          console.error('Failed to get ElForm instance after registration promise resolved.')
-          throw new Error('ElForm instance is not available even after registration.')
-      }
-      return elForm
+    await formReadyPromise
+    await nextTick()
+    const elForm = unref(elFormRef)
+    if (!elForm) {
+      console.error('Failed to get ElForm instance after registration promise resolved.')
+      throw new Error('ElForm instance is not available even after registration.')
+    }
+    return elForm
   }
 
   const methods = {
@@ -78,8 +81,8 @@ export const useForm = () => {
       const form = await getFormInstance()
       const model = form?.formModel
       if (!model) {
-          console.warn('Form model is not available when calling getFormData.')
-          return {} as T
+        console.warn('Form model is not available when calling getFormData.')
+        return {} as T
       }
 
       if (filterEmptyVal) {
@@ -116,7 +119,7 @@ export const useForm = () => {
     },
 
     getFormExpose: async () => {
-        return await getFormInstance()
+      return await getFormInstance()
     }
   }
 

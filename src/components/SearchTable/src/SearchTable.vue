@@ -228,7 +228,6 @@ const slotKeys = computed(() => {
 watch(
   () => loading.value,
   (newVal, oldVal) => {
-    console.log('safeTableData', dataList)
     if (oldVal === true && newVal === false) {
       emit('loaded', {
         data: dataList,
