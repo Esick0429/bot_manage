@@ -56,7 +56,6 @@ const checkList = ref([])
 
 // 表单相关
 const { formRegister: messageFormRegister, formMethods } = useForm()
-console.log('messageFormRegister', messageFormRegister)
 
 // 根据类型动态生成表单配置
 const formSchema = computed<FormSchema[]>(() => {

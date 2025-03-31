@@ -74,7 +74,10 @@ export const getMassSendRecordDetailApi = (id: number | string) => {
  * @param id 用户 ID
  * @param params 查询参数 (可选)
  */
-export const getUserBalanceRecordsApi = (id: number | string, params?: { unit?: string; change_type?: string }) => {
+export const getUserBalanceRecordsApi = (
+  id: number | string,
+  params?: { unit?: string; change_type?: string }
+) => {
   return request.get({ url: `/v1/user/bot/tg_user/change_balance/${id}`, params })
 }
 

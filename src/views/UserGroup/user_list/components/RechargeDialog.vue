@@ -1,14 +1,14 @@
 <template>
   <Dialog v-model="dialogVisible" title="充值">
     <Descriptions :schema="rechargeSchema" :data="userAccount" :column="2" border class="mb-4" />
-    
-    <Form 
+
+    <Form
       ref="formRef"
-      :schema="rechargeFormSchema" 
+      :schema="rechargeFormSchema"
       @register="formRegister"
       :showActionButtonGroup="false"
     />
-    
+
     <template #footer>
       <div class="flex justify-end">
         <ElButton @click="close">取消</ElButton>
@@ -64,29 +64,29 @@ const { formRegister, formMethods } = useForm()
 // 充值用户信息展示
 const rechargeSchema = computed<DescriptionsSchema[]>(() => {
   return [
-    { 
-      field: 'bot_info.bot_name', 
-      label: '机器人用户名',
+    {
+      field: 'bot_info.bot_name',
+      label: '机器人用户名'
     },
     {
       field: 'bot_info.firstname',
-      label: '机器人名称',
+      label: '机器人名称'
     },
     {
       field: 'tg_id',
-      label: 'TG用户ID',
+      label: 'TG用户ID'
     },
     {
       field: 'nickname',
-      label: 'TG用户名称',
+      label: 'TG用户名称'
     },
     {
       field: 'trx_mount',
-      label: 'TRX余额',
+      label: 'TRX余额'
     },
     {
       field: 'usdt_mount',
-      label: 'USDT余额',
+      label: 'USDT余额'
     }
   ]
 })
@@ -143,13 +143,15 @@ const initForm = () => {
   // 使用延迟确保表单完全注册
   setTimeout(() => {
     // 使用setValues方法设置初始值
-    formMethods.setValues({
-      unit: 'TRX',
-      amount: '',
-      describe: ''
-    }).catch(err => {
-      console.error('设置表单值失败:', err)
-    })
+    formMethods
+      .setValues({
+        unit: 'TRX',
+        amount: '',
+        describe: ''
+      })
+      .catch((err) => {
+        console.error('设置表单值失败:', err)
+      })
   }, 200)
 }
 
@@ -174,16 +176,16 @@ const handleRecharge = async () => {
       ElMessage.warning('表单未初始化，请稍后再试')
       return
     }
-    
+
     const valid = await elForm.validate().catch(() => false)
     if (!valid) return
-    
+
     submitting.value = true
-    
+
     try {
       // 获取表单数据
       const formData = await formMethods.getFormData()
-      
+
       // 构建参数（符合API要求的类型）
       const params = {
         id: userAccount.value.id,
@@ -191,10 +193,10 @@ const handleRecharge = async () => {
         unit: formData.unit,
         describe: formData.describe
       }
-      
+
       // 调用充值API
       await rechargeUserBalanceApi(params)
-      
+
       ElMessage.success('充值成功')
       close()
       emit('success')
@@ -224,4 +226,4 @@ watchDialog.value && initForm()
 .dialog-form {
   width: 100%;
 }
-</style> 
+</style>

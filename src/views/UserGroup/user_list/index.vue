@@ -22,7 +22,7 @@
       </SearchTable>
 
       <!-- 充值弹窗 -->
-      <RechargeDialog 
+      <RechargeDialog
         v-model:visible="rechargeDialogVisible"
         :user="currentAccount"
         @success="handleRechargeSuccess"
@@ -65,11 +65,7 @@ import { Form, FormSchema } from '@/components/Form'
 import { Descriptions } from '@/components/Descriptions'
 import type { TableColumn } from '@/components/Table'
 import type { DescriptionsSchema } from '@/components/Descriptions'
-import {
-  getTgUserListApi,
-  sendMessageToUserApi,
-  getUserBalanceRecordsApi
-} from '@/api/tgUser'
+import { getTgUserListApi, sendMessageToUserApi, getUserBalanceRecordsApi } from '@/api/tgUser'
 import { getBotListApi } from '@/api/botlist'
 import { useValidator } from '@/hooks/web/useValidator'
 import { useClipboard } from '@/hooks/web/useClipboard'
@@ -104,6 +100,7 @@ const fetchBotList = async () => {
       value: bot.id
     }))
     botOptions.value = [{ label: '全部', value: '' }, ...bots]
+    console.log('botOptions', botOptions.value)
   } catch (error) {
     console.error('获取机器人列表失败:', error)
   }
@@ -145,7 +142,11 @@ const columns: TableColumn[] = [
     width: 100,
     slots: {
       default: ({ row }) => {
-        return <ElLink type="primary" onClick={() => openBotList(row.bot_info.tg_bot_id)}>{row.bot_id}</ElLink>
+        return (
+          <ElLink type="primary" onClick={() => openBotList(row.bot_info.tg_bot_id)}>
+            {row.bot_id}
+          </ElLink>
+        )
       }
     }
   },
@@ -184,12 +185,11 @@ const columns: TableColumn[] = [
       default: ({ row }) => {
         return (
           <div>
-            <BaseButton type="primary" size="small" onClick={() => openSendMessageDialog(row)}>
+            <BaseButton type="primary" onClick={() => openSendMessageDialog(row)}>
               发送消息
             </BaseButton>
             <BaseButton
               type="success"
-              size="small"
               style="margin-left: 8px"
               onClick={() => openRechargeDialog(row)}
             >
@@ -197,7 +197,6 @@ const columns: TableColumn[] = [
             </BaseButton>
             <BaseButton
               type="warning"
-              size="small"
               style="margin-left: 8px"
               onClick={() => handleBalanceRecord(row.id)}
             >
@@ -256,7 +255,6 @@ const openBotList = (botId: number) => {
   })
 }
 
-
 // 充值相关
 const rechargeDialogVisible = ref(false)
 
@@ -275,8 +273,8 @@ const handleRechargeSuccess = () => {
 // 修改：余额记录处理函数
 const handleBalanceRecord = (accountIdValue: number | string) => {
   if (!accountIdValue) {
-      ElMessage.warning('无法获取用户ID，无法查看余额记录');
-      return;
+    ElMessage.warning('无法获取用户ID，无法查看余额记录')
+    return
   }
   console.log(`Opening balance record for account ID: ${accountIdValue}`) // 添加日志
   currentAccountId.value = accountIdValue // 设置当前要查询的账户 ID
@@ -284,7 +282,6 @@ const handleBalanceRecord = (accountIdValue: number | string) => {
   // 移除旧的 ElMessage.info
   // ElMessage.info('打开余额记录，需要实现相关组件')
 }
-
 
 // 发送消息相关
 const openSendMessageDialog = (row: any) => {
