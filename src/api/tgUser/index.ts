@@ -71,15 +71,11 @@ export const getMassSendRecordDetailApi = (id: number | string) => {
 
 /**
  * 获取用户余额记录
- * @param params 查询参数
+ * @param id 用户 ID
+ * @param params 查询参数 (可选)
  */
-export const getUserBalanceRecordsApi = (params: {
-  user_id: number | string
-  currency_type?: 'TRX' | 'USDT'
-  pageSize?: number
-  currentPage?: number
-}) => {
-  return request.get({ url: '/v1/user/bot/tg_user/balance/records', params })
+export const getUserBalanceRecordsApi = (id: number | string, params?: { unit?: string; change_type?: string }) => {
+  return request.get({ url: `/v1/user/bot/tg_user/change_balance/${id}`, params })
 }
 
 /**
@@ -87,9 +83,10 @@ export const getUserBalanceRecordsApi = (params: {
  * @param data 充值数据
  */
 export const rechargeUserBalanceApi = (data: {
-  user_id: number | string
+  id: number | string
   amount: number | string
-  currency_type: 'TRX' | 'USDT'
+  unit: 'TRX' | 'USDT'
+  describe: string
 }) => {
-  return request.post({ url: '/v1/user/bot/tg_user/balance/recharge', data })
+  return request.post({ url: '/v1/user/bot/tg_user/change_balance', data })
 }

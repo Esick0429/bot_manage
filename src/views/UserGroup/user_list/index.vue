@@ -21,34 +21,12 @@
         </template>
       </SearchTable>
 
-      <!-- 修改密码弹窗 -->
-      <Dialog v-model="passwordDialogVisible" title="修改密码" width="500px">
-        <Descriptions :schema="passwordSchema" :data="currentAccount" :column="1" border />
-        <Form :schema="passwordFormSchema" @register="passwordFormRegister" class="mt-4" />
-        <template #footer>
-          <div class="flex justify-end">
-            <ElButton @click="passwordDialogVisible = false">取消</ElButton>
-            <ElButton type="primary" :loading="submitting" @click="handleUpdatePassword"
-              >确认</ElButton
-            >
-          </div>
-        </template>
-      </Dialog>
-
       <!-- 充值弹窗 -->
-      <Dialog v-model="rechargeDialogVisible" title="账户充值" width="500px">
-        <div>
-          <div>收款地址</div>
-          <div>
-            <div>{{ currentAccount.receive_address }}</div>
-            <BaseButton type="primary" size="small" @click="copyAddress">复制地址</BaseButton>
-          </div>
-          <div>
-            二维码：
-            <ElImage :src="currentAccount.receive_address_qrcode" />
-          </div>
-        </div>
-      </Dialog>
+      <RechargeDialog 
+        v-model:visible="rechargeDialogVisible"
+        :user="currentAccount"
+        @success="handleRechargeSuccess"
+      />
 
       <!-- 发送消息弹窗 -->
       <MessageDialog
@@ -65,12 +43,18 @@
         ref="massSendRecordDialogRef"
         :bot-list="botOptions"
       />
+
+      <!-- 新增：余额记录弹窗 -->
+      <BalanceRecordDialog
+        v-model:visible="balanceRecordDialogVisible"
+        :account-id="currentAccountId"
+      />
     </ContentWrap>
   </div>
 </template>
 
 <script setup lang="tsx">
-import { ref, onMounted, h, computed, reactive, nextTick } from 'vue'
+import { ref, onMounted, h, computed, reactive } from 'vue'
 import { formatToDateTime } from '@/utils/dateUtil'
 import { ElButton, ElTag, ElMessage, ElLink } from 'element-plus'
 import { ContentWrap } from '@/components/ContentWrap'
@@ -84,16 +68,16 @@ import type { DescriptionsSchema } from '@/components/Descriptions'
 import {
   getTgUserListApi,
   sendMessageToUserApi,
-  rechargeUserBalanceApi,
   getUserBalanceRecordsApi
 } from '@/api/tgUser'
 import { getBotListApi } from '@/api/botlist'
-import { useForm } from '@/hooks/web/useForm'
 import { useValidator } from '@/hooks/web/useValidator'
 import { useClipboard } from '@/hooks/web/useClipboard'
 import MessageDialog from './components/MessageDialog.vue'
 import MassSendRecordDialog from './components/MassSendRecordDialog.vue'
 import { useRoute, useRouter } from 'vue-router'
+import RechargeDialog from './components/RechargeDialog.vue'
+import BalanceRecordDialog from './components/BalanceRecordDialog.vue'
 
 const router = useRouter()
 // 表单校验
@@ -127,13 +111,16 @@ const fetchBotList = async () => {
 
 // 当前选中账户
 const currentAccount = ref<any>({})
-const currentAccountId = ref<number>(0)
+const currentAccountId = ref<number | string | null>(null)
 const submitting = ref(false)
 
 // 消息发送相关
 const messageDialogVisible = ref(false)
 const messageDialogType = ref<'single' | 'mass'>('single')
 const massSendRecordDialogVisible = ref(false)
+
+// 新增：余额记录弹窗可见状态
+const balanceRecordDialogVisible = ref(false)
 
 // 表格列配置
 const columns: TableColumn[] = [
@@ -260,13 +247,6 @@ const fetchAccountList = async (params: any) => {
   }
 }
 
-// 处理搜索
-const onSearch = (params: any) => {
-  console.log('搜索参数:', params)
-  // 搜索表格组件内部会自动处理搜索逻辑
-}
-
-
 const openBotList = (botId: number) => {
   router.push({
     path: '/bot_manage/bot_list',
@@ -277,118 +257,34 @@ const openBotList = (botId: number) => {
 }
 
 
-// 密码修改相关
-const passwordDialogVisible = ref(false)
-const passwordSchema = computed(() => {
-  return [
-    { field: 'id', label: '账户ID' },
-    { field: 'account_name', label: '账户名' }
-  ] as DescriptionsSchema[]
-})
-
-const { formRegister: passwordFormRegister, formMethods: passwordFormMethods } = useForm()
-const passwordFormSchema = reactive<FormSchema[]>([
-  {
-    field: 'password',
-    component: 'InputPassword',
-    label: '新密码:',
-    colProps: {
-      span: 24
-    },
-    componentProps: {
-      placeholder: '请输入新密码'
-    },
-    formItemProps: {
-      rules: [required(), { min: 6, message: '密码长度不能少于6位' }]
-    }
-  },
-  {
-    field: 'confirmPassword',
-    component: 'InputPassword',
-    label: '确认密码:',
-    colProps: {
-      span: 24
-    },
-    componentProps: {
-      placeholder: '请再次输入新密码'
-    },
-    formItemProps: {
-      rules: [
-        required(),
-        {
-          validator: (rule, value, callback) => {
-            // 获取表单数据以访问密码字段
-            const formEl = document.querySelector('form')
-            const passwordInput = formEl?.querySelector(
-              'input[name="password"]'
-            ) as HTMLInputElement
-            const password = passwordInput?.value
-
-            if (value !== password) {
-              callback(new Error('两次输入密码不一致'))
-            } else {
-              callback()
-            }
-          },
-          trigger: 'blur'
-        }
-      ]
-    }
-  }
-])
-
-// 打开修改密码弹窗
-const openPasswordDialog = (row: any) => {
-  currentAccount.value = row
-  passwordDialogVisible.value = true
-}
-
-// 处理修改密码
-const handleUpdatePassword = async () => {
-  const elForm = await passwordFormMethods.getElFormExpose()
-  await elForm?.validate(async (valid) => {
-    if (!valid) return
-
-    const formData = await passwordFormMethods.getFormData()
-    submitting.value = true
-
-    try {
-      // 这里修改密码功能暂未实现，先用提示信息代替
-      // await updateAccountApi({
-      //   id: currentAccount.value.id,
-      //   password: formData.password
-      // })
-      ElMessage.success('密码修改成功')
-      passwordDialogVisible.value = false
-    } catch (error) {
-      console.error('修改密码失败:', error)
-      ElMessage.error('修改密码失败')
-    } finally {
-      submitting.value = false
-    }
-  })
-}
-
 // 充值相关
 const rechargeDialogVisible = ref(false)
+
 const openRechargeDialog = (row: any) => {
   currentAccount.value = row
   rechargeDialogVisible.value = true
 }
 
-// 余额记录
-const handleBalanceRecord = (accountId: number) => {
-  currentAccountId.value = accountId
-  ElMessage.info('打开余额记录，需要实现相关组件')
-  // 实现余额记录组件并调用
+// 充值成功回调
+const handleRechargeSuccess = () => {
+  // ElMessage.success('充值成功') // 这条消息可以在 RechargeDialog 内部处理，父组件刷新即可
+  // 刷新表格数据
+  searchTableRef.value?.reload()
 }
 
-// 复制地址
-const { copy } = useClipboard()
-const copyAddress = () => {
-  copy(currentAccount.value.receive_address)
-  ElMessage.success('地址复制成功')
+// 修改：余额记录处理函数
+const handleBalanceRecord = (accountIdValue: number | string) => {
+  if (!accountIdValue) {
+      ElMessage.warning('无法获取用户ID，无法查看余额记录');
+      return;
+  }
+  console.log(`Opening balance record for account ID: ${accountIdValue}`) // 添加日志
+  currentAccountId.value = accountIdValue // 设置当前要查询的账户 ID
+  balanceRecordDialogVisible.value = true // 打开余额记录弹窗
+  // 移除旧的 ElMessage.info
+  // ElMessage.info('打开余额记录，需要实现相关组件')
 }
+
 
 // 发送消息相关
 const openSendMessageDialog = (row: any) => {
@@ -410,7 +306,7 @@ const openMassSendRecordDialog = () => {
 
 // 消息发送成功处理
 const handleMessageSent = () => {
-  ElMessage.success('消息发送成功')
+  // ElMessage.success('消息发送成功') // 这条消息也可以在 MessageDialog 内部处理
   messageDialogVisible.value = false
 }
 
