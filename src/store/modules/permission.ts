@@ -46,11 +46,11 @@ export const usePermissionStore = defineStore('permission', {
     ): Promise<unknown> {
       return new Promise<void>((resolve) => {
         const systemType = import.meta.env.VITE_SYSTEM_TYPE || 'Management'
-        let baseDynamicRoutes: AppRouteRecordRaw[] = [];
+        let baseDynamicRoutes: AppRouteRecordRaw[] = []
         if (systemType === 'Management') {
-            baseDynamicRoutes = managementRoutes.filter((item) => item.path !== '/data_statistics');
+          baseDynamicRoutes = managementRoutes.filter((item) => item.path !== '/data_statistics')
         } else {
-            baseDynamicRoutes = operationRoutes;
+          baseDynamicRoutes = operationRoutes
         }
 
         let routerMap: AppRouteRecordRaw[] = []

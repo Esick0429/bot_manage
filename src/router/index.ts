@@ -31,8 +31,8 @@ const rootRoute: AppRouteRecordRaw = {
 export const constantRouterMap: AppRouteRecordRaw[] = [rootRoute, ...baseRoutes]
 
 // Final routes array construction logic using imported modules
-let finalManagementRoutes = managementRoutes;
-let finalOperationRoutes = operationRoutes;
+let finalManagementRoutes = managementRoutes
+let finalOperationRoutes = operationRoutes
 
 if (systemType === 'Management') {
   finalManagementRoutes = managementRoutes.filter((item) => item.path !== '/data_statistics')
@@ -50,7 +50,7 @@ if (systemType === 'Management') {
   routes = [...constantRouterMap, ...finalOperationRoutes]
 }
 
-// The 404 route is usually added dynamically by the permission store, 
+// The 404 route is usually added dynamically by the permission store,
 // so it doesn't need to be explicitly added here unless the permission logic changes.
 
 const router = createRouter({

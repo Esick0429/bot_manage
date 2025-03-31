@@ -656,4 +656,4 @@ const asyncCommonRoutes: AppRouteRecordRaw[] = [
   }
 ]
 
-export default asyncCommonRoutes 
+export default asyncCommonRoutes

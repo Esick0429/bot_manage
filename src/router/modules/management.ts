@@ -159,4 +159,4 @@ const managementRoutes: AppRouteRecordRaw[] = [
   }
 ]
 
-export default managementRoutes 
+export default managementRoutes

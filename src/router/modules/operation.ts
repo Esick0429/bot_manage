@@ -155,4 +155,4 @@ const operationRoutes: AppRouteRecordRaw[] = [
   }
 ]
 
-export default operationRoutes 
+export default operationRoutes

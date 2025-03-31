@@ -79,4 +79,4 @@ const baseRoutes: AppRouteRecordRaw[] = [
   }
 ]
 
-export default baseRoutes 
+export default baseRoutes
