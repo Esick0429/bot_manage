@@ -165,9 +165,7 @@ const exchangeDetailSchema = computed(() => {
           return h('span', formatToDateTime(row.pay_time * 1000))
         }
       }
-    },
-    { field: 'exchange_address', label: '兑换地址' },
-    { field: 'receive_address', label: '收款地址' }
+    }
   ]
   return schema
 })
