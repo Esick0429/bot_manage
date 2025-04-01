@@ -16,7 +16,7 @@
       </SearchTable>
 
       <!-- 详情弹窗 -->
-      <Dialog v-model="dialogVisible" :title="'订单详情'" width="1000px">
+      <Dialog v-model="dialogVisible" :title="'订单详情'">
         <ElTabs v-model="activeTab">
           <ElTabPane label="订单详情" name="order">
             <Descriptions :schema="orderDetailSchema" :data="orderDetail" :column="2" border />

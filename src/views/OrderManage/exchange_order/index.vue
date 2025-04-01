@@ -17,7 +17,7 @@
       </SearchTable>
 
       <!-- 兑换详情弹窗 -->
-      <Dialog v-model="dialogVisible" :title="'兑换详情'" width="1000px">
+      <Dialog v-model="dialogVisible" :title="'兑换详情'">
         <Descriptions :schema="exchangeDetailSchema" :data="orderDetail" :column="2" border />
         <template #footer>
           <div class="flex justify-end">
@@ -27,7 +27,7 @@
       </Dialog>
 
       <!-- 交易详情弹窗 - 综合版 -->
-      <Dialog v-model="transactionDialogVisible" :title="'交易详情'" width="800px">
+      <Dialog v-model="transactionDialogVisible" :title="'交易详情'">
         <ElTabs v-model="activeTransactionTab" class="transaction-tabs">
           <ElTabPane name="in" label="转入详情">
             <Descriptions

@@ -17,7 +17,7 @@
       </SearchTable>
 
       <!-- 托管详情弹窗 -->
-      <Dialog v-model="dialogVisible" :title="'托管详情'" width="1000px">
+      <Dialog v-model="dialogVisible" :title="'托管详情'">
         <Descriptions :schema="hostedDetailSchema" :data="orderDetail" :column="2" border />
         <template #footer>
           <div class="flex justify-end">
@@ -27,7 +27,7 @@
       </Dialog>
 
       <!-- 交易详情弹窗 -->
-      <Dialog v-model="transactionDialogVisible" :title="'交易详情'" width="1000px">
+      <Dialog v-model="transactionDialogVisible" :title="'交易详情'">
         <Descriptions
           :schema="transactionDetailSchema"
           :data="transactionDetail"

@@ -1,5 +1,5 @@
 <template>
-  <Dialog v-model="dialogVisible" :title="dialogTitle" width="1200px">
+  <Dialog v-model="dialogVisible" :title="dialogTitle">
     <Form :schema="formSchema" @register="messageFormRegister" />
     <template #footer>
       <div class="flex justify-end">

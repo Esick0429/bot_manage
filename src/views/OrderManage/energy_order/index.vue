@@ -23,7 +23,7 @@
       <OrderDetailDialog v-model="orderDialogVisible" :order-data="selectedOrderDetail" />
 
       <!-- 交易详情弹窗 -->
-      <Dialog v-model="transactionDialogVisible" :title="'交易详情'" width="1000px">
+      <Dialog v-model="transactionDialogVisible" :title="'交易详情'">
         <Descriptions
           :schema="transactionDetailSchema"
           :data="transactionDetail"

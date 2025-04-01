@@ -1,5 +1,5 @@
 <template>
-  <Dialog v-model="dialogVisible" title="余额日志" width="70%">
+  <Dialog v-model="dialogVisible" title="余额日志">
     <!-- 筛选区域 -->
     <Search :schema="searchSchema" @search="handleSearch" @reset="handleReset" class="mb-4" />
 

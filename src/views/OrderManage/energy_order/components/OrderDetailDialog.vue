@@ -697,7 +697,7 @@ watch(
     </template>
   </Dialog>
 
-  <Dialog v-model="activationTransactionDialogVisible" title="交易详情" width="800px">
+  <Dialog v-model="activationTransactionDialogVisible" title="交易详情">
     <Descriptions
       :schema="activationTransactionSchema"
       :data="selectedActivationTransaction"

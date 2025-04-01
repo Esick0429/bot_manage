@@ -1,5 +1,5 @@
 <template>
-  <Dialog v-model="dialogVisible" title="群发记录" width="1200px">
+  <Dialog v-model="dialogVisible" title="群发记录">
     <SearchTable
       :columns="tableColumns"
       :search-schema="searchSchema"
@@ -15,7 +15,7 @@
       </template>
     </SearchTable>
     <!-- 详情弹窗 -->
-    <Dialog v-model="detailDialogVisible" title="群发详情" width="600px" append-to-body>
+    <Dialog v-model="detailDialogVisible" title="群发详情" append-to-body>
       <Descriptions :schema="detailSchema" :data="currentRecord" :column="1" border />
       <ElDivider content-position="center">发送结果统计</ElDivider>
       <div class="flex justify-around">
