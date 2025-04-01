@@ -60,6 +60,7 @@ import {
   getTransactionDetailApi
 } from '@/api/energy_order'
 import OrderDetailDialog from './components/OrderDetailDialog.vue'
+import formatEnergyNum from '../helpers/formatEnergyNum'
 
 // const { t } = useI18n()
 const router = useRouter()
@@ -74,7 +75,7 @@ const currentSearchParams = ref({})
 // 表格列配置
 const columns: TableColumn[] = [
   {
-    field: 'order_id',
+    field: 'order_num',
     label: '订单号',
     width: 180
   },
@@ -124,8 +125,8 @@ const columns: TableColumn[] = [
     slots: {
       default: ({ row }: any) => {
         const typeTextMap: Record<number, string> = {
-          1: '笔数',
-          2: '时间',
+          1: '按笔数',
+          2: '按时间',
           3: '批量下单',
           4: '闪租',
           5: '激活'
@@ -156,7 +157,7 @@ const columns: TableColumn[] = [
   },
   {
     field: 'order_amount',
-    label: '订单金额',
+    label: '支付金额',
     width: 100,
     formatter: (row) => {
       return row.order_amount != 0 ? `${row.order_amount} ${row.pay_unit}` : '-'
@@ -167,9 +168,7 @@ const columns: TableColumn[] = [
     label: '能量数量',
     width: 100,
     formatter: (row) => {
-      if (!row.energy_num) return '-'
-      const num = Number(row.energy_num)
-      return num >= 10000 ? (num / 10000).toFixed(1) + 'w' : num.toString()
+      return formatEnergyNum(row.energy_num)
     }
   },
   {
@@ -212,12 +211,12 @@ const columns: TableColumn[] = [
     width: 180,
     formatter: (row) => (row.create_time ? formatToDateTime(row.create_time) : '-')
   },
-  {
-    field: 'pay_time',
-    label: '支付时间',
-    width: 180,
-    formatter: (row) => (row.pay_time ? formatToDateTime(row.pay_time) : '-')
-  },
+  // {
+  //   field: 'pay_time',
+  //   label: '支付时间',
+  //   width: 180,
+  //   formatter: (row) => (row.pay_time ? formatToDateTime(row.pay_time) : '-')
+  // },
   {
     field: 'finish_time',
     label: '完成时间',

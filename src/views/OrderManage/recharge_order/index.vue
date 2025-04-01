@@ -73,7 +73,7 @@ const rechargeDetail = ref<any>({})
 // 订单详情schema
 const orderDetailSchema = computed(() => {
   const schema: DescriptionsSchema[] = [
-    { field: 'order_id', label: '订单号' },
+    { field: 'order_num', label: '订单号' },
     {
       field: 'status',
       label: '订单状态',
@@ -166,7 +166,7 @@ const orderDetailSchema = computed(() => {
 // 充值详情schema
 const rechargeDetailSchema = computed(() => {
   const schema: DescriptionsSchema[] = [
-    { field: 'to_address', label: '充值地址', span: 24 },
+    { field: 'to_address', label: '收款地址', span: 24 },
     { field: 'owner_address', label: '支付地址', span: 24 },
     { field: 'number', label: '区块号', span: 24 },
     {
@@ -250,9 +250,9 @@ const columns: TableColumn[] = [
   },
   {
     field: 'order_type',
-    label: '充值订单类型',
+    label: '订单类型',
     // width: 150,
-    formatter: (row) => (row.order_type == 1 ? 'TRX' : 'USDT')
+    formatter: (row) => (row.order_type == 1 ? '充值TRX' : '充值USDT')
   },
   {
     field: 'in_mount',
@@ -307,7 +307,11 @@ const columns: TableColumn[] = [
     // width: 100,
     slots: {
       default: ({ row }) => {
-        return <BaseButton type="primary" onClick={() => handleViewDetail(row)}>充值详情</BaseButton>
+        return (
+          <BaseButton type="primary" onClick={() => handleViewDetail(row)}>
+            充值详情
+          </BaseButton>
+        )
       }
     }
   }
@@ -330,15 +334,15 @@ const searchSchema = [
     componentProps: {
       options: [
         { label: '全部', value: '' },
-        { label: '待支付', value: 1 },
-        { label: '已完成', value: 2 },
+        { label: '已完成', value: 1 },
+        { label: '待支付', value: 2 },
         { label: '已取消', value: 3 }
       ],
       placeholder: '请选择订单状态'
     }
   },
   {
-    field: 'tg_user_info',
+    field: 'query',
     component: 'Input' as const,
     label: 'TG用户信息',
     componentProps: {
@@ -350,8 +354,8 @@ const searchSchema = [
 // 获取订单状态显示类型
 const getStatusType = (status: number): 'success' | 'warning' | 'info' | 'danger' | 'primary' => {
   const statusMap: Record<number, 'success' | 'warning' | 'info' | 'danger' | 'primary'> = {
-    1: 'warning', // 待支付
-    2: 'success', // 已完成
+    1: 'success', //  已完成
+    2: 'warning', // 待支付
     3: 'danger' // 已取消
   }
   return statusMap[status] || 'info'
@@ -360,8 +364,8 @@ const getStatusType = (status: number): 'success' | 'warning' | 'info' | 'danger
 // 获取订单状态文本
 const getStatusText = (status: number): string => {
   const statusMap = {
-    1: '待支付',
-    2: '已完成',
+    1: '已完成',
+    2: '待支付',
     3: '已取消'
   }
   return statusMap[status] || '未知状态'

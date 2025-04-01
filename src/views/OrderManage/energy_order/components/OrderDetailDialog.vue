@@ -9,7 +9,7 @@ import { formatToDateTime } from '@/utils/dateUtil'
 import { getBatchActiveDetailApi } from '@/api/energy_order'
 import { Table } from '@/components/Table'
 import type { TableColumn } from '@/components/Table'
-
+import formatEnergyNum from '@/views/OrderManage/helpers/formatEnergyNum'
 const props = defineProps({
   modelValue: {
     // for v-model:visible
@@ -89,132 +89,227 @@ const navigateToBotList = (botId: string | number) => {
 
 // --- Schemas (Adjusted field names and simplified tag logic) ---
 
-const orderDetailSchema = computed((): DescriptionsSchema[] => [
-  { field: 'order_id', label: '订单号' },
-  {
-    field: 'status',
-    label: '订单状态',
-    slots: {
-      default: (data: any) => {
-        if (!data || data.status === undefined) return h('span', '-')
-        // Simplified status color mapping
-        const statusColorMap: Record<number, 'success' | 'warning' | 'danger' | 'info'> = {
-          1: 'success', // 已完成
-          2: 'warning', // 待支付
-          3: 'danger' // 已取消
+const orderDetailSchema = computed((): DescriptionsSchema[] => {
+  let schema = [
+    { field: 'order_num', label: '订单号' },
+    {
+      field: 'status',
+      label: '订单状态',
+      slots: {
+        default: (data: any) => {
+          if (!data || data.status === undefined) return h('span', '-')
+          // Simplified status color mapping
+          const statusColorMap: Record<number, 'success' | 'warning' | 'danger' | 'info'> = {
+            1: 'success', // 已完成
+            2: 'warning', // 待支付
+            3: 'danger' // 已取消
+          }
+          const tagType = statusColorMap[data.status] || 'info'
+          return h(ElTag, { type: tagType, size: 'small' }, () => getStatusText(data.status)) // Keep text helper
         }
-        const tagType = statusColorMap[data.status] || 'info'
-        return h(ElTag, { type: tagType, size: 'small' }, () => getStatusText(data.status)) // Keep text helper
       }
-    }
-  },
-  {
-    field: 'order_type',
-    label: '订单类型',
-    slots: {
-      default: (data: any) => {
-        if (!data || data.order_type === undefined) return h('span', '-')
-        const typeTextMap: Record<number, string> = {
-          1: '笔数',
-          2: '时间',
-          3: '批量下单',
-          4: '闪租',
-          5: '激活'
-        }
-        // Fixed color types
-        const typeColorMap: Record<number, 'primary' | 'success' | 'warning' | 'danger' | 'info'> =
-          {
+    },
+    {
+      field: 'order_type',
+      label: '订单类型',
+      slots: {
+        default: (data: any) => {
+          if (!data || data.order_type === undefined) return h('span', '-')
+          const typeTextMap: Record<number, string> = {
+            1: '按笔数',
+            2: '按时间',
+            3: '批量下单',
+            4: '闪租',
+            5: '激活'
+          }
+          // Fixed color types
+          const typeColorMap: Record<
+            number,
+            'primary' | 'success' | 'warning' | 'danger' | 'info'
+          > = {
             1: 'primary',
             2: 'success',
             3: 'warning',
             4: 'danger',
             5: 'info'
           }
-        const orderTypeNum =
-          typeof data.order_type === 'string' ? parseInt(data.order_type, 10) : data.order_type
+          const orderTypeNum =
+            typeof data.order_type === 'string' ? parseInt(data.order_type, 10) : data.order_type
 
-        if (isNaN(orderTypeNum) || !(orderTypeNum in typeTextMap)) {
-          return h(ElTag, { type: 'info', size: 'small' }, () => '未知类型')
+          if (isNaN(orderTypeNum) || !(orderTypeNum in typeTextMap)) {
+            return h(ElTag, { type: 'info', size: 'small' }, () => '未知类型')
+          }
+
+          const tagType = typeColorMap[orderTypeNum] || 'info'
+          const text = typeTextMap[orderTypeNum]
+          return h(ElTag, { type: tagType, size: 'small' }, () => text)
         }
+      }
+    },
+    // { field: 'tg_id', label: 'TG用户ID' },
+    {
+      field: 'tg_name',
+      label: 'TG用户名',
+      slots: {
+        default: (data: any) => {
+          if (!data || !data.tg_name) return h('span', '-')
+          return h(
+            ElLink,
+            { type: 'primary', onClick: () => navigateToUserList(data.tg_id) },
+            () => data.tg_name || '-' // Use tg_name from API
+          )
+        }
+      }
+    },
+    // Assuming API provides nickname, if not remove or adjust
+    { field: 'nickname', label: 'TG用户昵称' },
+    {
+      field: 'bot_name',
+      label: '机器人名称',
+      slots: {
+        default: (data: any) => {
+          if (!data || !data.bot_name) return h('span', '-')
+          return h(
+            ElLink,
+            { type: 'primary', onClick: () => navigateToBotList(data.bot_id) },
+            () => data.bot_name || '-' // Use bot_name from API
+          )
+        }
+      }
+    },
+    { field: 'bot_id', label: '机器人ID' },
+    {
+      field: 'create_time',
+      label: '创建时间',
+      slots: {
+        default: (data: any) =>
+          h('span', {}, data.create_time ? formatToDateTime(data.create_time) : '-')
+      }
+    },
+    {
+      field: 'order_amount',
+      label: '订单金额',
+      slots: {
+        default: (data: any) => h('span', {}, data.order_amount + ' ' + data.pay_unit)
+      }
+    },
+    {
+      field: 'pay_amount',
+      label: '支付金额',
+      slots: {
+        default: (data: any) => h('span', {}, data.pay_amount + ' ' + data.pay_unit)
+      }
+    },
+    {
+      field: 'pay_type',
+      label: '支付类型',
+      slots: {
+        default: (data: any) => h('span', {}, data.pay_type ?? '余额支付')
+      }
+    },
+    {
+      field: 'energy_num',
+      label: '能量数量',
+      slots: {
+        default: (data: any) => h('span', {}, formatEnergyNum(data.energy_num) ?? '-')
+      }
+    },
+    {
+      field: 'energy_rent_text',
+      label: '能量有效期',
+      slots: {
+        default: (data: any) => h('span', {}, data.energy_rent_text ?? '-')
+      }
+    },
+    {
+      field: 'stroke_num',
+      label: '笔数',
+      slots: {
+        default: (data: any) => h('span', {}, data.stroke_num ?? '-')
+      }
+    },
+    // {
+    //   field: 'recycle_energy_num',
+    //   label: '能量回收数',
 
-        const tagType = typeColorMap[orderTypeNum] || 'info'
-        const text = typeTextMap[orderTypeNum]
-        return h(ElTag, { type: tagType, size: 'small' }, () => text)
+    //   slots: {
+    //     default: (data: any) => h('span', {}, data.recycle_energy_num ?? '-')
+    //   }
+    // },
+    {
+      field: 'pay_time',
+      label: '支付时间',
+      slots: {
+        default: (data: any) => h('span', {}, data.pay_time ? formatToDateTime(data.pay_time) : '-')
       }
-    }
-  },
-  { field: 'tg_id', label: 'TG用户ID' },
-  {
-    field: 'tg_name',
-    label: 'TG用户名',
-    slots: {
-      default: (data: any) => {
-        if (!data || !data.tg_name) return h('span', '-')
-        return h(
-          ElLink,
-          { type: 'primary', onClick: () => navigateToUserList(data.tg_id) },
-          () => data.tg_name || '-' // Use tg_name from API
-        )
+    },
+    {
+      field: 'finish_time',
+      label: '完成时间',
+      slots: {
+        default: (data: any) =>
+          h('span', {}, data.finish_time ? formatToDateTime(data.finish_time) : '-')
       }
-    }
-  },
-  // Assuming API provides nickname, if not remove or adjust
-  { field: 'nickname', label: 'TG用户昵称' },
-  {
-    field: 'bot_name',
-    label: '机器人名称',
-    slots: {
-      default: (data: any) => {
-        if (!data || !data.bot_name) return h('span', '-')
-        return h(
-          ElLink,
-          { type: 'primary', onClick: () => navigateToBotList(data.bot_id) },
-          () => data.bot_name || '-' // Use bot_name from API
-        )
-      }
-    }
-  },
-  { field: 'bot_id', label: '机器人ID' },
-  {
-    field: 'create_time',
-    label: '创建时间',
-    span: 24,
-    slots: {
-      default: (data: any) =>
-        h('span', {}, data.create_time ? formatToDateTime(data.create_time) : '-')
-    }
-  },
-  {
-    field: 'pay_time',
-    label: '支付时间',
-    span: 24,
-    slots: {
-      default: (data: any) => h('span', {}, data.pay_time ? formatToDateTime(data.pay_time) : '-')
-    }
-  },
-  {
-    field: 'finish_time',
-    label: '完成时间',
-    span: 24,
-    slots: {
-      default: (data: any) =>
-        h('span', {}, data.finish_time ? formatToDateTime(data.finish_time) : '-')
-    }
-  },
-  { field: 'describe', label: '描述', span: 24 } // Use 'describe' from API example
-  // { field: 'remark', label: '备注', span: 24 } // Removed remark as it wasn't in API example
-])
+    },
+    { field: 'describe', label: '描述', span: 24 } // Use 'describe' from API example
+    // { field: 'remark', label: '备注', span: 24 } // Removed remark as it wasn't in API example
+  ]
+  return schema
+})
 
 // 按笔数详情 schema
 const byCountDetailSchema = computed((): DescriptionsSchema[] => [
   { field: 'stroke_num', label: '租用笔数' },
-  { field: 'order_amount', label: '订单金额' },
-  { field: 'pay_unit', label: '支付单位' }
+  {
+    field: 'order_amount',
+    label: '订单金额',
+    slots: {
+      default: (data: any) => h('span', {}, data.order_amount + ' ' + data.pay_unit)
+    }
+  }
+])
+
+//按笔数详情 tableSchema
+const byCountDetailTableSchema = computed((): TableColumn[] => [
+  {
+    field: 'index', // 字段名，通常用于标识数据
+    label: '序号', // 表头显示的名称
+    type: 'index', // 指定为索引列，会自动显示行号
+    width: '60px' // 列宽
+  },
+  {
+    field: 'amount', // 对应数据中的能量数量字段
+    label: '能量数量'
+  },
+  {
+    field: 'expiryDate', // 对应数据中的有效期字段
+    label: '有效期'
+  },
+  {
+    field: 'status', // 对应数据中的状态字段
+    label: '状态'
+    // 可以根据需要添加 formatter 或 slot 来自定义状态显示
+    // e.g., formatter: (row) => row.status === 1 ? '已使用' : '未使用'
+  },
+  {
+    field: 'usageTime', // 对应数据中的使用时间字段
+    label: '使用时间'
+  }
+  // {
+  //   field: 'recoveryTime', // 对应数据中的能量回收时间字段
+  //   label: '能量回收时间'
+  // }
 ])
 
 // 按时间详情 schema
 const byTimeDetailSchema = computed((): DescriptionsSchema[] => [
-  { field: 'energy_num', label: '能量数量' },
+  {
+    field: 'energy_num',
+    label: '能量数量',
+    slots: {
+      default: (data: any) => h('span', {}, formatEnergyNum(data.energy_num) ?? '-')
+    }
+  },
   { field: 'energy_rent_text', label: '能量有效期' },
   { field: 'receive_address', label: '接收地址', span: 24 },
   {
@@ -237,14 +332,21 @@ const byTimeDetailSchema = computed((): DescriptionsSchema[] => [
     }
   }
   // Commented out fields already present in the main orderDetailSchema
-  // { field: 'order_amount', label: '订单金额' },
-  // { field: 'pay_unit', label: '支付单位' }
 ])
 
 // 闪租详情 schema
 const flashRentDetailSchema = computed((): DescriptionsSchema[] => [
   { field: 'stroke_num', label: '闪租笔数' }, // Assuming 'stroke_num' applies
+  {
+    field: 'flash_price',
+    label: '闪租能量价格',
+    slots: {
+      default: (data: any) =>
+        h('span', {}, data.flash_price + ' ' + data.pay_unit + '/' + data.energy_rent_text)
+    }
+  },
   { field: 'receive_address', label: '接收地址', span: 24 },
+  { field: 'from_address', label: '收款地址', span: 24 },
   {
     field: 'txid',
     label: '交易hash',
@@ -263,9 +365,7 @@ const flashRentDetailSchema = computed((): DescriptionsSchema[] => [
         )
       }
     }
-  },
-  { field: 'order_amount', label: '订单金额' },
-  { field: 'pay_unit', label: '支付单位' }
+  }
 ])
 
 // 批量下单详情 schema
@@ -306,8 +406,8 @@ const activationTotal = ref(0) // 激活详情 - 总条数
 // --- 新增获取激活详情的函数 ---
 const fetchActivationDetails = async () => {
   // 确保有订单数据和 ID
-  const orderId = props.orderData?.id || props.orderData?.order_id
-  if (!orderId) {
+  const id = props.orderData?.id
+  if (!id) {
     console.warn('无法获取订单ID以加载激活详情')
     activationDetails.value = [] // 清空以防万一
     return
@@ -323,7 +423,7 @@ const fetchActivationDetails = async () => {
     }
     // TODO: 确认 getBatchActiveDetailApi 是否已修改以接受 params
     // const response = await getBatchActiveDetailApi(orderId, params); // 期望的调用方式
-    const response = await getBatchActiveDetailApi(orderId) // 临时保持旧调用，需要后端配合修改
+    const response = await getBatchActiveDetailApi(id) // 临时保持旧调用，需要后端配合修改
     // --- 假设 API 返回结构为 { data: { list: [], total: number } } ---
     activationDetails.value = response?.data?.list || [] // 使用 list
     if (!Array.isArray(activationDetails.value)) {
@@ -483,11 +583,56 @@ const activationTransactionSchema = computed((): DescriptionsSchema[] => [
     }
   }
 ])
+
+const loading = ref(false) // 表格加载状态
+const byCountCurrentPage = ref(1)
+const byCountPageSize = ref(10)
+
+// 计算总条数 (从 orderDetail 获取)
+const byCountTotal = computed(() => {
+  // 如果后端直接给了总数用这个: return orderDetail.value?.countDetailsTotal || 0
+  // 如果后端只给了完整列表，用列表长度:
+  return orderDetail.value?.countDetailsList?.length || 0
+})
+
+// 计算当前页显示的笔数详情数据 (前端分页)
+const byCountDetailDataPaginated = computed(() => {
+  const list = orderDetail.value?.countDetailsList || []
+  const start = (byCountCurrentPage.value - 1) * byCountPageSize.value
+  const end = start + byCountPageSize.value
+  return list.slice(start, end)
+})
+
+// 笔数详情分页改变处理 (不再调用 API)
+const handleByCountPageChange = (page: number) => {
+  byCountCurrentPage.value = page
+}
+
+// 笔数详情每页条数改变处理 (不再调用 API)
+const handleByCountSizeChange = (size: number) => {
+  // 如果改变每页条数时需要回到第一页
+  if (byCountPageSize.value !== size) {
+    byCountCurrentPage.value = 1
+  }
+  byCountPageSize.value = size
+}
+
+// 监听 orderDetail 变化，重置分页到第一页
+watch(
+  orderDetail,
+  (newDetail) => {
+    if (newDetail?.order_type === 1) {
+      byCountCurrentPage.value = 1 // 切换订单时回到第一页
+    }
+    // 如果需要，可以在这里清空旧分页状态，但通常重置页码就够了
+  },
+  { deep: true }
+)
 </script>
 
 <template>
-  <Dialog v-model="localVisible" :title="'订单详情'" width="1000px" @close="handleClose">
-    <ElTabs v-if="orderDetail && orderDetail.order_id" v-model="activeTab">
+  <Dialog v-model="localVisible" :title="'订单详情'" @close="handleClose">
+    <ElTabs v-if="orderDetail && orderDetail.order_num" v-model="activeTab">
       <!-- 基础订单详情页 -->
       <ElTabPane label="订单详情" name="order">
         <Descriptions :schema="orderDetailSchema" :data="orderDetail" :column="2" border />
@@ -496,6 +641,16 @@ const activationTransactionSchema = computed((): DescriptionsSchema[] => [
       <!-- 按笔数详情标签页 (Type 1) -->
       <ElTabPane v-if="orderDetail.order_type === 1" label="笔数详情" name="byCount">
         <Descriptions :schema="byCountDetailSchema" :data="orderDetail" :column="2" border />
+
+        <div class="mt-20px">
+          <Table
+            :columns="byCountDetailTableSchema"
+            :data="byCountDetailDataPaginated"
+            :loading="loading"
+            stripe
+            :border="true"
+          />
+        </div>
       </ElTabPane>
 
       <!-- 按时间详情标签页 (Type 2) -->

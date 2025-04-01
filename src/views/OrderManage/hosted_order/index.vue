@@ -63,7 +63,7 @@ import {
   exportHostedOrderApi,
   getTransactionDetailApi
 } from '@/api/hosted_order'
-
+import formatEnergyNum from '@/views/OrderManage/helpers/formatEnergyNum'
 // const { t } = useI18n()
 const router = useRouter()
 const searchTableRef = ref<InstanceType<typeof SearchTable> | null>(null)
@@ -133,16 +133,14 @@ const hostedDetailSchema = computed(() => {
       label: '能量数量',
       slots: {
         default: (row: any) => {
-          if (!row || !row.energy_num) return h('span', '-')
-          return h(
-            'span',
-            row.energy_num >= 10000 ? (row.energy_num / 10000).toFixed(1) + 'w' : row.energy_num
-          )
+          return h('span', formatEnergyNum(row.energy_num))
         }
       }
     },
     { field: 'energy_rent_text', label: '能量有效期' },
-    { field: 'energyCount', label: '笔数' },
+    { field: 'stroke_num', label: '笔数' },
+    { field: 'recycle_energy_num', label: '能量回收数' },
+    { field: 'recycle_time', label: '回收时间' },
     {
       field: 'txid',
       label: '交易hash',
@@ -250,7 +248,16 @@ const transactionDetailSchema = computed(() => {
       }
     },
     { field: 'validity_period', label: '有效期' },
-    { field: 'energy_amount', label: '能量数量' },
+    {
+      field: 'energy_amount',
+      label: '能量数量',
+      slots: {
+        default: (row: any) => {
+          let energyAmount = row.energy_amount
+          return h('span', formatEnergyNum(energyAmount))
+        }
+      }
+    },
     {
       field: 'create_time',
       label: '创建时间',
@@ -321,11 +328,13 @@ const columns: TableColumn[] = [
   },
   {
     field: 'pay_amount',
-    label: '支付金额'
+    label: '支付金额',
+    formatter: (row) => (row.pay_amount != 0 ? `${row.pay_amount} ${row.pay_unit}` : '-')
   },
   {
     field: 'energy_num',
-    label: '能量数量'
+    label: '能量数量',
+    formatter: (row) => formatEnergyNum(row.energy_num)
   },
   {
     field: 'energy_rent_text',
@@ -380,7 +389,7 @@ const actionColumn: TableColumn = {
 // 搜索表单配置
 const searchSchema = [
   {
-    field: 'orderNo',
+    field: 'order_id',
     component: 'Input' as const,
     label: '订单号',
     componentProps: {
@@ -394,11 +403,9 @@ const searchSchema = [
     componentProps: {
       options: [
         { label: '全部', value: '' },
-        { label: '待支付', value: 0 },
-        { label: '支付中', value: 1 },
-        { label: '已完成', value: 2 },
-        { label: '支付失败', value: 3 },
-        { label: '已取消', value: 4 }
+        { label: '已完成', value: 1 },
+        { label: '待支付', value: 2 },
+        { label: '已取消', value: 3 }
       ],
       placeholder: '请选择订单状态'
     }
@@ -408,11 +415,9 @@ const searchSchema = [
 // 获取订单状态显示类型
 const getStatusType = (status: number): 'success' | 'warning' | 'info' | 'danger' | 'primary' => {
   const statusMap: Record<number, 'success' | 'warning' | 'info' | 'danger' | 'primary'> = {
-    0: 'warning',
-    1: 'info',
-    2: 'success',
-    3: 'danger',
-    4: 'info'
+    1: 'success',
+    2: 'warning',
+    3: 'danger'
   }
   return statusMap[status] || 'info'
 }
@@ -420,11 +425,9 @@ const getStatusType = (status: number): 'success' | 'warning' | 'info' | 'danger
 // 获取订单状态文本
 const getStatusText = (status: number): string => {
   const statusMap = {
-    0: '待支付',
-    1: '支付中',
-    2: '已完成',
-    3: '支付失败',
-    4: '已取消'
+    1: '已完成',
+    2: '待支付',
+    3: '已取消'
   }
   return statusMap[status] || '未知状态'
 }
