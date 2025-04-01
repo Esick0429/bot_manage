@@ -4,7 +4,14 @@
     <Search :schema="searchSchema" @search="handleSearch" @reset="handleReset" class="mb-4" />
 
     <!-- 表格区域 -->
-    <Table :columns="tableColumns" :data="recordList" :loading="loading" max-height="500px" />
+    <Table
+      :columns="tableColumns"
+      :data="recordList"
+      :loading="loading"
+      :pagination="pagination"
+      @pagination-change="handlePaginationChange"
+      max-height="500px"
+    />
 
     <!-- 弹窗底部按钮 -->
     <template #footer>
@@ -22,7 +29,7 @@ import { Dialog } from '@/components/Dialog'
 import { Table, TableColumn } from '@/components/Table'
 import { Search } from '@/components/Search'
 import type { FormSchema } from '@/components/Form'
-import { getUserBalanceRecordsApi } from '@/api/tgUser'
+import { getUserBalanceRecordsApi, type UserBalanceRecordParams } from '@/api/tgUser/index'
 import { formatToDateTime } from '@/utils/dateUtil'
 
 // ----------- Props and Emits -----------
@@ -53,6 +60,11 @@ const closeDialog = () => {
 const loading = ref(false)
 const recordList = ref<any[]>([])
 const searchParams = ref<Recordable>({})
+const pagination = reactive({
+  currentPage: 1,
+  pageSize: 10, // 你可以设置一个默认的 pageSize
+  total: 0
+})
 
 // ----------- Search Schema -----------
 const searchSchema = reactive<FormSchema[]>([
@@ -135,63 +147,78 @@ const tableColumns = ref<TableColumn[]>([
   }
 ])
 
-// ----------- Data Fetching (后端筛选) -----------
+// ----------- Data Fetching (后端筛选 + 分页) -----------
 const fetchData = async () => {
   if (!props.accountId) {
     recordList.value = []
+    pagination.total = 0
     return
   }
 
   loading.value = true
 
-  // --- 准备 API 参数 ---
-  const apiParams: { unit?: string; change_type?: string } = {}
-  // 直接使用 searchParams 中的字段名，因为 API 定义中使用了它们
-  if (searchParams.value?.unit) {
-    apiParams.unit = searchParams.value.unit
-  }
-  if (searchParams.value?.change_type) {
-    apiParams.change_type = searchParams.value.change_type
+  // --- 准备 API 参数 (包含分页和筛选) ---
+  const apiParams: UserBalanceRecordParams = {
+    currentPage: pagination.currentPage,
+    pageSize: pagination.pageSize,
+    unit: searchParams.value?.unit || undefined,
+    change_type: searchParams.value?.change_type || undefined
   }
 
   try {
     // 调用更新后的 API 函数
     const res = await getUserBalanceRecordsApi(props.accountId, apiParams)
 
-    // 直接使用 API 返回的列表 (假设已筛选)
-    if (res && res.data?.list) {
-      recordList.value = res.data.list
+    // 使用 API 返回的数据和总数
+    if (res && res.data) {
+      recordList.value = res.data.list || []
+      pagination.total = res.data.total || 0 // 确保 API 返回了 total
     } else {
       recordList.value = []
+      pagination.total = 0
     }
   } catch (error) {
     console.error('Error fetching balance records (global handler should show message):', error)
     recordList.value = []
+    pagination.total = 0
   } finally {
     loading.value = false
   }
 }
 
-// ----------- Event Handlers for Search (调用 fetchData) -----------
+// ----------- Event Handlers -----------
 const handleSearch = (data: Recordable) => {
   searchParams.value = data
-  fetchData() // 重新获取数据
+  pagination.currentPage = 1 // 搜索时重置到第一页
+  fetchData()
 }
 
 const handleReset = (data: Recordable) => {
-  searchParams.value = data // data 通常是空对象或初始值
-  fetchData() // 重新获取数据 (无筛选条件)
+  searchParams.value = data
+  pagination.currentPage = 1 // 重置时也回到第一页
+  fetchData()
 }
 
-// ----------- Watchers (调用 fetchData) -----------
+const handlePaginationChange = (page: number, size: number) => {
+  pagination.currentPage = page
+  pagination.pageSize = size
+  fetchData() // 页码或条数变化时重新获取数据
+}
+
+// ----------- Watchers -----------
 watch(
   () => [props.visible, props.accountId],
   ([visible, accountId], [prevVisible]) => {
     if (visible && !prevVisible && accountId) {
-      handleReset({}) // 打开时重置筛选参数并获取初始数据
+      // 打开时重置搜索条件、页码并获取初始数据
+      handleReset({})
     } else if (!visible && prevVisible) {
+      // 关闭时清空数据并重置状态
       recordList.value = []
       searchParams.value = {}
+      pagination.currentPage = 1
+      pagination.pageSize = 10 // 或者你的默认值
+      pagination.total = 0
     }
   }
 )

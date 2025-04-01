@@ -2,9 +2,11 @@
   <div class="app-container">
     <ContentWrap>
       <SearchTable
+        v-if="isBotListLoaded"
         :columns="columns"
         :search-schema="searchSchema"
         :fetch-data-api="fetchAccountList"
+        :showAddButton="false"
         ref="searchTableRef"
       >
         <template #searchButtons>
@@ -34,18 +36,14 @@
         :type="messageDialogType"
         :user="currentAccount"
         @success="handleMessageSent"
-        :bot-list="botOptions"
       />
 
       <!-- 群发记录弹窗 -->
-      <MassSendRecordDialog
-        v-model="massSendRecordDialogVisible"
-        ref="massSendRecordDialogRef"
-        :bot-list="botOptions"
-      />
+      <MassSendRecordDialog v-model="massSendRecordDialogVisible" ref="massSendRecordDialogRef" />
 
       <!-- 新增：余额记录弹窗 -->
       <BalanceRecordDialog
+        v-if="currentAccountId !== null"
         v-model:visible="balanceRecordDialogVisible"
         :account-id="currentAccountId"
       />
@@ -54,7 +52,7 @@
 </template>
 
 <script setup lang="tsx">
-import { ref, onMounted, h, computed, reactive } from 'vue'
+import { ref, onMounted, h, computed, reactive, watch } from 'vue'
 import { formatToDateTime } from '@/utils/dateUtil'
 import { ElButton, ElTag, ElMessage, ElLink } from 'element-plus'
 import { ContentWrap } from '@/components/ContentWrap'
@@ -82,17 +80,15 @@ const { required } = useValidator()
 const searchTableRef = ref<InstanceType<typeof SearchTable> | null>(null)
 const massSendRecordDialogRef = ref<InstanceType<typeof MassSendRecordDialog> | null>(null)
 
+// State for conditional rendering
+const isBotListLoaded = ref(false)
+
 // 机器人列表
 const botOptions = ref<{ label: string; value: number | string }[]>([{ label: '全部', value: '' }])
 
-// 创建一个botOptions的副本，避免响应式引用可能导致的问题
-const botOptionsForComponent = computed(() => {
-  // 转换成普通的JSON对象再转回来，彻底切断响应式引用
-  return JSON.parse(JSON.stringify(botOptions.value.filter((item) => item.value !== '')))
-})
-
 // 获取机器人列表
 const fetchBotList = async () => {
+  isBotListLoaded.value = false // Reset before fetching if needed
   try {
     const res = await getBotListApi({})
     const bots = (res.data.list || []).map((bot: any) => ({
@@ -100,7 +96,7 @@ const fetchBotList = async () => {
       value: bot.id
     }))
     botOptions.value = [{ label: '全部', value: '' }, ...bots]
-    console.log('botOptions', botOptions.value)
+    isBotListLoaded.value = true // Set to true after successful fetch
   } catch (error) {
     console.error('获取机器人列表失败:', error)
   }
@@ -109,7 +105,6 @@ const fetchBotList = async () => {
 // 当前选中账户
 const currentAccount = ref<any>({})
 const currentAccountId = ref<number | string | null>(null)
-const submitting = ref(false)
 
 // 消息发送相关
 const messageDialogVisible = ref(false)
@@ -137,14 +132,13 @@ const columns: TableColumn[] = [
     url: (row) => `https://t.me/${row.tg_name}`
   },
   {
-    field: 'bot_id',
+    field: 'tg_bot_id',
     label: '机器人ID',
-    width: 100,
     slots: {
       default: ({ row }) => {
         return (
           <ElLink type="primary" onClick={() => openBotList(row.bot_info.tg_bot_id)}>
-            {row.bot_id}
+            {row.tg_bot_id}
           </ElLink>
         )
       }
@@ -209,18 +203,15 @@ const columns: TableColumn[] = [
   }
 ]
 
-// 搜索表单配置
-const searchSchema = computed(() => {
-  // 创建一个新的选项数组，避免直接引用响应式对象
-  const options = JSON.parse(JSON.stringify(botOptions.value))
-
+// 搜索表单配置 - computed is fine now
+const searchSchema = computed<FormSchema[]>(() => {
   return [
     {
       field: 'bot_id',
       component: 'Select' as const,
       label: '机器人',
       componentProps: {
-        options: options,
+        options: botOptions.value,
         placeholder: '请选择机器人'
       }
     },

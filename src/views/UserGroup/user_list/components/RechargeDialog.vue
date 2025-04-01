@@ -120,7 +120,13 @@ const rechargeFormSchema = reactive<FormSchema[]>([
       style: {
         width: '100%'
       },
-      remark: '如需要取消金额，请输入负数'
+      remark: () => (
+        <div>
+          <span>如果需要扣减余额，请输入负数</span>
+          <br />
+          <span>例如：输入5，则是增加5余额，输入-5，则是扣减5余额</span>
+        </div>
+      )
     },
     formItemProps: {
       rules: [required()]
