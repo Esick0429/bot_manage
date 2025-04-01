@@ -119,6 +119,11 @@ const columns = [
     }
   },
   {
+    field: 'firstname',
+    label: '机器人昵称',
+    formatter: (row) => row.firstname
+  },
+  {
     field: 'status',
     label: '状态',
     // formatter: (row) => (row.status === 1 ? '是' : '否'),

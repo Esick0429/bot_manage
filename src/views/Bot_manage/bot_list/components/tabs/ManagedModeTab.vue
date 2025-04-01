@@ -15,40 +15,40 @@ const { formRegister, formMethods } = useForm()
 
 // 托管模式价格表单
 const managedModeSchema = reactive<FormSchema[]>([
-  {
-    field: 'delegate_price_trx',
-    component: 'InputNumber' as const,
-    label: '【托管模式】笔数价格（TRX）：',
-    componentProps: {
-      placeholder: '请输入笔数价格',
-      min: 0,
-      precision: 2
-    },
-    formItemProps: {
-      rules: [{ required: true, message: '笔数价格是必填项' }]
-    }
-  },
-  {
-    field: 'divider',
-    component: 'Divider' as const,
-    label: '自定义【托管模式】笔数价格（TRX）：',
-    componentProps: {
-      content: '自定义笔数价格',
-      direction: 'horizontal'
-    }
-  },
-  {
-    field: 'enable_custom_delegate',
-    component: 'Switch' as const,
-    label: {
-      text: '是否开启',
-      tips: '可以自定义65000或131000能量使用的不同价格'
-    },
-    value: false,
-    colProps: {
-      span: 24
-    }
-  },
+  // {
+  //   field: 'delegate_price_trx',
+  //   component: 'InputNumber' as const,
+  //   label: '【托管模式】笔数价格（TRX）：',
+  //   componentProps: {
+  //     placeholder: '请输入笔数价格',
+  //     min: 0,
+  //     precision: 2
+  //   },
+  //   formItemProps: {
+  //     rules: [{ required: true, message: '笔数价格是必填项' }]
+  //   }
+  // },
+  // {
+  //   field: 'divider',
+  //   component: 'Divider' as const,
+  //   label: '自定义【托管模式】笔数价格（TRX）：',
+  //   componentProps: {
+  //     content: '自定义笔数价格',
+  //     direction: 'horizontal'
+  //   }
+  // },
+  // {
+  //   field: 'enable_custom_delegate',
+  //   component: 'Switch' as const,
+  //   label: {
+  //     text: '是否开启',
+  //     tips: '可以自定义65000或131000能量使用的不同价格'
+  //   },
+  //   value: false,
+  //   colProps: {
+  //     span: 24
+  //   }
+  // },
   {
     field: 'price_trx_65000',
     component: 'InputNumber' as const,
