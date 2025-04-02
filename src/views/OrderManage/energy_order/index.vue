@@ -61,6 +61,7 @@ import {
 } from '@/api/energy_order'
 import OrderDetailDialog from './components/OrderDetailDialog.vue'
 import formatEnergyNum from '../helpers/formatEnergyNum'
+import isEmpty from 'lodash-es/isEmpty'
 
 // const { t } = useI18n()
 const router = useRouter()
@@ -85,13 +86,14 @@ const columns: TableColumn[] = [
     width: 120,
     slots: {
       default: ({ row }) => {
+        if (isEmpty(row.tg_name)) return h('span', '-')
         return h(
           ElLink,
           {
             type: 'primary',
             onClick: () => navigateToUserList(row.tg_id)
           },
-          () => row.tg_name || '-'
+          () => row.tg_name
         )
       }
     }
@@ -107,13 +109,14 @@ const columns: TableColumn[] = [
     minWidth: 160,
     slots: {
       default: ({ row }) => {
+        if (isEmpty(row.bot_name)) return h('span', '-')
         return h(
           ElLink,
           {
             type: 'primary',
             onClick: () => navigateToBotList(row.bot_id)
           },
-          () => row.bot_name || '-'
+          () => row.bot_name
         )
       }
     }
@@ -184,7 +187,7 @@ const columns: TableColumn[] = [
     label: '笔数',
     width: 80,
     formatter: (row) => {
-      return row.stroke_num !== undefined && row.stroke_num !== null ? row.stroke_num : '-'
+      return row.stroke_num ? row.stroke_num : '-'
     }
   },
   {
@@ -241,7 +244,11 @@ const actionColumn: TableColumn = {
             订单详情
           </BaseButton>
 
-          <BaseButton type="success" onClick={() => handleTransactionDetail(row)}>
+          <BaseButton
+            type="success"
+            onClick={() => handleTransactionDetail(row)}
+            disabled={[1, 3, 5].includes(row.order_type)}
+          >
             交易详情
           </BaseButton>
         </>
