@@ -139,8 +139,6 @@ const hostedDetailSchema = computed(() => {
     },
     { field: 'energy_rent_text', label: '能量有效期' },
     { field: 'stroke_num', label: '笔数' },
-    { field: 'recycle_energy_num', label: '能量回收数' },
-    { field: 'recycle_time', label: '回收时间' },
     {
       field: 'txid',
       label: '交易hash',
@@ -199,62 +197,43 @@ const hostedDetailSchema = computed(() => {
 const transactionDetailSchema = computed(() => {
   const schema: DescriptionsSchema[] = [
     {
-      field: 'transaction_hash',
+      field: 'txid',
       label: '交易hash',
       span: 24,
       slots: {
         default: (row: any) => {
-          if (!row || !row.transaction_hash) return h('span', '-')
+          if (!row || !row.txid) return h('span', '-')
           return h(
             ElLink,
             {
-              href: `https://tronscan.org/#/transaction/${row.transaction_hash}`,
+              href: `https://tronscan.org/#/transaction/${row.txid}`,
               type: 'primary',
               target: '_blank'
             },
-            () => row.transaction_hash
+            () => row.txid
           )
         }
       }
     },
-    { field: 'from_address', label: '发送地址', span: 24 },
-    { field: 'to_address', label: '接收地址', span: 24 },
+    { field: 'address', label: '接收地址', span: 24 },
     {
-      field: 'block_details',
-      label: '区块详情',
-      slots: {
-        default: (row: any) => {
-          if (!row || !row.block_details) return h('span', '-')
-          return h(
-            ElLink,
-            {
-              href: `https://tronscan.org/#/block/${row.block_details}`,
-              type: 'primary',
-              target: '_blank'
-            },
-            () => row.block_details
-          )
-        }
-      }
-    },
-    {
-      field: 'transaction_status',
+      field: 'status',
       label: '交易状态',
       slots: {
         default: (row: any) => {
           if (!row) return h('span', '-')
-          return h(ElTag, { type: 'success', size: 'small' }, () => row.transaction_status)
+          return h(ElTag, { type: getStatusType(row.status), size: 'small' }, () => getStatusText(row.status))
         }
       }
     },
-    { field: 'validity_period', label: '有效期' },
+    { field: 'energy_rent_text', label: '能量有效期' },
     {
-      field: 'energy_amount',
-      label: '能量数量',
+      field: 'energy_num',
+      label: '能量数',
       slots: {
         default: (row: any) => {
-          let energyAmount = row.energy_amount
-          return h('span', formatEnergyNum(energyAmount))
+          let energy_num = row.energy_num
+          return h('span', formatEnergyNum(energy_num))
         }
       }
     },
@@ -265,18 +244,18 @@ const transactionDetailSchema = computed(() => {
       slots: {
         default: (row: any) => {
           if (!row || !row.create_time) return h('span', '-')
-          return h('span', row.create_time)
+          return h('span', formatToDateTime(row.create_time))
         }
       }
     },
     {
-      field: 'complete_time',
+      field: 'finish_time',
       label: '完成时间',
       span: 24,
       slots: {
         default: (row: any) => {
-          if (!row || !row.complete_time) return h('span', '-')
-          return h('span', row.complete_time)
+          if (!row || !row.finish_time) return h('span', '-')
+          return h('span', formatToDateTime(row.finish_time))
         }
       }
     }
@@ -355,13 +334,13 @@ const columns: TableColumn[] = [
     field: 'create_time',
     label: '创建时间',
     width: 180,
-    formatter: (row) => (row.create_time ? formatToDateTime(row.create_time) : '-')
+    formatter: (row) => row.create_time ? formatToDateTime(row.create_time) : '-'
   },
   {
     field: 'finish_time',
     label: '完成时间',
     width: 180,
-    formatter: (row) => (row.finish_time ? formatToDateTime(row.finish_time) : '-')
+    formatter: (row) => row.finish_time ? formatToDateTime(row.finish_time) : '-'
   }
 ]
 
@@ -475,26 +454,11 @@ const handleViewDetail = async (row: any) => {
 const handleTransactionDetail = async (row: any) => {
   try {
     // 尝试从API获取交易详情
-    if (row.transactionHash) {
-      const response = await getTransactionDetailApi(row.transactionHash)
+      const response = await getHostedOrderDetailApi(row.id)
       if (response.data) {
         transactionDetail.value = response.data
         transactionDialogVisible.value = true
         return
-      }
-    }
-
-    // 如果API获取失败或者没有交易哈希，则使用模拟数据
-    transactionDetail.value = {
-      transaction_hash: 'b33fe10cad17bed6579ac01f94891617f0111571b2c3107bb21a70499f7207d2',
-      from_address: 'TTSGZF4YqWRDZ2TT23TwcrTSxSCJfxLvMR',
-      block_details: '70435110',
-      to_address: 'TZ5VUwCDAUrF2Bp573R1u89SQ4bj5nk7Kw',
-      transaction_status: '已完成',
-      validity_period: '1天',
-      energy_amount: '13.1W',
-      create_time: '2025-02-24 23:55:22',
-      complete_time: '2025-02-24 23:55:22'
     }
     transactionDialogVisible.value = true
   } catch (error) {
