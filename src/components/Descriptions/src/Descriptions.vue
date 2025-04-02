@@ -1,5 +1,5 @@
 <script lang="tsx">
-import { ElCollapseTransition, ElTooltip, ElRow, ElCol } from 'element-plus'
+import { ElCollapseTransition, ElTooltip, ElRow, ElCol, ElCard } from 'element-plus'
 import { useDesign } from '@/hooks/web/useDesign'
 import { propTypes } from '@/utils/propTypes'
 import { ref, unref, PropType, computed, defineComponent } from 'vue'
@@ -19,11 +19,15 @@ export default defineComponent({
   props: {
     title: propTypes.string.def(''),
     message: propTypes.string.def(''),
-    collapse: propTypes.bool.def(true),
+    collapse: propTypes.bool.def(false),
     border: propTypes.bool.def(true),
     column: propTypes.number.def(2),
     size: propTypes.oneOf(['large', 'default', 'small']).def('default'),
-    direction: propTypes.oneOf(['horizontal', 'vertical']).def('horizontal'),
+    mode: {
+      type: String as PropType<'horizontal' | 'vertical' | 'normal'>,
+      default: 'normal',
+      validator: (val: string) => ['horizontal', 'vertical', 'normal'].includes(val)
+    },
     extra: propTypes.string.def(''),
     schema: {
       type: Array as PropType<DescriptionsSchema[]>,
@@ -34,7 +38,8 @@ export default defineComponent({
       default: () => ({})
     }
   },
-  setup(props, { attrs }) {
+  setup(props, { attrs, slots }) {
+    console.log('props', props)
     const appStore = useAppStore()
     const mobile = computed(() => appStore.getMobile)
 
@@ -47,7 +52,7 @@ export default defineComponent({
         }
       }
       if (unref(mobile)) {
-        obj.direction = 'vertical'
+        obj.mode = 'vertical'
       }
       return obj
     })
@@ -108,11 +113,10 @@ export default defineComponent({
           ) : null}
 
           <ElCollapseTransition>
-            <div v-show={unref(show)} class={[`${prefixCls}-content`, 'p-20px']}>
+            <ElCard v-show={unref(show)} class={[`${prefixCls}-content`, 'p-20px']}>
               <ElRow
                 gutter={0}
                 {...unref(getBindValue)}
-                class="outline-2px outline-[var(--el-border-color-lighter)] outline-solid"
               >
                 {props.schema.map((item) => {
                   return (
@@ -121,8 +125,8 @@ export default defineComponent({
                       span={item.span || 24 / props.column}
                       class="flex items-stretch"
                     >
-                      {props.direction === 'horizontal' ? (
-                        <div class="flex items-stretch bg-[var(--el-fill-color-light)] outline-2px outline-[var(--el-border-color-lighter)] outline-solid flex-1">
+                      {props.mode === 'horizontal' ? (
+                        <div class="flex items-stretch bg-[var(--el-fill-color-light)] outline-1px outline-[var(--el-border-color-lighter)] outline-solid flex-1">
                           <div
                             {...getBindItemValue(item)}
                             class="w-120px text-left px-8px py-11px font-700 color-[var(--el-text-color-regular)] border-r-1px border-r-[var(--el-border-color-lighter)] border-r-solid "
@@ -135,8 +139,8 @@ export default defineComponent({
                               : (get(props.data, item.field) ?? defaultData)}
                           </div>
                         </div>
-                      ) : (
-                        <div class="bg-[var(--el-fill-color-light)] outline-2px outline-[var(--el-border-color-lighter)] outline-solid flex-1">
+                      ) : props.mode === 'vertical' ? (
+                        <div class="bg-[var(--el-fill-color-light)] outline-1px outline-[var(--el-border-color-lighter)] outline-solid flex-1">
                           <div
                             {...getBindItemValue(item)}
                             class="text-left px-8px py-11px font-700 color-[var(--el-text-color-regular)] border-b-1px border-b-[var(--el-border-color-lighter)] border-b-solid"
@@ -149,12 +153,24 @@ export default defineComponent({
                               : (get(props.data, item.field) ?? defaultData)}
                           </div>
                         </div>
-                      )}
+                      ) : props.mode === 'normal' ? (
+                        <div class="text-[15px] my-12px">
+                          <span class="font-bold">{ item.label }: </span>
+                          <span style="color:#606266">
+                            {item.slots?.default
+                              ? item.slots?.default(props.data)
+                              : (get(props.data, item.field) ?? defaultData)}
+                          </span>
+                        </div>
+                      ) : null}
                     </ElCol>
                   )
                 })}
               </ElRow>
-            </div>
+              <div>
+                { slots.footer ? slots.footer() : null }
+              </div>
+            </ElCard>
           </ElCollapseTransition>
         </div>
       )
@@ -186,6 +202,10 @@ export default defineComponent({
 
 :deep(.@{prefix-cls}-label) {
   width: 150px !important;
+}
+
+:deep(.el-card__body){
+  padding: 0;
 }
 
 // .@{prefix-cls}-content {
