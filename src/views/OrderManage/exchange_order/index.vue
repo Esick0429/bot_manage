@@ -18,7 +18,7 @@
 
       <!-- 兑换详情弹窗 -->
       <Dialog v-model="dialogVisible" :title="'兑换详情'">
-        <Descriptions :schema="exchangeDetailSchema" :data="orderDetail" :column="2" border />
+        <Descriptions :schema="exchangeDetailSchema" :data="orderDetail" :column="2" title="兑换详情"/>
         <template #footer>
           <div class="flex justify-end">
             <ElButton @click="dialogVisible = false">关闭</ElButton>
