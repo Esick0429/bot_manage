@@ -9,7 +9,8 @@
       :data="recordList"
       :loading="loading"
       :pagination="pagination"
-      @pagination-change="handlePaginationChange"
+      @update:currentPage="handleCurrentPageChange"
+      @update:pageSize="handlePageSizeChange"
       max-height="500px"
     />
 
@@ -23,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, reactive, h } from 'vue'
+import { ref, computed, watch, reactive, h, onMounted } from 'vue'
 import { ElButton, ElMessage, ElTag } from 'element-plus'
 import { Dialog } from '@/components/Dialog'
 import { Table, TableColumn } from '@/components/Table'
@@ -159,8 +160,8 @@ const fetchData = async () => {
 
   // --- 准备 API 参数 (包含分页和筛选) ---
   const apiParams: UserBalanceRecordParams = {
-    currentPage: pagination.currentPage,
-    pageSize: pagination.pageSize,
+    current_page: pagination.currentPage,
+    page_size: pagination.pageSize,
     unit: searchParams.value?.unit || undefined,
     change_type: searchParams.value?.change_type || undefined
   }
@@ -172,7 +173,7 @@ const fetchData = async () => {
     // 使用 API 返回的数据和总数
     if (res && res.data) {
       recordList.value = res.data.list || []
-      pagination.total = res.data.total || 0 // 确保 API 返回了 total
+      pagination.total = res.data.totalCount || 0 // 确保 API 返回了 total
     } else {
       recordList.value = []
       pagination.total = 0
@@ -194,30 +195,45 @@ const handleSearch = (data: Recordable) => {
 }
 
 const handleReset = (data: Recordable) => {
-  searchParams.value = data
+  searchParams.value = data // 当从 watch 调用时，data 是 {}
   pagination.currentPage = 1 // 重置时也回到第一页
   fetchData()
 }
 
-const handlePaginationChange = (page: number, size: number) => {
+// 处理页码变化
+const handleCurrentPageChange = (page: number) => {
   pagination.currentPage = page
-  pagination.pageSize = size
-  fetchData() // 页码或条数变化时重新获取数据
+  fetchData()
 }
 
+// 处理每页条数变化
+const handlePageSizeChange = (size: number) => {
+  pagination.pageSize = size
+  pagination.currentPage = 1 // 切换每页条数时，通常重置到第一页
+  fetchData()
+}
+
+// ----------- Lifecycle Hooks -----------
+onMounted(() => {
+  handleReset({})
+})
+
 // ----------- Watchers -----------
+// 监听 visible 变化，处理打开和关闭
 watch(
-  () => [props.visible, props.accountId],
-  ([visible, accountId], [prevVisible]) => {
-    if (visible && !prevVisible && accountId) {
-      // 打开时重置搜索条件、页码并获取初始数据
-      handleReset({})
-    } else if (!visible && prevVisible) {
-      // 关闭时清空数据并重置状态
+  () => props.visible,
+  (isVisible, wasVisible) => {
+    if (isVisible && !wasVisible) {
+      // 弹窗从不可见变为可见时加载数据
+      if (props.accountId) {
+        handleReset({})
+      }
+    } else if (!isVisible && wasVisible) {
+      // 弹窗从可见变为不可见时执行清理
       recordList.value = []
       searchParams.value = {}
       pagination.currentPage = 1
-      pagination.pageSize = 10 // 或者你的默认值
+      pagination.pageSize = 10
       pagination.total = 0
     }
   }
