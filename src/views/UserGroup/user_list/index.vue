@@ -179,7 +179,7 @@ const columns: TableColumn[] = [
       default: ({ row }) => {
         return (
           <div>
-            <BaseButton type="primary" onClick={() => openSendMessageDialog(row)}>
+            <BaseButton type="primary" disabled onClick={() => openSendMessageDialog(row)}>
               发送消息
             </BaseButton>
             <BaseButton
