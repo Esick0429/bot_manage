@@ -149,7 +149,7 @@ const hostedDetailSchema = computed(() => {
           return h(
             ElLink,
             {
-              href: `https://tronscan.org/#/transaction/${row.txid}`,
+              href: `https://nile.tronscan.org/#/transaction/${row.txid}`,
               type: 'primary',
               target: '_blank'
             },
@@ -206,7 +206,7 @@ const transactionDetailSchema = computed(() => {
           return h(
             ElLink,
             {
-              href: `https://tronscan.org/#/transaction/${row.txid}`,
+              href: `https://nile.tronscan.org/#/transaction/${row.txid}`,
               type: 'primary',
               target: '_blank'
             },
@@ -222,7 +222,9 @@ const transactionDetailSchema = computed(() => {
       slots: {
         default: (row: any) => {
           if (!row) return h('span', '-')
-          return h(ElTag, { type: getStatusType(row.status), size: 'small' }, () => getStatusText(row.status))
+          return h(ElTag, { type: getStatusType(row.status), size: 'small' }, () =>
+            getStatusText(row.status)
+          )
         }
       }
     },
@@ -331,16 +333,20 @@ const columns: TableColumn[] = [
     }
   },
   {
+    field: 'describe',
+    label: '备注'
+  },
+  {
     field: 'create_time',
     label: '创建时间',
     width: 180,
-    formatter: (row) => row.create_time ? formatToDateTime(row.create_time) : '-'
+    formatter: (row) => (row.create_time ? formatToDateTime(row.create_time) : '-')
   },
   {
     field: 'finish_time',
     label: '完成时间',
     width: 180,
-    formatter: (row) => row.finish_time ? formatToDateTime(row.finish_time) : '-'
+    formatter: (row) => (row.finish_time ? formatToDateTime(row.finish_time) : '-')
   }
 ]
 
@@ -454,11 +460,11 @@ const handleViewDetail = async (row: any) => {
 const handleTransactionDetail = async (row: any) => {
   try {
     // 尝试从API获取交易详情
-      const response = await getHostedOrderDetailApi(row.id)
-      if (response.data) {
-        transactionDetail.value = response.data
-        transactionDialogVisible.value = true
-        return
+    const response = await getHostedOrderDetailApi(row.id)
+    if (response.data) {
+      transactionDetail.value = response.data
+      transactionDialogVisible.value = true
+      return
     }
     transactionDialogVisible.value = true
   } catch (error) {

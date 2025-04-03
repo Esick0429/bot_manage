@@ -199,8 +199,8 @@ const columns: TableColumn[] = [
         // Simplified status color mapping
         const statusColorMap: Record<number, 'success' | 'warning' | 'danger' | 'info'> = {
           1: 'success', // 已完成
-          2: 'warning', // 待支付
-          3: 'danger' // 已取消
+          2: 'warning', // 已支付
+          3: 'danger' // 支付失败
         }
         const type = statusColorMap[row.status] || 'info' // Use simplified map
         const text = getStatusTextForTable(row.status) // Keep text helper for clarity
@@ -260,7 +260,7 @@ const actionColumn: TableColumn = {
 // 搜索表单配置
 const searchSchema = [
   {
-    field: 'order_id',
+    field: 'order_num',
     component: 'Input' as const,
     label: '订单号',
     componentProps: {
@@ -291,8 +291,8 @@ const searchSchema = [
       options: [
         { label: '全部', value: '' },
         { label: '已完成', value: 1 },
-        { label: '待支付', value: 2 },
-        { label: '已取消', value: 3 }
+        { label: '已支付', value: 2 },
+        { label: '支付失败', value: 3 }
       ],
       placeholder: '请选择订单状态'
     }
@@ -303,8 +303,8 @@ const searchSchema = [
 const getStatusTextForTable = (status: number): string => {
   const statusMap: Record<number, string> = {
     1: '已完成',
-    2: '待支付',
-    3: '已取消'
+    2: '已支付',
+    3: '支付失败'
   }
   return statusMap[status] || '未知状态'
 }
@@ -440,7 +440,7 @@ const transactionDetailSchema = computed((): DescriptionsSchema[] => [
         return h(
           ElLink,
           {
-            href: `https://tronscan.org/#/transaction/${data.txid}`,
+            href: `https://nile.tronscan.org/#/transaction/${data.txid}`,
             type: 'primary',
             target: '_blank'
           },
@@ -461,13 +461,13 @@ const transactionDetailSchema = computed((): DescriptionsSchema[] => [
         // Use the same status mapping as the main table/order detail dialog
         const statusColorMap: Record<number, 'success' | 'warning' | 'danger' | 'info'> = {
           1: 'success', // 已完成
-          2: 'warning', // 待支付
-          3: 'danger' // 已取消
+          2: 'warning', // 已支付
+          3: 'danger' // 支付失败
         }
         const statusTextMap: Record<number, string> = {
           1: '已完成',
-          2: '待支付',
-          3: '已取消'
+          2: '已支付',
+          3: '支付失败'
         }
         const numericStatus =
           typeof data.status === 'string' ? parseInt(data.status, 10) : data.status
@@ -480,7 +480,13 @@ const transactionDetailSchema = computed((): DescriptionsSchema[] => [
       }
     }
   },
-  { field: 'energy_num', label: '能量数量' }, // Ensure 'energy_num' is present
+  {
+    field: 'energy_num',
+    label: '能量数量',
+    slots: {
+      default: (data: any) => h('span', {}, formatEnergyNum(data.energy_num))
+    }
+  }, // Ensure 'energy_num' is present
   {
     field: 'create_time',
     label: '创建时间',

@@ -18,7 +18,12 @@
 
       <!-- 兑换详情弹窗 -->
       <Dialog v-model="dialogVisible" :title="'兑换详情'">
-        <Descriptions :schema="exchangeDetailSchema" :data="orderDetail" :column="2" title="兑换详情"/>
+        <Descriptions
+          :schema="exchangeDetailSchema"
+          :data="orderDetail"
+          :column="2"
+          title="兑换详情"
+        />
         <template #footer>
           <div class="flex justify-end">
             <ElButton @click="dialogVisible = false">关闭</ElButton>
@@ -182,7 +187,7 @@ const transactionInSchema = computed<DescriptionsSchema[]>(() => [
         return h(
           ElLink,
           {
-            href: `https://tronscan.org/#/transaction/${row.in_txid}`,
+            href: `https://nile.tronscan.org/#/transaction/${row.in_txid}`,
             type: 'primary',
             target: '_blank'
           },
@@ -242,7 +247,7 @@ const transactionOutSchema = computed<DescriptionsSchema[]>(() => [
         return h(
           ElLink,
           {
-            href: `https://tronscan.org/#/transaction/${row.out_txid}`,
+            href: `https://nile.tronscan.org/#/transaction/${row.out_txid}`,
             type: 'primary',
             target: '_blank'
           },

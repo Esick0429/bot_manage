@@ -9,7 +9,7 @@ import type { TableColumn } from '@/components/Table'
 import { formatToDateTime } from '@/utils/dateUtil'
 import { getBatchActiveDetailApi } from '@/api/energy_order' // Keep API import
 import isEmpty from 'lodash-es/isEmpty'
-
+import formatEnergyNum from '../../../helpers/formatEnergyNum'
 const props = defineProps({
   orderData: {
     type: Object,
@@ -34,7 +34,7 @@ const selectedBatchOrderTransaction = ref<any>(null) // 选中的批量下单交
 const getBatchStatusText = (status: number): string => {
   const statusMap: Record<number, string> = {
     1: '已激活', // Assuming 1 means activated
-    0: '未激活' // Assuming 0 means not activated
+    2: '未激活' // Assuming 0 means not activated
     // Add other potential statuses based on API response
   }
   return statusMap[status] ?? '未知'
@@ -43,7 +43,7 @@ const getBatchStatusText = (status: number): string => {
 const getBatchStatusTagType = (status: number): 'success' | 'warning' | 'info' | 'danger' => {
   const typeMap: Record<number, 'success' | 'warning' | 'info' | 'danger'> = {
     1: 'success', // 已激活
-    0: 'warning' // 未激活
+    2: 'warning' // 未激活
   }
   return typeMap[status] ?? 'info'
 }
@@ -102,7 +102,13 @@ const handleViewBatchOrderTransaction = (row: any) => {
 const batchOrderTableColumns = ref<TableColumn[]>([
   { type: 'index', label: '序号', width: 60, align: 'center', field: 'index' },
   { prop: 'to_address', field: 'to_address', label: '地址', minWidth: 280 }, // Assuming field name is 'to_address'
-  { prop: 'addr_energy_num', field: 'addr_energy_num', label: '能量数', minWidth: 150 }, // Adjusted width
+  {
+    prop: 'addr_energy_num',
+    field: 'addr_energy_num',
+    label: '能量数',
+    minWidth: 150,
+    formatter: (row) => formatEnergyNum(row.addr_energy_num)
+  }, // Adjusted width
   {
     prop: 'active_status', // Assuming field name is 'active_status'
     field: 'active_status',
@@ -125,7 +131,8 @@ const batchOrderTableColumns = ref<TableColumn[]>([
     field: 'create_time',
     label: '激活时间',
     width: 180,
-    formatter: (row: any) => (row.create_time ? formatToDateTime(row.create_time) : '-') // Use correct field if different
+    formatter: (row: any) =>
+      row.create_time && row.active_status == 2 ? formatToDateTime(row.create_time) : '-' // Use correct field if different
   },
   {
     prop: 'order_amount', // Assuming field name is 'order_amount' or similar for TRX amount
@@ -171,7 +178,7 @@ const batchOrderTransactionSchema = computed((): DescriptionsSchema[] => [
         return h(
           ElLink,
           {
-            href: `https://tronscan.org/#/transaction/${data.txid}`,
+            href: `https://nile.tronscan.org/#/transaction/${data.txid}`,
             type: 'primary',
             target: '_blank'
           },
@@ -180,17 +187,22 @@ const batchOrderTransactionSchema = computed((): DescriptionsSchema[] => [
       }
     }
   },
-  { field: 'energy_txid', label: '能量交易hash', span: 24 , slots: { default: (data: any) => {
-    if (isEmpty(data?.energy_txid)) return h('span', '-')
-    return h(
-      ElLink,
-      {
-        href: `https://tronscan.org/#/transaction/${data.energy_txid}`,
-        type: 'primary',
-        target: '_blank'
-      },
-      () => data.energy_txid
-    )
+  {
+    field: 'energy_txid',
+    label: '能量交易hash',
+    span: 24,
+    slots: {
+      default: (data: any) => {
+        if (isEmpty(data?.energy_txid)) return h('span', '-')
+        return h(
+          ElLink,
+          {
+            href: `https://nile.tronscan.org/#/transaction/${data.energy_txid}`,
+            type: 'primary',
+            target: '_blank'
+          },
+          () => data.energy_txid
+        )
       }
     }
   },
@@ -216,7 +228,7 @@ const batchOrderTransactionSchema = computed((): DescriptionsSchema[] => [
         // Consistent formatting with the table
         if (data.addr_energy_num === undefined || data.addr_energy_num === null)
           return h('span', '-')
-        return h('span', `${data.addr_energy_num}`)
+        return h('span', `${formatEnergyNum(data.addr_energy_num)}`)
       }
     }
   },

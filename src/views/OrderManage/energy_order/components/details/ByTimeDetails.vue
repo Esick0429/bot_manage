@@ -23,6 +23,16 @@ const byTimeDetailSchema = computed((): DescriptionsSchema[] => [
     }
   },
   { field: 'energy_rent_text', label: '能量有效期' },
+  {
+    field: 'energy_price',
+    label: '单价',
+    slots: { default: (data: any) => h('span', {}, data.energy_price + data.pay_unit) }
+  },
+  {
+    field: 'stroke_num',
+    label: '笔数',
+    slots: { default: (data: any) => h('span', {}, data.stroke_num + '笔') }
+  },
   { field: 'receive_address', label: '接收地址', span: 24 },
   {
     field: 'txid',
@@ -34,7 +44,7 @@ const byTimeDetailSchema = computed((): DescriptionsSchema[] => [
         return h(
           ElLink,
           {
-            href: `https://tronscan.org/#/transaction/${data.txid}`,
+            href: `https://nile.tronscan.org/#/transaction/${data.txid}`,
             type: 'primary',
             target: '_blank'
           },

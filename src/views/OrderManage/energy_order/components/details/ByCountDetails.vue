@@ -57,7 +57,13 @@ const countOrderTableSchema = computed((): TableColumn[] => [
   },
   {
     field: 'create_time',
+    label: '创建时间',
+    formatter: (row) => (row.create_time ? formatToDateTime(row.create_time * 1000) : '-')
+  },
+  {
+    field: 'end_time',
     label: '完成时间',
+    formatter: (row) => (row.end_time ? formatToDateTime(row.end_time * 1000) : '-')
   },
   {
     field: 'energy_txid',
@@ -69,7 +75,7 @@ const countOrderTableSchema = computed((): TableColumn[] => [
         return h(
           ElLink,
           {
-            href: `https://tronscan.org/#/transaction/${row.energy_txid}`,
+            href: `https://nile.tronscan.org/#/transaction/${row.energy_txid}`,
             type: 'primary',
             target: '_blank'
           },
@@ -82,18 +88,18 @@ const countOrderTableSchema = computed((): TableColumn[] => [
 
 const getCountStatusText = (status: number): string => {
   const statusMap: Record<number, string> = {
-    1: '已完成',
-    2: '待支付',
-    3: '已取消'
+    1: '待使用',
+    2: '已使用',
+    3: '已过期'
   }
   return statusMap[status] ?? '未知'
 }
 
 const getCountStatusTagType = (status: number): 'success' | 'warning' | 'info' | 'danger' => {
   const typeMap: Record<number, 'success' | 'warning' | 'info' | 'danger'> = {
-    1: 'success', // 已完成
-    2: 'warning', // 待支付
-    3: 'danger' // 已取消
+    1: 'success', // 待使用
+    2: 'warning', // 已使用
+    3: 'danger' // 已过期
   }
   return typeMap[status] ?? 'info'
 }
@@ -168,21 +174,21 @@ watch(
     <Descriptions :schema="byCountDetailSchema" :data="orderData" :column="2" border>
     </Descriptions>
     <div class="mt-20px">
-          <Table
-            :columns="countOrderTableSchema"
-            :data="countOrderDetails"
-            :loading="countOrderLoading"
-            stripe
-            :border="true"
-            :pagination="{
-              total: apiTotalCount,
-              currentPage: countCurrentPage,
-              pageSize: countPageSize
-            }"
-            @update:current-page="handleCountPageChange"
-            @update:page-size="handleCountSizeChange"
-          />
-        </div>
+      <Table
+        :columns="countOrderTableSchema"
+        :data="countOrderDetails"
+        :loading="countOrderLoading"
+        stripe
+        :border="true"
+        :pagination="{
+          total: apiTotalCount,
+          currentPage: countCurrentPage,
+          pageSize: countPageSize
+        }"
+        @update:current-page="handleCountPageChange"
+        @update:page-size="handleCountSizeChange"
+      />
+    </div>
   </div>
 </template>
 

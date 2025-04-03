@@ -69,8 +69,8 @@ const handleClose = () => {
 const getStatusText = (status: number): string => {
   const statusMap: Record<number, string> = {
     1: '已完成',
-    2: '待支付',
-    3: '已取消'
+    2: '已支付',
+    3: '支付失败'
   }
   return statusMap[status] || '未知状态'
 }
@@ -104,8 +104,8 @@ const orderDetailSchema = computed((): DescriptionsSchema[] => {
           if (!data || data.status === undefined) return h('span', '-')
           const statusColorMap: Record<number, 'success' | 'warning' | 'danger' | 'info'> = {
             1: 'success', // 已完成
-            2: 'warning', // 待支付
-            3: 'danger' // 已取消
+            2: 'warning', // 已支付
+            3: 'danger' // 支付失败
           }
           const tagType = statusColorMap[data.status] || 'info'
           return h(ElTag, { type: tagType, size: 'small' }, () => getStatusText(data.status))
@@ -204,7 +204,7 @@ const orderDetailSchema = computed((): DescriptionsSchema[] => {
       field: 'pay_type',
       label: '支付类型',
       slots: {
-        default: (data: any) => h('span', {}, data.pay_type ?? '余额支付')
+        default: (data: any) => h('span', {}, '余额支付')
       }
     },
     {
