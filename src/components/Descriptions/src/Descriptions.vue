@@ -114,10 +114,7 @@ export default defineComponent({
 
           <ElCollapseTransition>
             <ElCard v-show={unref(show)} class={[`${prefixCls}-content`, 'p-20px']}>
-              <ElRow
-                gutter={0}
-                {...unref(getBindValue)}
-              >
+              <ElRow gutter={0} {...unref(getBindValue)}>
                 {props.schema.map((item) => {
                   return (
                     <ElCol
@@ -155,7 +152,7 @@ export default defineComponent({
                         </div>
                       ) : props.mode === 'normal' ? (
                         <div class="text-[15px] my-12px">
-                          <span class="font-bold">{ item.label }: </span>
+                          <span class="font-bold">{item.label}: </span>
                           <span style="color:#606266">
                             {item.slots?.default
                               ? item.slots?.default(props.data)
@@ -167,9 +164,7 @@ export default defineComponent({
                   )
                 })}
               </ElRow>
-              <div>
-                { slots.footer ? slots.footer() : null }
-              </div>
+              <div>{slots.footer ? slots.footer() : null}</div>
             </ElCard>
           </ElCollapseTransition>
         </div>
@@ -204,7 +199,7 @@ export default defineComponent({
   width: 150px !important;
 }
 
-:deep(.el-card__body){
+:deep(.el-card__body) {
   padding: 0;
 }
 
