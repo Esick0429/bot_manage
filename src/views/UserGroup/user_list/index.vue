@@ -92,7 +92,7 @@ const fetchBotList = async () => {
   try {
     const res = await getBotListApi({})
     const bots = (res.data.list || []).map((bot: any) => ({
-      label: bot.name,
+      label: `${bot.name} (${bot.firstname})`,
       value: bot.id
     }))
     botOptions.value = [{ label: '全部', value: '' }, ...bots]
