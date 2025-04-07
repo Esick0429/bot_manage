@@ -228,7 +228,7 @@ const transactionDetailSchema = computed(() => {
         }
       }
     },
-    { field: 'energy_rent_text', label: '能量有效期' },
+    // { field: 'energy_rent_text', label: '能量有效期' },
     {
       field: 'energy_num',
       label: '能量数',
