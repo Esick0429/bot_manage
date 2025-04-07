@@ -84,7 +84,7 @@ export const useSearchTable = (config: UseSearchTableConfig) => {
       processedFilters = config.handleSearchInfoFn(searchFilters) as Recordable
     }
 
-    let finalParams = {
+    const finalParams = {
       ...processedFilters,
       currentPage: currentPage,
       pageSize: pageSize

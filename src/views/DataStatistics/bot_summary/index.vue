@@ -6,8 +6,7 @@
       :fetch-data-api="fetchDataApi"
       :action-column="actionColumn"
       :show-add-button="false"
-    >
-    </SearchTable>
+    />
 
     <!-- 详情弹窗 -->
     <el-dialog

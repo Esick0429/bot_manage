@@ -42,13 +42,13 @@
             class="mt-4"
           >
             <ElFormItem prop="phone" label="手机号">
-              <ElInput v-model="resetForm.phone" placeholder="请输入手机号码"></ElInput>
+              <ElInput v-model="resetForm.phone" placeholder="请输入手机号码" />
             </ElFormItem>
 
             <!-- 验证码 -->
             <ElFormItem prop="code" label="验证码">
               <div class="flex">
-                <ElInput v-model="resetForm.code" placeholder="请输入验证码"></ElInput>
+                <ElInput v-model="resetForm.code" placeholder="请输入验证码" />
                 <ElButton
                   type="primary"
                   class="ml-2 w-[120px]"
@@ -67,7 +67,7 @@
                 type="password"
                 placeholder="请输入新密码"
                 show-password
-              ></ElInput>
+              />
             </ElFormItem>
 
             <!-- 确认密码 -->
@@ -77,7 +77,7 @@
                 type="password"
                 placeholder="请再次输入新密码"
                 show-password
-              ></ElInput>
+              />
             </ElFormItem>
           </ElForm>
         </div>

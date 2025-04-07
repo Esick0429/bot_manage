@@ -195,7 +195,7 @@ const saveMenuOrder = async () => {
     })
 
     // 使用Promise.all并行处理所有保存请求
-    let res = await Promise.all(saveRequests)
+    const res = await Promise.all(saveRequests)
     console.log('res', res)
 
     ElMessage.success('菜单排序已保存')

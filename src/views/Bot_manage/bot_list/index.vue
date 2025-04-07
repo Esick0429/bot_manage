@@ -365,7 +365,7 @@ const handleStatusChange = async (value) => {
   if (!isLoaded.value) return
   console.log('状态切换:', value)
   // 调用API更新状态
-  let res = await updateBotApi(value)
+  const res = await updateBotApi(value)
   if (res.code === '000000') {
     ElMessage.success('状态更新成功')
   } else {

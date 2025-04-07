@@ -94,7 +94,7 @@ const navigateToBotList = (botId: string | number) => {
 // --- Schemas (Keep only the main order detail schema) ---
 
 const orderDetailSchema = computed((): DescriptionsSchema[] => {
-  let schema = [
+  const schema = [
     { field: 'order_num', label: '订单号' },
     {
       field: 'status',

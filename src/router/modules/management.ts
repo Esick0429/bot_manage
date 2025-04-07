@@ -34,16 +34,16 @@ const managementRoutes: AppRouteRecordRaw[] = [
           title: '菜单列表',
           icon: 'vi-bx:bx-menu'
         }
-      },
-      {
-        path: 'reply_list',
-        component: () => import('@/views/Bot_manage/reply_list/index.vue'),
-        name: 'ReplyList',
-        meta: {
-          title: '关键词回复',
-          icon: 'vi-bx:bx-message-square-dots'
-        }
       }
+      // {
+      //   path: 'reply_list',
+      //   component: () => import('@/views/Bot_manage/reply_list/index.vue'),
+      //   name: 'ReplyList',
+      //   meta: {
+      //     title: '关键词回复',
+      //     icon: 'vi-bx:bx-message-square-dots'
+      //   }
+      // }
     ]
   },
   {

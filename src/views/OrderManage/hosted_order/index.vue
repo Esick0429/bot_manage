@@ -234,7 +234,7 @@ const transactionDetailSchema = computed(() => {
       label: '能量数',
       slots: {
         default: (row: any) => {
-          let energy_num = row.energy_num
+          const energy_num = row.energy_num
           return h('span', formatEnergyNum(energy_num))
         }
       }

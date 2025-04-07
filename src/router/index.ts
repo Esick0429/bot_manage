@@ -32,7 +32,7 @@ export const constantRouterMap: AppRouteRecordRaw[] = [rootRoute, ...baseRoutes]
 
 // Final routes array construction logic using imported modules
 let finalManagementRoutes = managementRoutes
-let finalOperationRoutes = operationRoutes
+const finalOperationRoutes = operationRoutes
 
 if (systemType === 'Management') {
   finalManagementRoutes = managementRoutes.filter((item) => item.path !== '/data_statistics')
