@@ -118,36 +118,36 @@ const botInfoSchema = reactive<FormSchema[]>([
       activeValue: 1,
       inactiveValue: 2
     }
-  },
-  {
-    field: 'tg_verify_status',
-    component: 'Tag' as const,
-    label: 'TG同步状态：',
-    componentProps: {
-      disabled: true
-    },
-    formItemProps: {
-      slots: {
-        default: () => {
-          return (
-            <>
-              <div class="flex items-center">
-                <ElTag type="success">已同步</ElTag>
-                <div
-                  class="flex items-center ml-2 cursor-pointer"
-                  style="color: #007bff"
-                  onClick={syncTgStatus}
-                >
-                  <Icon icon="ri:refresh-line" />
-                  <span class="ml-1">点我同步</span>
-                </div>
-              </div>
-            </>
-          )
-        }
-      }
-    }
   }
+  // {
+  //   field: 'tg_verify_status',
+  //   component: 'Tag' as const,
+  //   label: 'TG同步状态：',
+  //   componentProps: {
+  //     disabled: true
+  //   },
+  //   formItemProps: {
+  //     slots: {
+  //       default: () => {
+  //         return (
+  //           <>
+  //             <div class="flex items-center">
+  //               <ElTag type="success">已同步</ElTag>
+  //               <div
+  //                 class="flex items-center ml-2 cursor-pointer"
+  //                 style="color: #007bff"
+  //                 onClick={syncTgStatus}
+  //               >
+  //                 <Icon icon="ri:refresh-line" />
+  //                 <span class="ml-1">点我同步</span>
+  //               </div>
+  //             </div>
+  //           </>
+  //         )
+  //       }
+  //     }
+  //   }
+  // }
 ])
 
 // TG状态同步
