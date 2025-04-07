@@ -1,6 +1,16 @@
 import request from '@/axios'
 
 /**
+ * 定义用户余额记录请求参数类型
+ */
+export interface UserBalanceRecordParams {
+  current_page?: number
+  page_size?: number
+  unit?: 'TRX' | 'USDT' | ''
+  change_type?: 'in' | 'out' | ''
+}
+
+/**
  * 获取机器人TG用户列表
  * @param params 查询参数
  */
@@ -72,12 +82,9 @@ export const getMassSendRecordDetailApi = (id: number | string) => {
 /**
  * 获取用户余额记录
  * @param id 用户 ID
- * @param params 查询参数 (可选)
+ * @param params 查询参数 (可选, 包含分页和筛选)
  */
-export const getUserBalanceRecordsApi = (
-  id: number | string,
-  params?: { unit?: string; change_type?: string }
-) => {
+export const getUserBalanceRecordsApi = (id: number | string, params?: UserBalanceRecordParams) => {
   return request.get({ url: `/v1/user/bot/tg_user/change_balance/${id}`, params })
 }
 

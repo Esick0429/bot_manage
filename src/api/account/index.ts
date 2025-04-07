@@ -30,22 +30,8 @@ export const exportAccountListApi = (params: any) => {
   return request.get({ url: '/v1/account/export', params, responseType: 'blob' })
 }
 
-// 获取账户充值记录
-export const getAccountRechargeRecordsApi = (params: {
-  accountId: number
-  pageSize?: number
-  currentPage?: number
-}) => {
-  return request.get({ url: '/v1/account/recharge-records', params })
-}
-
-// 获取账户扣款记录
-export const getAccountDeductionRecordsApi = (params: {
-  accountId: number
-  transaction_type?: string
-  order_id?: string
-  pageSize?: number
-  currentPage?: number
-}) => {
-  return request.get({ url: '/v1/account/deduction-records', params })
+// 添加通用的余额记录API函数
+export const getBalanceRecordApi = (params: any) => {
+  // 根据type参数决定是充值记录还是扣款记录
+  return request.get({ url: `/v1/user/balance_record`, params })
 }
