@@ -9,7 +9,7 @@
     <SearchTable
       :columns="columns"
       :search-schema="searchSchema"
-      :fetch-data-api="fetchDeductionRecords"
+      :fetch-data-api="getList"
       ref="searchTableRef"
       @search="onSearch"
     />
@@ -27,9 +27,10 @@ import { ref, onMounted } from 'vue'
 import { ElButton, ElTag, ElMessage } from 'element-plus'
 import { Dialog } from '@/components/Dialog'
 import { SearchTable } from '@/components/SearchTable'
-import { dateUtil } from '@/utils/dateUtil'
-import { getAccountDeductionRecordsApi } from '@/api/account'
+import { formatToDateTime } from '@/utils/dateUtil'
+import { getBalanceRecordApi } from '@/api/account'
 import type { TableColumn } from '@/components/Table'
+import isEmpty from 'lodash-es/isEmpty'
 
 const props = defineProps({
   accountId: {
@@ -46,117 +47,118 @@ const searchTableRef = ref<InstanceType<typeof SearchTable> | null>(null)
 // 表格列配置
 const columns: TableColumn[] = [
   {
-    field: 'transaction_id',
+    field: 'id',
     label: '交易ID',
     minWidth: 120
   },
   {
-    field: 'transaction_type',
+    field: 'order_type',
     label: '交易类型',
-    minWidth: 120
+    minWidth: 120,
+    formatter: (row) => {
+      switch (row.order_type) {
+        case 1:
+          return '能量租赁'
+        case 2:
+          return '闪兑'
+        case 3:
+          return '智能托管'
+        case 4:
+          return '续费机器人'
+        default:
+          return '-'
+      }
+    }
   },
   {
     field: 'bot_name',
     label: '所属机器人',
-    minWidth: 120
+    minWidth: 120,
   },
   {
     field: 'amount',
     label: '交易金额',
     minWidth: 120,
-    formatter: (row) => `${row.amount} USDT`
-  },
-  {
-    field: 'before_trx',
-    label: '交易前TRX',
-    minWidth: 120,
-    formatter: (row) => `${row.before_trx} T`
+    formatter: (row) => `${row.amount}${row.unit}`
   },
   {
     field: 'after_trx',
     label: '交易后TRX',
     minWidth: 120,
-    formatter: (row) => `${row.after_trx} T`
+    formatter: (row) => `${row.after_amount} T`
   },
   {
-    field: 'status',
-    label: '交易状态',
-    minWidth: 100,
-    slots: {
-      default: ({ row }) => {
-        return <ElTag type="success">成功</ElTag>
-      }
-    }
-  },
-  {
-    field: 'transaction_time',
+    field: 'create_time',
     label: '交易时间',
     minWidth: 160,
-    formatter: (row) => row.transaction_time
+    formatter: (row) => formatToDateTime(row.create_time)
   },
   {
-    field: 'order_id',
+    field: 'order_num',
     label: '关联订单ID',
-    minWidth: 120
+    minWidth: 120,
+    formatter: (row) => isEmpty(row.order_num) ? '-' : row.order_num
   }
 ]
 
 // 搜索表单配置，添加订单号查询
 const searchSchema = [
   {
-    field: 'transaction_type',
+    field: 'order_type',
     component: 'Select' as const,
     label: '交易类型',
     componentProps: {
       options: [
         { label: '全部', value: '' },
-        { label: '智能托管', value: '智能托管' },
-        { label: '闪兑', value: '闪兑' },
-        { label: '能量租赁', value: '能量租赁' }
+        { label: '续费机器人', value: 4 },
+        { label: '智能托管', value: 3 },
+        { label: '闪兑', value: 2 },
+        { label: '能量租赁', value: 1 }
       ],
       placeholder: '请选择交易类型'
     }
   },
   {
-    field: 'order_id',
+    field: 'id',
     component: 'Input' as const,
     label: '订单号',
     componentProps: {
-      placeholder: '请输入订单号'
+      placeholder: '请输入交易ID'
     }
   },
   {
-    field: 'transaction_time',
+    field: 'time_range',
     component: 'DatePicker' as const,
-    label: '交易时间',
+    label: '日期',
     componentProps: {
-      type: 'datetime',
-      placeholder: '请选择交易时间'
+      type: 'daterange',
+      valueFormat: 'x',
+      clearable: true,
+      placeholder: ['开始日期', '结束日期'],
+      startPlaceholder: '开始日期',
+      endPlaceholder: '结束日期'
     }
   }
 ]
 
 // 获取扣款记录数据
-const fetchDeductionRecords = async (params: any) => {
-  if (!props.accountId) return { list: [], total: 0 }
-
+const getList = async (params: any = {}) => {
   try {
-    const response = await getAccountDeductionRecordsApi({
-      accountId: props.accountId,
-      transaction_type: params.transaction_type,
-      order_id: params.order_id,
-      pageSize: params.pageSize,
-      currentPage: params.currentPage
+    // 调用通用API但使用/out路径表示扣款记录
+    const res = await getBalanceRecordApi({
+      ...params,
+      change_type: 'out', 
+      accountId: props.accountId
     })
 
-    if (response && response.data) {
+    if (res && res.data) {
       // 如果有记录且没有保存账户名，就从第一条记录获取
-      if (response.data.list && response.data.list.length > 0 && !accountName.value) {
+      if (res.data.list && res.data.list.length > 0 && !accountName.value) {
         // 假设记录中包含账户名字段，实际情况可能需要调整
-        // accountName.value = response.data.list[0].account_name
+        // accountName.value = res.data.list[0].account_name
       }
 
-      return response.data
+      return res.data
     }
 
     return { list: [], total: 0 }
@@ -164,7 +166,7 @@ const fetchDeductionRecords = async (params: any) => {
     console.error('获取扣款记录失败:', error)
     ElMessage.error('获取扣款记录失败')
     return { list: [], total: 0 }
-  }
+  } 
 }
 
 // 处理搜索

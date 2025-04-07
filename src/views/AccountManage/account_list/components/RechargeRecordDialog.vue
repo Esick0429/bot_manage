@@ -32,7 +32,7 @@ import { ElButton, ElTag, ElMessage } from 'element-plus'
 import { Dialog } from '@/components/Dialog'
 import { Table } from '@/components/Table'
 import { formatToDateTime } from '@/utils/dateUtil'
-import { getAccountRechargeRecordsApi } from '@/api/account'
+import { getBalanceRecordApi } from '@/api/account'
 import type { TableColumn } from '@/components/Table'
 
 const props = defineProps({
@@ -98,15 +98,13 @@ const columns: TableColumn[] = [
 ]
 
 // 获取充值记录列表
-const getList = async () => {
-  if (!props.accountId) return
-
+const getList = async (params: any = {}) => {
   loading.value = true
   try {
-    const res = await getAccountRechargeRecordsApi({
-      accountId: props.accountId,
-      pageSize: pageSize.value,
-      currentPage: currentPage.value
+    const res = await getBalanceRecordApi({
+      ...params,
+      change_type: 'in',
+      accountId: props.accountId 
     })
 
     if (res.data) {

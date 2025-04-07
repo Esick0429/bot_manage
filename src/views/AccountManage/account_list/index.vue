@@ -94,7 +94,7 @@
 
       <!-- 充值弹窗 -->
       <Dialog v-model="rechargeDialogVisible" title="账户充值" width="500px">
-        <div v-if="userData.receive_address">
+        <div v-if="userData.pay_address">
           <ElDescriptions :column="1" border>
             <ElDescriptionsItem label="账户ID">{{ userData.id }}</ElDescriptionsItem>
             <ElDescriptionsItem label="账户名">{{ userData.username }}</ElDescriptionsItem>
@@ -103,18 +103,19 @@
             }}</ElDescriptionsItem>
             <ElDescriptionsItem label="收款地址">
               <div class="flex items-center">
-                <div class="truncate mr-2">{{ userData.receive_address }}</div>
+                <div class="truncate mr-2">{{ userData.pay_address }}</div>
                 <ElButton type="primary" size="small" @click="copyAddress">复制</ElButton>
               </div>
             </ElDescriptionsItem>
           </ElDescriptions>
 
-          <div v-if="userData.receive_address_qrcode" class="mt-4 text-center">
+          <div v-if="userData.qr_address" class="mt-4 text-center">
             <div class="font-bold mb-2">扫描二维码充值</div>
-            <ElImage
-              :src="userData.receive_address_qrcode"
-              fit="contain"
-              style="max-width: 200px; margin: 0 auto"
+            <img 
+              :src="userData.qr_address" 
+              alt="收款二维码"
+              class="mx-auto"
+              style="max-width: 200px; height: auto;"
             />
           </div>
         </div>
@@ -411,12 +412,12 @@ const handleDeductionRecord = () => {
 // 复制地址
 const { copy } = useClipboard()
 const copyAddress = () => {
-  if (!userData.value.receive_address) {
+  if (!userData.value.pay_address) {
     ElMessage.warning('收款地址为空，无法复制')
     return
   }
 
-  copy(userData.value.receive_address)
+  copy(userData.value.pay_address)
   ElMessage.success('地址复制成功')
 }
 
