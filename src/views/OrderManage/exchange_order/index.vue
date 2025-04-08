@@ -12,7 +12,7 @@
       >
         <!-- 自定义搜索按钮 -->
         <template #searchButtons>
-          <BaseButton @click="handleExport">导出订单</BaseButton>
+          <BaseButton @click="handleExport" disabled>导出订单</BaseButton>
         </template>
       </SearchTable>
 
@@ -34,7 +34,7 @@
       <!-- 交易详情弹窗 - 综合版 -->
       <Dialog v-model="transactionDialogVisible" :title="'交易详情'">
         <ElTabs v-model="activeTransactionTab" class="transaction-tabs">
-          <ElTabPane name="in" label="转入详情">
+          <ElTabPane name="in" label="代理转入详情">
             <Descriptions
               :schema="transactionInSchema"
               :data="transactionDetail"
@@ -42,7 +42,7 @@
               border
             />
           </ElTabPane>
-          <ElTabPane name="out" label="转出详情">
+          <ElTabPane name="out" label="用户转出详情">
             <Descriptions
               :schema="transactionOutSchema"
               :data="transactionDetail"
@@ -70,7 +70,7 @@
 <script setup lang="tsx">
 import { ref, onMounted, h, computed } from 'vue'
 import { formatToDateTime } from '@/utils/dateUtil'
-import { useRouter } from 'vue-router'
+import { useRoute,useRouter } from 'vue-router'
 import { ElButton, ElTag, ElMessage, ElTabs, ElTabPane, ElLink, ElEmpty } from 'element-plus'
 import { ContentWrap } from '@/components/ContentWrap'
 import { Dialog } from '@/components/Dialog'
@@ -89,6 +89,7 @@ import {
 
 // const { t } = useI18n()
 const router = useRouter()
+const route = useRoute()
 const searchTableRef = ref<InstanceType<typeof SearchTable> | null>(null)
 
 // 订单详情相关
@@ -105,7 +106,7 @@ const exchangeDetailSchema = computed(() => {
   const schema: DescriptionsSchema[] = [
     { field: 'order_id', label: '订单号' },
     { field: 'tg_bot_id', label: '机器人ID' },
-    { field: 'tg_name', label: 'TG用户名' },
+    // { field: 'tg_name', label: 'TG用户名' },
     {
       field: 'order_amount',
       label: '支付金额',
@@ -138,7 +139,7 @@ const exchangeDetailSchema = computed(() => {
       }
     },
     { field: 'bot_name', label: '机器人名称' },
-    { field: 'nickname', label: 'TG用户昵称' },
+    // { field: 'nickname', label: 'TG用户昵称' },
     {
       field: 'exchange_amount',
       label: '兑换金额',
@@ -179,7 +180,7 @@ const exchangeDetailSchema = computed(() => {
 const transactionInSchema = computed<DescriptionsSchema[]>(() => [
   {
     field: 'in_txid',
-    label: '转入交易Hash',
+    label: '交易Hash',
     span: 24,
     slots: {
       default: (row: any) => {
@@ -239,7 +240,7 @@ const transactionInSchema = computed<DescriptionsSchema[]>(() => [
 const transactionOutSchema = computed<DescriptionsSchema[]>(() => [
   {
     field: 'out_txid',
-    label: '转出交易Hash',
+    label: '交易Hash',
     span: 24,
     slots: {
       default: (row: any) => {
@@ -259,11 +260,11 @@ const transactionOutSchema = computed<DescriptionsSchema[]>(() => [
   { field: 'out_from_address', label: '发送人', span: 24 },
   { field: 'out_to_address', label: '接收人', span: 24 },
   {
-    field: 'agent_out_amount',
+    field: 'order_amount',
     label: 'USDT数量',
     formatter: (row) => {
-      if (!row.agent_out_amount) return '0'
-      return row.agent_out_amount
+      if (!row.order_amount) return '0'
+      return row.order_amount
     }
   },
   {
@@ -533,8 +534,16 @@ const onSearch = (params: any) => {
 }
 
 onMounted(() => {
-  // 组件加载后自动调用首次查询
-  searchTableRef.value?.reload()
+  const query = useRoute().query
+  setTimeout(() => {
+    if (searchTableRef.value) {
+      searchTableRef.value.setSearchParams({
+        order_id: query.order_num
+      })
+      console.log('手动触发数据刷新')
+      searchTableRef.value.reload()
+    }
+  }, 100)
 })
 </script>
 

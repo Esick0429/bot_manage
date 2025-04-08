@@ -27,7 +27,7 @@ const countPageSize = ref(10)
 const apiTotalCount = ref(0)
 
 const byCountDetailSchema = computed((): DescriptionsSchema[] => [
-  { field: 'stroke_num', label: '租用笔数' }
+  { field: 'stroke_num', label: '租用笔数' },
   // {
   //   field: 'order_amount',
   //   label: '订单金额',
@@ -35,6 +35,11 @@ const byCountDetailSchema = computed((): DescriptionsSchema[] => [
   //     default: (data: any) => h('span', {}, `${data.order_amount ?? '-'} ${data.pay_unit ?? ''}`)
   //   }
   // }
+  { field: 'energy_price', label: '单价',
+    slots: {
+      default: (data: any) => h('span', {}, `${data.energy_price ?? '-'} ${data.pay_unit ?? ''}`)
+    }
+  },
 ])
 
 const countOrderTableSchema = computed((): TableColumn[] => [

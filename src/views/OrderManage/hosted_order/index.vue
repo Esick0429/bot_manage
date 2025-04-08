@@ -12,7 +12,7 @@
       >
         <!-- 自定义搜索按钮 -->
         <template #searchButtons>
-          <BaseButton @click="handleExport">导出订单</BaseButton>
+          <BaseButton @click="handleExport" disabled>导出订单</BaseButton>
         </template>
       </SearchTable>
 
@@ -47,7 +47,7 @@
 <script setup lang="tsx">
 import { ref, onMounted, h, computed } from 'vue'
 import { formatToDateTime } from '@/utils/dateUtil'
-import { useRouter } from 'vue-router'
+import { useRouter,useRoute } from 'vue-router'
 import { ElButton, ElTag, ElMessage, ElTabs, ElTabPane, ElLink } from 'element-plus'
 import { ContentWrap } from '@/components/ContentWrap'
 import { Dialog } from '@/components/Dialog'
@@ -66,6 +66,7 @@ import {
 import formatEnergyNum from '@/views/OrderManage/helpers/formatEnergyNum'
 // const { t } = useI18n()
 const router = useRouter()
+const route = useRoute()
 const searchTableRef = ref<InstanceType<typeof SearchTable> | null>(null)
 
 // 订单详情相关
@@ -420,16 +421,16 @@ const getStatusText = (status: number): string => {
 // 跳转到用户列表
 const navigateToUserList = (userId: string) => {
   router.push({
-    path: '/user/list',
-    query: { userId }
+    path: '/user_group/user_list',
+    query: { tg_id: userId }
   })
 }
 
 // 跳转到机器人列表
-const navigateToBotList = (botId: string) => {
+const navigateToBotList = (tgUserId: string) => {
   router.push({
-    path: '/bot/list',
-    query: { botId }
+    path: '/bot_manage/bot_list',
+    query: { tg_bot_id: tgUserId }
   })
 }
 
@@ -491,8 +492,16 @@ const onSearch = (params: any) => {
 }
 
 onMounted(() => {
-  // 组件加载后自动调用首次查询
-  searchTableRef.value?.reload()
+  const query = useRoute().query
+  setTimeout(() => {
+    if (searchTableRef.value) {
+      searchTableRef.value.setSearchParams({
+        order_id: query.order_num
+      })
+      console.log('手动触发数据刷新')
+      searchTableRef.value.reload()
+    }
+  }, 100)
 })
 </script>
 

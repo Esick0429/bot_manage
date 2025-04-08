@@ -7,7 +7,7 @@ import { Descriptions } from '@/components/Descriptions'
 import type { DescriptionsSchema } from '@/components/Descriptions'
 import { formatToDateTime } from '@/utils/dateUtil'
 import isEmpty from 'lodash-es/isEmpty'
-import  formatEnergyNum  from '../../helpers/formatEnergyNum'
+import formatEnergyNum from '../../helpers/formatEnergyNum'
 // Import the new detail components (using defineAsyncComponent for lazy loading)
 const ByCountDetails = defineAsyncComponent(() => import('./details/ByCountDetails.vue'))
 const ByTimeDetails = defineAsyncComponent(() => import('./details/ByTimeDetails.vue'))
@@ -221,7 +221,7 @@ const orderDetailSchema = computed((): DescriptionsSchema[] => {
         default: (data: any) =>
           h('span', {}, data.finish_time ? formatToDateTime(data.finish_time) : '-')
       }
-    },
+    }
   ]
   if (orderDetail.value.order_type === 4) {
     const flash = [
@@ -242,7 +242,7 @@ const orderDetailSchema = computed((): DescriptionsSchema[] => {
     ]
     schema.push(...flash)
   }
-  schema.push({ field: 'describe', label: '描述'})
+  schema.push({ field: 'describe', label: '描述' })
   return schema
 })
 

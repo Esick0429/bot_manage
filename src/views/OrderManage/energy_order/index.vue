@@ -15,7 +15,7 @@
       >
         <!-- 自定义搜索按钮 -->
         <template #searchButtons>
-          <BaseButton @click="handleExport">导出订单</BaseButton>
+          <BaseButton @click="handleExport" disabled>导出订单</BaseButton>
         </template>
       </SearchTable>
 
@@ -43,7 +43,7 @@
 <script setup lang="tsx">
 import { ref, onMounted, h, computed } from 'vue'
 import { formatToDateTime } from '@/utils/dateUtil'
-import { useRouter } from 'vue-router'
+import { useRoute,useRouter } from 'vue-router'
 import { ElButton, ElTag, ElLink } from 'element-plus'
 import { ContentWrap } from '@/components/ContentWrap'
 import { Dialog } from '@/components/Dialog'
@@ -65,6 +65,7 @@ import isEmpty from 'lodash-es/isEmpty'
 
 // const { t } = useI18n()
 const router = useRouter()
+const route = useRoute()
 const searchTableRef = ref<InstanceType<typeof SearchTable> | null>(null)
 const totalCount = ref(0)
 const orderDialogVisible = ref(false)
@@ -509,9 +510,16 @@ const transactionDetailSchema = computed((): DescriptionsSchema[] => [
 ])
 
 onMounted(() => {
-  // Initial load might not trigger onSearch,
-  // fetchEnergyOrderList will set initial params if needed.
-  // Or, if SearchTable exposes an initial value, capture it here.
+  const query = useRoute().query
+  setTimeout(() => {
+    if (searchTableRef.value) {
+      searchTableRef.value.setSearchParams({
+        order_num: query.order_num
+      })
+      console.log('手动触发数据刷新')
+      searchTableRef.value.reload()
+    }
+  }, 100)
 })
 </script>
 

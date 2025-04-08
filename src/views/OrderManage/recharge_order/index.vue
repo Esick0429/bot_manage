@@ -11,7 +11,7 @@
       >
         <!-- 自定义搜索按钮 -->
         <template #searchButtons>
-          <BaseButton @click="handleExport">导出订单</BaseButton>
+          <BaseButton @click="handleExport" disabled>导出订单</BaseButton>
         </template>
       </SearchTable>
 
@@ -58,9 +58,10 @@ import {
   exportRechargeOrderApi
 } from '@/api/recharge_order'
 import { ElLink } from 'element-plus'
-import { useRouter } from 'vue-router'
+import { useRouter,useRoute } from 'vue-router'
 
 const router = useRouter()
+const route = useRoute()
 const { t } = useI18n()
 const searchTableRef = ref<InstanceType<typeof SearchTable> | null>(null)
 
@@ -423,8 +424,16 @@ const onSearch = (params: any) => {
 }
 
 onMounted(() => {
-  // 组件加载后自动调用首次查询
-  searchTableRef.value?.reload()
+  const query = useRoute().query
+  setTimeout(() => {
+    if (searchTableRef.value) {
+      searchTableRef.value.setSearchParams({
+        order_id: query.order_num
+      })
+      console.log('手动触发数据刷新')
+      searchTableRef.value.reload()
+    }
+  }, 100)
 })
 </script>
 
