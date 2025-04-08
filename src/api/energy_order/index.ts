@@ -27,3 +27,10 @@ export const exportEnergyOrderApi = (params: any) => {
 export const getBatchActiveDetailApi = (id: string | number, params?: any) => {
   return request.get({ url: `/v1/order/batch_active/list/${id}`, params })
 }
+
+export const getByCountDetailApi = (
+  id: string | number,
+  params?: { currentPage: number; pageSize: number }
+) => {
+  return request.get({ url: `/v1/order/energy_count/list/${id}`, params })
+}
