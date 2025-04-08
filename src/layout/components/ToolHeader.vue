@@ -1,5 +1,5 @@
 <script lang="tsx">
-import { defineComponent, computed } from 'vue'
+import { defineComponent, computed, ref } from 'vue'
 import { Collapse } from '@/components/Collapse'
 import { LocaleDropdown } from '@/components/LocaleDropdown'
 import { SizeDropdown } from '@/components/SizeDropdown'
@@ -8,6 +8,8 @@ import { Screenfull } from '@/components/Screenfull'
 import { Breadcrumb } from '@/components/Breadcrumb'
 import { useAppStore } from '@/store/modules/app'
 import { useDesign } from '@/hooks/web/useDesign'
+import { Icon } from '@/components/Icon'
+import WebhookFormModal from './WebhookFormModal.vue'
 
 const { getPrefixCls, variables } = useDesign()
 
@@ -35,7 +37,22 @@ const locale = computed(() => appStore.getLocale)
 
 export default defineComponent({
   name: 'ToolHeader',
+  components: { WebhookFormModal },
   setup() {
+    // 使用 ref 创建本地响应式状态来控制模态框的可见性
+    const isWebhookFormVisible = ref(false)
+
+    // 处理打开 Webhook 表单的点击事件
+    const handleOpenWebhookForm = () => {
+      isWebhookFormVisible.value = true
+      console.log('打开 Webhook 表单（本地状态）')
+    }
+
+    // 处理关闭模态框的事件
+    const handleCloseWebhookForm = () => {
+      isWebhookFormVisible.value = false
+    }
+
     return () => (
       <div
         id={`${variables.namespace}-tool-header`}
@@ -53,6 +70,16 @@ export default defineComponent({
           </div>
         ) : undefined}
         <div class="h-full flex items-center">
+          <div
+            class="custom-hover mr-2 flex items-center cursor-pointer"
+            onClick={handleOpenWebhookForm}
+          >
+            <Icon
+              icon="ant-design:form-outlined"
+              size={18}
+              color="var(--top-header-text-color)"
+            ></Icon>
+          </div>
           {screenfull.value ? (
             <Screenfull class="custom-hover" color="var(--top-header-text-color)"></Screenfull>
           ) : undefined}
@@ -67,6 +94,8 @@ export default defineComponent({
           ) : undefined}
           <UserInfo></UserInfo>
         </div>
+
+        <WebhookFormModal visible={isWebhookFormVisible.value} onClose={handleCloseWebhookForm} />
       </div>
     )
   }
