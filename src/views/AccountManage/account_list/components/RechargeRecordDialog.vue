@@ -62,32 +62,26 @@ const pageSize = ref(10)
 // 表格列配置
 const columns: TableColumn[] = [
   {
-    field: 'account_id',
+    field: 'user_id',
     label: '账户ID',
     minWidth: 100
   },
   {
-    field: 'account_name',
+    field: 'username',
     label: '账户名',
     minWidth: 150
   },
   {
-    field: 'after_balance',
+    field: 'trx_mount',
     label: 'TRX余额',
     minWidth: 120,
-    formatter: (row) => `${row.after_balance} TRX`
+    formatter: (row) => `${row.trx_mount} TRX`
   },
   {
     field: 'amount',
     label: '充值金额',
     minWidth: 120,
     formatter: (row) => `+${row.amount} TRX`
-  },
-  {
-    field: 'create_time',
-    label: '创建时间',
-    minWidth: 160,
-    formatter: (row) => (row.create_time ? formatToDateTime(row.create_time) : '-')
   },
   {
     field: 'create_time',
@@ -104,12 +98,12 @@ const getList = async (params: any = {}) => {
     const res = await getBalanceRecordApi({
       ...params,
       change_type: 'in',
-      accountId: props.accountId 
+      accountId: props.accountId
     })
 
     if (res.data) {
       dataList.value = res.data.list || []
-      total.value = res.data.total || 0
+      total.value = res.data.totalCount || 0
 
       // 更新账户名称（如果记录中包含）
       if (dataList.value.length > 0) {

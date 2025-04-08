@@ -19,17 +19,13 @@
         <ElSkeleton :rows="5" animated />
       </div>
 
-      <ElDescriptions v-else :column="1" border>
-        <ElDescriptionsItem v-for="(item, index) in accountSchema" :key="index" :label="item.label">
-          <div>{{ formatAccountField(item.field, userData[item.field]) }}</div>
-        </ElDescriptionsItem>
-      </ElDescriptions>
+      <Descriptions v-else :column="1" :schema="accountSchema" :data="userData" />
 
       <!-- 修改密码弹窗 -->
       <Dialog v-model="passwordDialogVisible" title="修改密码" width="600px">
         <div class="pw-reset-container">
           <h3 class="text-lg font-bold mb-4">账户信息</h3>
-          <ElDescriptions :column="1" border>
+          <ElDescriptions :column="1" border label-width="120px">
             <ElDescriptionsItem label="账户ID">{{ userData.id }}</ElDescriptionsItem>
             <ElDescriptionsItem label="账户名">{{ userData.username }}</ElDescriptionsItem>
           </ElDescriptions>
@@ -41,8 +37,8 @@
             label-position="top"
             class="mt-4"
           >
-            <ElFormItem prop="phone" label="手机号">
-              <ElInput v-model="resetForm.phone" placeholder="请输入手机号码" />
+            <ElFormItem prop="email" label="邮箱">
+              <ElInput v-model="resetForm.email" disabled />
             </ElFormItem>
 
             <!-- 验证码 -->
@@ -53,7 +49,7 @@
                   type="primary"
                   class="ml-2 w-[120px]"
                   :disabled="isCounting"
-                  @click="sendVerificationCode"
+                  @click="handleSendCodeClick"
                 >
                   {{ isCounting ? `${countdown}秒` : '获取验证码' }}
                 </ElButton>
@@ -93,9 +89,9 @@
       </Dialog>
 
       <!-- 充值弹窗 -->
-      <Dialog v-model="rechargeDialogVisible" title="账户充值" width="500px">
+      <Dialog v-model="rechargeDialogVisible" title="账户充值" width="600px">
         <div v-if="userData.pay_address">
-          <ElDescriptions :column="1" border>
+          <ElDescriptions :column="1" border label-width="120px">
             <ElDescriptionsItem label="账户ID">{{ userData.id }}</ElDescriptionsItem>
             <ElDescriptionsItem label="账户名">{{ userData.username }}</ElDescriptionsItem>
             <ElDescriptionsItem label="TRX余额">{{
@@ -111,12 +107,7 @@
 
           <div v-if="userData.qr_address" class="mt-4 text-center">
             <div class="font-bold mb-2">扫描二维码充值</div>
-            <img 
-              :src="userData.qr_address" 
-              alt="收款二维码"
-              class="mx-auto"
-              style="max-width: 200px; height: auto;"
-            />
+            <img :src="userData.qr_address" alt="收款二维码" />
           </div>
         </div>
         <div v-else class="py-4 text-center text-red-500">
@@ -167,10 +158,15 @@ import { useValidator } from '@/hooks/web/useValidator'
 import RechargeRecordDialog from './components/RechargeRecordDialog.vue'
 import DeductionRecordDialog from './components/DeductionRecordDialog.vue'
 import { useClipboard } from '@/hooks/web/useClipboard'
-import { changePasswordApi, sendPhoneCodeApi } from '@/api/login'
+import { changePasswordApi, sendEmailCodeApi } from '@/api/login'
+import { debounce } from 'lodash-es'
+import { useUserStore } from '@/store/modules/user'
 
 // 表单校验
 const { required } = useValidator()
+
+// 获取 user store 实例 (移除 router，因为 logout action 通常会处理跳转)
+const userStore = useUserStore()
 
 const rechargeRecordDialogRef = ref<InstanceType<typeof RechargeRecordDialog> | null>(null)
 const deductionRecordDialogRef = ref<InstanceType<typeof DeductionRecordDialog> | null>(null)
@@ -185,28 +181,13 @@ const passwordDialogVisible = ref(false)
 const rechargeDialogVisible = ref(false)
 
 // 账户信息显示Schema
-const accountSchema: TableColumn[] = [
+const accountSchema: DescriptionsSchema[] = [
   { field: 'id', label: '账户ID' },
   { field: 'username', label: '账户名' },
   { field: 'trx_mount', label: 'TRX余额' },
   { field: 'create_time', label: '创建时间' },
   { field: 'update_time', label: '更新时间' }
 ]
-
-// 格式化账户字段
-const formatAccountField = (field: string, value: any) => {
-  if (value === undefined || value === null) return '暂无'
-
-  switch (field) {
-    case 'trx_mount':
-      return formatTrx(value)
-    case 'create_time':
-    case 'update_time':
-      return formatToDateTime(value)
-    default:
-      return value
-  }
-}
 
 // 格式化TRX数量
 const formatTrx = (value: number | string) => {
@@ -242,7 +223,7 @@ const resetFormRef = ref()
 
 // 重置密码表单
 const resetForm = reactive({
-  phone: '',
+  email: '',
   code: '',
   password: '',
   confirmPassword: ''
@@ -251,19 +232,6 @@ const resetForm = reactive({
 // 表单校验规则
 const resetRules = computed(() => {
   return {
-    phone: [
-      { required: true, message: '请输入手机号', trigger: 'blur' },
-      {
-        validator: (rule, value, callback) => {
-          if (value && !/^1[3-9]\d{9}$/.test(value)) {
-            callback(new Error('请输入正确的手机号码'))
-          } else {
-            callback()
-          }
-        },
-        trigger: 'blur'
-      }
-    ],
     code: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
     password: [
       { required: true, message: '请输入新密码', trigger: 'blur' },
@@ -302,31 +270,51 @@ const startCountdown = () => {
   }, 1000)
 }
 
-// 发送验证码
-const sendVerificationCode = async () => {
+// 实际执行 API 请求的防抖函数
+const debouncedApiCall = debounce(async () => {
   try {
-    // 验证手机号
-    await resetFormRef.value.validateField('phone')
-
-    if (!resetForm.phone) {
-      ElMessage.warning('请输入手机号')
+    if (!resetForm.email) {
+      // 如果 API 调用因邮箱为空而未执行，也需要重置状态
+      ElMessage.warning('邮箱地址为空，无法发送验证码')
+      resetCountdown() // 重置倒计时状态
       return
     }
 
-    // 发送手机验证码
-    await sendPhoneCodeApi({
-      mobile: resetForm.phone,
+    // 发送邮箱验证码
+    await sendEmailCodeApi({
+      email: resetForm.email,
       channel: 'change_passwd'
     })
 
-    ElMessage.success('验证码已发送到手机')
-
-    // 启动倒计时
-    startCountdown()
+    ElMessage.success('验证码已发送到邮箱')
+    // 注意：倒计时已经在 handleClickSendCode 中启动了
   } catch (error) {
     console.error('发送验证码失败:', error)
     ElMessage.error('发送验证码失败，请稍后重试')
+    // API 请求失败时，重置倒计时状态，让用户可以重试
+    resetCountdown()
   }
+}, 1000) // 保持 1 秒防抖
+
+// 重置倒计时的辅助函数
+const resetCountdown = () => {
+  if (timer) {
+    clearInterval(timer)
+    timer = null
+  }
+  countdown.value = 0 // 这会使 isCounting 变为 false，按钮重新启用
+}
+
+// 按钮点击时触发的函数
+const handleSendCodeClick = () => {
+  // 如果正在倒计时，则不执行任何操作
+  if (isCounting.value) {
+    return
+  }
+
+  startCountdown()
+
+  debouncedApiCall()
 }
 
 // 打开修改密码弹窗
@@ -335,11 +323,17 @@ const openPasswordDialog = () => {
     ElMessage.warning('账户信息不完整，请刷新页面后重试')
     return
   }
+  if (!userData.value.email) {
+    ElMessage.warning('账户邮箱信息缺失，无法修改密码')
+    return
+  }
 
-  // 重置表单
-  Object.keys(resetForm).forEach((key) => {
-    resetForm[key] = ''
-  })
+  resetForm.code = ''
+  resetForm.password = ''
+  resetForm.confirmPassword = ''
+  resetForm.email = userData.value.email
+
+  resetFormRef.value?.clearValidate()
 
   passwordDialogVisible.value = true
 }
@@ -363,13 +357,17 @@ const handleUpdatePassword = async () => {
         id: userData.value.id,
         password: resetForm.password,
         verify_code: resetForm.code,
-        phone: resetForm.phone
+        email: resetForm.email
       }
 
       // 调用修改密码API
       await changePasswordApi(params)
       ElMessage.success('密码修改成功')
       passwordDialogVisible.value = false
+
+      // 添加: 修改成功后退出登录
+      await userStore.logout() // 调用退出登录 action
+
     } catch (error) {
       console.error('修改密码失败:', error)
       ElMessage.error('修改密码失败')

@@ -12,6 +12,7 @@
       :fetch-data-api="getList"
       ref="searchTableRef"
       @search="onSearch"
+      :show-add-button="false"
     />
 
     <template #footer>
@@ -24,14 +25,16 @@
 
 <script setup lang="tsx">
 import { ref, onMounted } from 'vue'
-import { ElButton, ElTag, ElMessage } from 'element-plus'
+import { ElButton, ElTag, ElMessage, ElLink } from 'element-plus'
 import { Dialog } from '@/components/Dialog'
 import { SearchTable } from '@/components/SearchTable'
 import { formatToDateTime } from '@/utils/dateUtil'
 import { getBalanceRecordApi } from '@/api/account'
 import type { TableColumn } from '@/components/Table'
 import isEmpty from 'lodash-es/isEmpty'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const props = defineProps({
   accountId: {
     type: Number,
@@ -73,7 +76,7 @@ const columns: TableColumn[] = [
   {
     field: 'bot_name',
     label: '所属机器人',
-    minWidth: 120,
+    minWidth: 120
   },
   {
     field: 'amount',
@@ -97,7 +100,35 @@ const columns: TableColumn[] = [
     field: 'order_num',
     label: '关联订单ID',
     minWidth: 120,
-    formatter: (row) => isEmpty(row.order_num) ? '-' : row.order_num
+    formatter: (row) => (isEmpty(row.order_num) ? '-' : row.order_num),
+    slots:{
+      default: ({row}: any) => {
+        let href = '/order_manage'
+        switch (row.order_type) {
+          case 1:
+            href = `${href}/energy_order`
+            break
+          case 2:
+            href = `${href}/exchange_order`
+            break
+          case 3:
+            href = `${href}/hosted_order`
+            break
+          case 4:
+            href = `${href}/recharge_order`
+            break
+          default:
+            href = ''
+        }
+        return (
+          <>
+            <ElLink type="primary" onClick={() => router.push({path: href, query: {order_num: row.order_num}})}>
+              {row.order_num}
+            </ElLink>
+          </>
+        )
+      }
+    }
   }
 ]
 
@@ -147,7 +178,7 @@ const getList = async (params: any = {}) => {
     // 调用通用API但使用/out路径表示扣款记录
     const res = await getBalanceRecordApi({
       ...params,
-      change_type: 'out', 
+      change_type: 'out',
       accountId: props.accountId
     })
 
@@ -166,7 +197,7 @@ const getList = async (params: any = {}) => {
     console.error('获取扣款记录失败:', error)
     ElMessage.error('获取扣款记录失败')
     return { list: [], total: 0 }
-  } 
+  }
 }
 
 // 处理搜索
