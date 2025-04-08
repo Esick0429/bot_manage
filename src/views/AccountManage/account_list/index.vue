@@ -367,7 +367,6 @@ const handleUpdatePassword = async () => {
 
       // 添加: 修改成功后退出登录
       await userStore.logout() // 调用退出登录 action
-
     } catch (error) {
       console.error('修改密码失败:', error)
       ElMessage.error('修改密码失败')

@@ -101,8 +101,8 @@ const columns: TableColumn[] = [
     label: '关联订单ID',
     minWidth: 120,
     formatter: (row) => (isEmpty(row.order_num) ? '-' : row.order_num),
-    slots:{
-      default: ({row}: any) => {
+    slots: {
+      default: ({ row }: any) => {
         let href = '/order_manage'
         switch (row.order_type) {
           case 1:
@@ -122,7 +122,10 @@ const columns: TableColumn[] = [
         }
         return (
           <>
-            <ElLink type="primary" onClick={() => router.push({path: href, query: {order_num: row.order_num}})}>
+            <ElLink
+              type="primary"
+              onClick={() => router.push({ path: href, query: { order_num: row.order_num } })}
+            >
               {row.order_num}
             </ElLink>
           </>

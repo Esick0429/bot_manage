@@ -70,7 +70,7 @@
 <script setup lang="tsx">
 import { ref, onMounted, h, computed } from 'vue'
 import { formatToDateTime } from '@/utils/dateUtil'
-import { useRoute,useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ElButton, ElTag, ElMessage, ElTabs, ElTabPane, ElLink, ElEmpty } from 'element-plus'
 import { ContentWrap } from '@/components/ContentWrap'
 import { Dialog } from '@/components/Dialog'

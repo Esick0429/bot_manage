@@ -35,11 +35,13 @@ const byCountDetailSchema = computed((): DescriptionsSchema[] => [
   //     default: (data: any) => h('span', {}, `${data.order_amount ?? '-'} ${data.pay_unit ?? ''}`)
   //   }
   // }
-  { field: 'energy_price', label: '单价',
+  {
+    field: 'energy_price',
+    label: '单价',
     slots: {
       default: (data: any) => h('span', {}, `${data.energy_price ?? '-'} ${data.pay_unit ?? ''}`)
     }
-  },
+  }
 ])
 
 const countOrderTableSchema = computed((): TableColumn[] => [
