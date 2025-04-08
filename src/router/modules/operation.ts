@@ -4,10 +4,11 @@ import { Layout, getParentLayout } from '@/utils/routerHelper'
 // Rely on global AppRouteRecordRaw type
 
 // const { t } = useI18n() // Assuming t() is not directly used here, otherwise uncomment
-
-const operationRoutes: AppRouteRecordRaw[] = [
-  {
-    path: '/data_statistics',
+let operationRoutes: AppRouteRecordRaw[] = []
+if (import.meta.env.VITE_SYSTEM_TYPE === 'Operation') {
+  operationRoutes = [
+    {
+      path: '/data_statistics',
     component: Layout,
     name: 'DataStatistics',
     redirect: '/data_statistics/index',
@@ -153,6 +154,8 @@ const operationRoutes: AppRouteRecordRaw[] = [
       }
     ]
   }
-]
+]}else{
+  operationRoutes = []
+}
 
 export default operationRoutes
