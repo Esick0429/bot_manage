@@ -56,7 +56,7 @@ const flashExchangeSchema = reactive<FormSchema[]>([
     component: 'Input' as const,
     label: {
       text: '【闪兑TRX/USDT】收款钱包地址 ',
-      tips: '当您的可兑换库存低于设置值时，将会发送通知机器人管理员'
+      tips: '提交后不能修改，如需修改，请联系客服'
     },
     componentProps: {
       placeholder: '请输入钱包地址'
