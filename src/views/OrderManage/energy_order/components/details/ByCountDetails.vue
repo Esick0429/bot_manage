@@ -36,10 +36,17 @@ const byCountDetailSchema = computed((): DescriptionsSchema[] => [
   //   }
   // }
   {
-    field: 'energy_price',
-    label: '单价',
+    field: 'stroke_ext.price_trx',
+    label: '能量TRX价格',
     slots: {
-      default: (data: any) => h('span', {}, `${data.energy_price ?? '-'} ${data.pay_unit ?? ''}`)
+      default: (data: any) => h('span', {}, `${data.stroke_ext.price_trx + ' TRX'}`)
+    }
+  },
+  {
+    field: 'stroke_ext.price_usdt',
+    label: '能量USDT价格',
+    slots: {
+      default: (data: any) => h('span', {}, `${data.stroke_ext.price_usdt + ' USDT'}`)
     }
   }
 ])
