@@ -30,7 +30,7 @@ export default defineComponent({
     // 是否展示表格的工具栏
     showAction: propTypes.bool.def(false),
     // 是否所有的超出隐藏，优先级低于schema中的showOverflowTooltip,
-    showOverflowTooltip: propTypes.bool.def(true),
+    showOverflowTooltip: propTypes.bool.def(false),
     // 表头
     columns: {
       type: Array as PropType<TableColumn[]>,
@@ -429,7 +429,7 @@ export default defineComponent({
         currentPage,
         align,
         headerAlign,
-        showOverflowTooltip,
+        showOverflowTooltip: tableShowOverflowTooltip,
         reserveSelection,
         imagePreview,
         videoPreview
@@ -517,11 +517,16 @@ export default defineComponent({
           if (props?.slots?.header) {
             slots['header'] = (...args: any[]) => props.slots.header(...args)
           }
+
+          const finalShowOverflowTooltip = props?.slots?.header
+            ? false
+            : props.showOverflowTooltip ?? tableShowOverflowTooltip
+
           return (
             <ElTableColumn
-              showOverflowTooltip={showOverflowTooltip}
-              align={align}
-              headerAlign={headerAlign}
+              showOverflowTooltip={finalShowOverflowTooltip}
+              align={v.align || align}
+              headerAlign={v.headerAlign || headerAlign}
               {...props}
               prop={v.field}
             >
