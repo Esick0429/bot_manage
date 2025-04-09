@@ -10,11 +10,12 @@ import type {
   PhoneCodeParams,
   LoginResponse
 } from './types'
-
+import { isManagementSystem } from '@/utils/system'
 interface RoleParams {
   roleName: string
 }
 
+const isManagement = isManagementSystem()
 // 旧的API接口，保留供兼容
 export const loginApi = (data: UserType): Promise<IResponse<UserType>> => {
   // TODO：需要修改为后端接口
@@ -70,7 +71,11 @@ export const emailRegisterApi = (data: EmailRegisterParams): Promise<IResponse> 
  * @param data 登录参数
  */
 export const passwordLoginApi = (data: PasswordLoginParams): Promise<IResponse<LoginResponse>> => {
-  return request.post({ url: '/v1/user/login', data })
+  let url = '/v1/user/login'
+  if (!isManagement) {
+    url = '/manage/user/login'
+  }
+  return request.post({ url, data })
 }
 
 /**
@@ -87,7 +92,11 @@ export const verifyCodeLoginApi = (
  * 退出登录
  */
 export const logoutApi = (): Promise<IResponse> => {
-  return request.post({ url: '/v1/user/logout' })
+  let url = '/v1/user/logout'
+  if (!isManagement) {
+    url = '/manage/user/logout'
+  }
+  return request.post({ url })
 }
 
 // 修改密码相关API

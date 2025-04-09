@@ -3,7 +3,9 @@ import { defaultRequestInterceptors, defaultResponseInterceptors } from './confi
 import { AxiosInstance, InternalAxiosRequestConfig, RequestConfig, AxiosResponse } from './types'
 import { ElMessage } from 'element-plus'
 import { REQUEST_TIMEOUT } from '@/constants'
-import { useAppStore } from '@/store/modules/app'
+// Remove system store import
+// import { useAppStore } from '@/store/modules/app' // Keep app store if used elsewhere, remove if not
+// import { useSystemStore } from '@/store/modules/system'
 
 export const PATH_URL = import.meta.env.VITE_API_BASE_PATH
 
@@ -14,53 +16,82 @@ const axiosInstance: AxiosInstance = axios.create({
   baseURL: PATH_URL // 如果使用mock，则不使用API基础路径
 })
 
-axiosInstance.interceptors.request.use((res: InternalAxiosRequestConfig) => {
+axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const controller = new AbortController()
-  let url = res.url || ''
-  const MOCK_LIST = import.meta.env.VITE_MOCK_LIST.split(',')
-  // 如果启用了mock并且是bot相关请求，添加/mock前缀
-  if (
-    import.meta.env.VITE_USE_MOCK === 'true' &&
-    MOCK_LIST.some((item) => url.indexOf(item) !== -1)
-  ) {
-    url = '/mock' + url
-    res.url = url
+  const originalUrl = config.url || ''
 
-    // 完全覆盖baseURL，确保使用本地mock而不是远程服务器
-    res.baseURL = ''
+  // --- Mock 逻辑判断 ---
+  const MOCK_LIST = (import.meta.env.VITE_MOCK_LIST || '').split(',')
+  const useMock = import.meta.env.VITE_USE_MOCK === 'true'
+  const isMockRequest = useMock && MOCK_LIST.some((item) => item && originalUrl.includes(item)) // 确保 item 非空
+
+  if (isMockRequest) {
+    // 如果是 Mock 请求, 修改 URL 并设置 baseURL 为空
+    config.url = '/mock' + originalUrl
+    config.baseURL = ''
+  } else {
+    // --- 非 Mock 请求: 添加 API 版本前缀 ---
+    const systemType = import.meta.env.VITE_SYSTEM_TYPE
+    // 根据环境变量 VITE_SYSTEM_TYPE 决定前缀
+    const prefix = systemType === 'Management' ? '/v1' : '/v2'
+    const currentUrl = config.url || '' // 获取当前 config 中的 url
+
+    // 如果当前 url 没有 /v1 或 /v2 前缀, 则添加
+    if (!currentUrl.startsWith('/v1') && !currentUrl.startsWith('/v2')) {
+      config.url = `${prefix}${currentUrl}`
+    }
+    // 可选: 如果已有 *错误* 的前缀, 可以加日志警告
+    else if (
+      (systemType === 'Management' && currentUrl.startsWith('/v2')) ||
+      (systemType !== 'Management' && currentUrl.startsWith('/v1'))
+    ) {
+      console.warn(`请求 URL [${currentUrl}] 可能包含错误的版本前缀 (当前系统: ${systemType})`)
+    }
   }
 
-  res.signal = controller.signal
-  abortControllerMap.set(url, controller)
-  return res
+  // --- 设置 AbortController ---
+  const finalUrl = config.url || '' // 使用最终确定的 URL
+  config.signal = controller.signal
+  abortControllerMap.set(finalUrl, controller)
+
+  return config
 })
 
+// Response interceptor remains the same (handles abort cleanup)
 axiosInstance.interceptors.response.use(
   (res: AxiosResponse) => {
     const url = res.config.url || ''
     abortControllerMap.delete(url)
-    // 这里不能做任何处理，否则后面的 interceptors 拿不到完整的上下文了
     return res
   },
   (error: AxiosError) => {
     console.log('err： ' + error) // for debug
+    const url = error.config?.url || ''
+    if (url) {
+      abortControllerMap.delete(url)
+    }
     ElMessage.error(error.message)
     return Promise.reject(error)
   }
 )
 
+// Apply default interceptors (assuming they don't depend on Pinia)
 axiosInstance.interceptors.request.use(defaultRequestInterceptors)
 axiosInstance.interceptors.response.use(defaultResponseInterceptors)
 
+// Export the configured instance
+// The service object might need adjustment if its methods relied on the prefix being added here
 const service = {
-  request: (config: RequestConfig) => {
+  request: (config: RequestConfig): Promise<AxiosResponse> => {
+    // Keep explicit Promise type
     return new Promise((resolve, reject) => {
+      // Apply per-request interceptors if provided
       if (config.interceptors?.requestInterceptors) {
-        config = config.interceptors.requestInterceptors(config as any)
+        config = config.interceptors.requestInterceptors(config as InternalAxiosRequestConfig)
       }
 
       axiosInstance
-        .request(config)
+        .request(config) // Use the globally configured axiosInstance
         .then((res) => {
           resolve(res)
         })
@@ -84,4 +115,6 @@ const service = {
   }
 }
 
+// Export both the instance (for adding interceptors later) and the service object
+export { axiosInstance }
 export default service

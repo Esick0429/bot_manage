@@ -520,7 +520,7 @@ export default defineComponent({
 
           const finalShowOverflowTooltip = props?.slots?.header
             ? false
-            : props.showOverflowTooltip ?? tableShowOverflowTooltip
+            : (props.showOverflowTooltip ?? tableShowOverflowTooltip)
 
           return (
             <ElTableColumn

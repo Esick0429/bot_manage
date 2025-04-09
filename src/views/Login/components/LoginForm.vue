@@ -14,6 +14,7 @@ import { useValidator } from '@/hooks/web/useValidator'
 import { Icon } from '@/components/Icon'
 import { useUserStore } from '@/store/modules/user'
 import { BaseButton } from '@/components/Button'
+import { isManagementSystem } from '@/utils/system' // <-- 导入
 import {
   passwordLoginApi,
   verifyCodeLoginApi,
@@ -36,6 +37,7 @@ const { currentRoute, addRoute, push, replace } = useRouter()
 
 const { t } = useI18n()
 
+const isManagement = isManagementSystem()
 // 添加登录类型切换
 const loginType = ref('account') // 'account' 或 'phone'
 
@@ -180,9 +182,11 @@ const accountSchema = reactive<FormSchema[]>([
             <>
               <div class="flex justify-between items-center w-[100%]">
                 <ElCheckbox v-model={remember.value} label={t('login.remember')} size="small" />
-                <ElLink type="primary" underline={false} onClick={toResetPassword}>
-                  {t('login.forgetPassword')}
-                </ElLink>
+                {isManagement && (
+                  <ElLink type="primary" underline={false} onClick={toResetPassword}>
+                    {t('login.forgetPassword')}
+                  </ElLink>
+                )}
               </div>
             </>
           )
@@ -209,9 +213,11 @@ const accountSchema = reactive<FormSchema[]>([
                 </BaseButton>
               </div>
               <div class="w-[100%] mt-15px">
-                <BaseButton class="w-[100%]" onClick={toRegister}>
-                  {t('login.register')}
-                </BaseButton>
+                {isManagement && (
+                  <BaseButton class="w-[100%]" onClick={toRegister}>
+                    {t('login.register')}
+                  </BaseButton>
+                )}
               </div>
             </>
           )
