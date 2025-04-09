@@ -54,25 +54,25 @@ const columns: TableColumn[] = [
     label: '交易ID',
     minWidth: 120
   },
-  {
-    field: 'order_type',
-    label: '交易类型',
-    minWidth: 120,
-    formatter: (row) => {
-      switch (row.order_type) {
-        case 1:
-          return '能量租赁'
-        case 2:
-          return '闪兑'
-        case 3:
-          return '智能托管'
-        case 4:
-          return '续费机器人'
-        default:
-          return '-'
-      }
-    }
-  },
+  // {
+  //   field: 'order_type',
+  //   label: '交易类型',
+  //   minWidth: 120,
+  //   formatter: (row) => {
+  //     switch (row.order_type) {
+  //       case 1:
+  //         return '能量租赁'
+  //       case 2:
+  //         return '闪兑'
+  //       case 3:
+  //         return '智能托管'
+  //       case 4:
+  //         return '续费机器人'
+  //       default:
+  //         return '-'
+  //     }
+  //   }
+  // },
   {
     field: 'bot_name',
     label: '所属机器人',
@@ -88,13 +88,19 @@ const columns: TableColumn[] = [
     field: 'after_trx',
     label: '交易后TRX',
     minWidth: 120,
-    formatter: (row) => `${row.after_amount} T`
+    formatter: (row) => `${row.after_amount}`
   },
   {
     field: 'create_time',
     label: '交易时间',
     minWidth: 160,
     formatter: (row) => formatToDateTime(row.create_time)
+  },
+  {
+    field: 'describe',
+    label: '备注',
+    minWidth: 120,
+    formatter: (row) => (isEmpty(row.describe) ? '-' : row.describe)
   },
   {
     field: 'order_num',
@@ -137,21 +143,21 @@ const columns: TableColumn[] = [
 
 // 搜索表单配置，添加订单号查询
 const searchSchema = [
-  {
-    field: 'order_type',
-    component: 'Select' as const,
-    label: '交易类型',
-    componentProps: {
-      options: [
-        { label: '全部', value: '' },
-        { label: '续费机器人', value: 4 },
-        { label: '智能托管', value: 3 },
-        { label: '闪兑', value: 2 },
-        { label: '能量租赁', value: 1 }
-      ],
-      placeholder: '请选择交易类型'
-    }
-  },
+  // {
+  //   field: 'order_type',
+  //   component: 'Select' as const,
+  //   label: '交易类型',
+  //   componentProps: {
+  //     options: [
+  //       { label: '全部', value: '' },
+  //       { label: '续费机器人', value: 4 },
+  //       { label: '智能托管', value: 3 },
+  //       { label: '闪兑', value: 2 },
+  //       { label: '能量租赁', value: 1 }
+  //     ],
+  //     placeholder: '请选择交易类型'
+  //   }
+  // },
   {
     field: 'id',
     component: 'Input' as const,
