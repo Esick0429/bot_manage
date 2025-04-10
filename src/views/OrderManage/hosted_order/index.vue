@@ -354,7 +354,7 @@ const columns: TableColumn[] = [
 const actionColumn: TableColumn = {
   field: 'action',
   label: '操作',
-  minWidth: 150,
+  minWidth: 180,
   fixed: 'right',
   slots: {
     default: ({ row }) => {

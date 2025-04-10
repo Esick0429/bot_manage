@@ -162,7 +162,7 @@ const activationTransactionSchema = computed((): DescriptionsSchema[] => [
   },
   {
     field: 'order_amount', // 对应 row.order_amount (or the relevant amount field)
-    label: 'TRX数量',
+    label: '激活单价',
     slots: {
       default: (data: any) => {
         if (data.order_amount === undefined || data.order_amount === null) return h('span', '-')

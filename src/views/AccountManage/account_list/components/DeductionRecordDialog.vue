@@ -115,16 +115,22 @@ const columns: TableColumn[] = [
       default: ({ row }: any) => {
         let href = '/order_manage'
         switch (row.order_type) {
-          case 1:
+          case 4:
+          case 5:
+          case 6:
+          case 7:
+          case 8:
+          case 9:
             href = `${href}/energy_order`
-            break
-          case 2:
-            href = `${href}/exchange_order`
+
             break
           case 3:
+            href = `${href}/exchange_order`
+            break
+          case 2:
             href = `${href}/hosted_order`
             break
-          case 4:
+          case 1:
             href = `${href}/recharge_order`
             break
           default:
