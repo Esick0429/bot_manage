@@ -14,7 +14,7 @@
     "build:pro": "pnpm vite build --mode pro",
     "build:gitee": "pnpm vite build --mode gitee",
     "build:dev": "pnpm vite build --mode dev",
-    "build:test": "pnpm vite build --mode test",
+    "build:test": "cross-env VITE_SYSTEM_TYPE=$npm_config_key pnpm vite build  --mode test",
     "build:management": "cross-env VITE_SYSTEM_TYPE=Management pnpm vite build --mode pro",
     "build:operation": "cross-env VITE_SYSTEM_TYPE=Operation pnpm vite build --mode pro",
     "serve:pro": "pnpm vite preview --mode pro",
