@@ -37,7 +37,8 @@ axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     const currentUrl = config.url || '' // 获取当前 config 中的 url
 
     // 如果当前 url 没有 /v1 或 /v2 前缀, 则添加
-    if (!currentUrl.startsWith('/v1') && !currentUrl.startsWith('/v2')) {
+
+    if (!currentUrl.includes('/public') && !currentUrl.startsWith('/v1') && !currentUrl.startsWith('/v2') ) {
       config.url = `${prefix}${currentUrl}`
     }
     // 可选: 如果已有 *错误* 的前缀, 可以加日志警告

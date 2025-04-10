@@ -141,6 +141,7 @@ export interface SelectComponentProps extends Omit<Partial<ISelectProps>, 'optio
     value?: string
     label?: string
     children?: string
+    filterable?: boolean
   }
   on?: {
     change?: (value: string | number | boolean | object) => void

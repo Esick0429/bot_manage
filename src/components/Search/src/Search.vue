@@ -103,6 +103,11 @@ const newSchema = computed(() => {
       }
     ])
   }
+  schema.some(item => {
+    if(item.component === 'Select'){
+      item.componentProps.filterable = true
+    }
+  })
   return schema
 })
 
