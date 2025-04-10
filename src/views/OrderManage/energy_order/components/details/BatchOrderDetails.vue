@@ -67,7 +67,10 @@ const fetchBatchOrderDetails = async () => {
   batchOrderLoading.value = true
   batchOrderDetails.value = []
   try {
-    const params = { current_page: batchOrderCurrentPage.value, page_size: batchOrderPageSize.value }
+    const params = {
+      current_page: batchOrderCurrentPage.value,
+      page_size: batchOrderPageSize.value
+    }
     // TODO: 确认 getBatchActiveDetailApi 是否适用于 Type 3 或是否有专用 API
     // Assuming getBatchActiveDetailApi can be used for type 3 for now. Adjust if needed.
     const response = await getBatchActiveDetailApi(props.orderId, params) // Pass params
@@ -109,7 +112,11 @@ const handleViewBatchOrderTransaction = (row: any) => {
 // --- 批量下单详情 (Type 3) 表格列定义 ---
 const batchOrderTableColumns = ref<TableColumn[]>([
   { type: 'index', label: '序号', width: 60, align: 'center', field: 'index' },
-  { prop: 'to_address', field: 'to_address', label: '地址', minWidth: 400,
+  {
+    prop: 'to_address',
+    field: 'to_address',
+    label: '地址',
+    minWidth: 400,
     slots: {
       default: ({ row }) => {
         return (
@@ -144,10 +151,11 @@ const batchOrderTableColumns = ref<TableColumn[]>([
     label: '激活单价',
     width: 150,
     align: 'center',
-    formatter: (row: any) => h('span', {}, row.active_price == 0 ? '-' : `${row.active_price + ' TRX'}`)
+    formatter: (row: any) =>
+      h('span', {}, row.active_price == 0 ? '-' : `${row.active_price + ' TRX'}`)
   },
   {
-    prop: 'status', 
+    prop: 'status',
     field: 'status',
     label: '交易状态',
     width: 100,

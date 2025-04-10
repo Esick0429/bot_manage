@@ -56,7 +56,6 @@ const orderTypeMap = () => {
   }
 }
 
-
 // 账户信息
 const accountName = ref('')
 const dialogVisible = ref(false)

@@ -220,7 +220,6 @@ watch(
   }
 )
 
-
 // 暴露方法
 defineExpose({
   reload: tableMethods.getList,
@@ -232,7 +231,7 @@ defineExpose({
   searchMethods,
   tableState,
   searchParams,
-  setSearchParams,
+  setSearchParams
 })
 </script>
 

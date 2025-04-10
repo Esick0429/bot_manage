@@ -53,7 +53,7 @@ const byCountDetailSchema = computed((): DescriptionsSchema[] => [
 
 const countOrderTableSchema = computed((): TableColumn[] => [
   { type: 'index', label: '序号', width: 60, align: 'center', field: 'index' },
-  { field: 'to_address', label: '地址',minWidth: 180},
+  { field: 'to_address', label: '地址', minWidth: 180 },
   {
     field: 'status',
     label: '状态',
