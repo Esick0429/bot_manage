@@ -83,6 +83,14 @@ const activationTableColumns = ref<TableColumn[]>([
   { type: 'index', label: '序号', width: 80, align: 'center', field: 'index' },
   { prop: 'to_address', field: 'to_address', label: '地址', minWidth: 280 },
   {
+    prop: 'active_price',
+    field: 'active_price',
+    label: '激活单价',
+    width: 150,
+    align: 'center',
+    formatter: (row: any) => h('span', {}, `${row.active_price + ' TRX'}`)
+  },
+  {
     prop: 'status', // Assuming API returns a status field, otherwise adjust
     field: 'status',
     label: '状态',

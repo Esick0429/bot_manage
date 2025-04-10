@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="tsx">
 import { ref, computed, watch, h, onMounted } from 'vue'
 import { ElTag, ElLink, ElButton, ElTable, ElTableColumn } from 'element-plus'
 import { Dialog } from '@/components/Dialog'
@@ -30,6 +30,14 @@ const batchOrderTotal = ref(0) // 批量下单详情 - 总条数
 const batchOrderTransactionDialogVisible = ref(false) // 批量下单交易详情弹窗
 const selectedBatchOrderTransaction = ref<any>(null) // 选中的批量下单交易
 
+const getOrderStatusText = (status: number): string => {
+  const statusMap: Record<number, string> = {
+    1: '已完成',
+    2: '已支付',
+    3: '支付失败'
+  }
+  return statusMap[status] || '未知状态'
+}
 // --- Helper Functions --- Shared or move to utils
 const getBatchStatusText = (status: number): string => {
   const statusMap: Record<number, string> = {
@@ -59,7 +67,7 @@ const fetchBatchOrderDetails = async () => {
   batchOrderLoading.value = true
   batchOrderDetails.value = []
   try {
-    const params = { page: batchOrderCurrentPage.value, pageSize: batchOrderPageSize.value }
+    const params = { current_page: batchOrderCurrentPage.value, page_size: batchOrderPageSize.value }
     // TODO: 确认 getBatchActiveDetailApi 是否适用于 Type 3 或是否有专用 API
     // Assuming getBatchActiveDetailApi can be used for type 3 for now. Adjust if needed.
     const response = await getBatchActiveDetailApi(props.orderId, params) // Pass params
@@ -101,7 +109,28 @@ const handleViewBatchOrderTransaction = (row: any) => {
 // --- 批量下单详情 (Type 3) 表格列定义 ---
 const batchOrderTableColumns = ref<TableColumn[]>([
   { type: 'index', label: '序号', width: 60, align: 'center', field: 'index' },
-  { prop: 'to_address', field: 'to_address', label: '地址', minWidth: 280 }, // Assuming field name is 'to_address'
+  { prop: 'to_address', field: 'to_address', label: '地址', minWidth: 400,
+    slots: {
+      default: ({ row }) => {
+        return (
+          <span class="flex items-center justify-between">
+            <span>{row.to_address}</span>
+            <ElTag type={getBatchStatusTagType(row.active_status)} size="small">
+              {getBatchStatusText(row.active_status)}
+            </ElTag>
+          </span>
+        )
+      }
+    }
+  }, // Assuming field name is 'to_address'
+  {
+    prop: 'energy_price',
+    field: 'energy_price',
+    label: '能量单价',
+    width: 150,
+    align: 'center',
+    formatter: (row: any) => h('span', {}, `${row.energy_price + ' TRX'}`)
+  },
   {
     prop: 'addr_energy_num',
     field: 'addr_energy_num',
@@ -110,18 +139,25 @@ const batchOrderTableColumns = ref<TableColumn[]>([
     formatter: (row) => formatEnergyNum(row.addr_energy_num)
   }, // Adjusted width
   {
-    prop: 'active_status', // Assuming field name is 'active_status'
-    field: 'active_status',
-    label: '状态',
+    prop: 'active_price',
+    field: 'active_price',
+    label: '激活单价',
+    width: 150,
+    align: 'center',
+    formatter: (row: any) => h('span', {}, row.active_price == 0 ? '-' : `${row.active_price + ' TRX'}`)
+  },
+  {
+    prop: 'status', 
+    field: 'status',
+    label: '交易状态',
     width: 100,
     align: 'center',
     slots: {
       default: ({ row }) => {
-        // Assuming status is 0 (未激活) or 1 (已激活)
-        const status = Number(row.active_status) // Ensure it's a number
+        const status = Number(row.status)
         if (isNaN(status)) return h(ElTag, { type: 'info', size: 'small' }, () => '未知')
         return h(ElTag, { type: getBatchStatusTagType(status), size: 'small' }, () =>
-          getBatchStatusText(status)
+          getOrderStatusText(status)
         )
       }
     }
@@ -148,6 +184,7 @@ const batchOrderTableColumns = ref<TableColumn[]>([
     label: '操作',
     width: 120,
     align: 'center',
+    fixed: 'right',
     slots: {
       default: ({ row }) => {
         return h(
@@ -209,12 +246,12 @@ const batchOrderTransactionSchema = computed((): DescriptionsSchema[] => [
   { field: 'from_address', label: '发起地址', span: 24 }, // Assuming row has from_address
   { field: 'to_address', label: '接收地址', span: 24 }, // Assuming row has to_address
   {
-    field: 'active_status', // Field from the main row
+    field: 'status', // Field from the main row
     label: '交易状态',
     slots: {
       default: (data: any) => {
-        const status = Number(data.active_status)
-        const text = getBatchStatusText(status)
+        const status = Number(data.status)
+        const text = getOrderStatusText(status)
         const type = getBatchStatusTagType(status)
         return h(ElTag, { type: type, size: 'small' }, () => text)
       }
@@ -277,6 +314,7 @@ watch(
       :columns="batchOrderTableColumns"
       :data="batchOrderDetails"
       :loading="batchOrderLoading"
+      :scrollbar-always-on="true"
       border
       stripe
       style="margin-top: 15px"
