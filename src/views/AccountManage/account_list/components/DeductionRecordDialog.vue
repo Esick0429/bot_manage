@@ -42,6 +42,21 @@ const props = defineProps({
   }
 })
 
+const orderTypeMap = () => {
+  return {
+    1: '充值',
+    2: '托管',
+    3: '兑换',
+    4: '按笔数',
+    5: '按时间',
+    6: '批量下单',
+    7: '闪租',
+    8: '激活',
+    9: '机器人续费'
+  }
+}
+
+
 // 账户信息
 const accountName = ref('')
 const dialogVisible = ref(false)
@@ -54,25 +69,14 @@ const columns: TableColumn[] = [
     label: '交易ID',
     minWidth: 120
   },
-  // {
-  //   field: 'order_type',
-  //   label: '交易类型',
-  //   minWidth: 120,
-  //   formatter: (row) => {
-  //     switch (row.order_type) {
-  //       case 1:
-  //         return '能量租赁'
-  //       case 2:
-  //         return '闪兑'
-  //       case 3:
-  //         return '智能托管'
-  //       case 4:
-  //         return '续费机器人'
-  //       default:
-  //         return '-'
-  //     }
-  //   }
-  // },
+  {
+    field: 'order_type',
+    label: '交易类型',
+    minWidth: 120,
+    formatter: (row) => {
+      return orderTypeMap()[row.order_type]
+    }
+  },
   {
     field: 'bot_name',
     label: '所属机器人',
@@ -143,21 +147,21 @@ const columns: TableColumn[] = [
 
 // 搜索表单配置，添加订单号查询
 const searchSchema = [
-  // {
-  //   field: 'order_type',
-  //   component: 'Select' as const,
-  //   label: '交易类型',
-  //   componentProps: {
-  //     options: [
-  //       { label: '全部', value: '' },
-  //       { label: '续费机器人', value: 4 },
-  //       { label: '智能托管', value: 3 },
-  //       { label: '闪兑', value: 2 },
-  //       { label: '能量租赁', value: 1 }
-  //     ],
-  //     placeholder: '请选择交易类型'
-  //   }
-  // },
+  {
+    field: 'order_type',
+    component: 'Select' as const,
+    label: '交易类型',
+    componentProps: {
+      options: [
+        { label: '全部', value: '' },
+        ...Object.entries(orderTypeMap()).map(([key, value]) => ({
+          label: value,
+          value: key
+        }))
+      ],
+      placeholder: '请选择交易类型'
+    }
+  },
   {
     field: 'id',
     component: 'Input' as const,
