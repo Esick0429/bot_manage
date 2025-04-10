@@ -88,7 +88,6 @@ interface SearchTableInstance {
   tableState: any
   searchParams: any
   setSearchParams: (params: any) => any
-  hasError: boolean
 }
 
 const searchTableRef = ref<SearchTableInstance | null>(null)

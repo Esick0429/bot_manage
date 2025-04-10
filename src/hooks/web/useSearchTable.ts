@@ -27,7 +27,6 @@ interface UseSearchTableConfig {
 export const useSearchTable = (config: UseSearchTableConfig) => {
   const searchParams = ref<Recordable>(config.defaultParams || {})
   const currentRow = ref<Recordable | null>(null)
-  const hasError = ref(false)
 
   const adaptRequestParams = (params: Recordable): Recordable => {
     const adaptedParams = { ...params }
@@ -51,14 +50,12 @@ export const useSearchTable = (config: UseSearchTableConfig) => {
   const { tableRegister, tableMethods, tableState } = useTable({
     immediate: false,
     fetchDataApi: async () => {
-      hasError.value = false
       try {
         const apiParams = buildApiParams()
         const result = await config.fetchDataApi(apiParams)
         return adaptResponseData(result)
       } catch (error) {
         console.error('Data fetch failed:', error)
-        hasError.value = true
         return { list: [], total: 0 }
       }
     },
@@ -190,7 +187,6 @@ export const useSearchTable = (config: UseSearchTableConfig) => {
     handleDelete,
     searchParams,
     setSearchParams,
-    hasError,
     loading,
     dataList,
     total,

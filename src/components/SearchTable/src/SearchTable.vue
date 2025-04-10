@@ -24,22 +24,6 @@
       </slot>
     </div>
 
-    <!-- 错误提示 -->
-    <el-alert
-      v-if="hasError"
-      title="加载数据失败"
-      type="error"
-      show-icon
-      closable
-      @close="hasError = false"
-      class="mb-10px"
-    >
-      <template #default>
-        <span>请检查网络连接或稍后再试</span>
-        <el-button type="primary" link @click="reload" class="ml-10px">重试</el-button>
-      </template>
-    </el-alert>
-
     <!-- 表格 -->
     <Table
       :pageSize="unref(tableState.pageSize)"
@@ -165,7 +149,6 @@ const {
   handleDelete,
   searchParams,
   setSearchParams,
-  hasError,
   loading,
   dataList,
   total
@@ -213,7 +196,6 @@ const doDelete = async (row: Recordable) => {
 
 // 重新加载
 const reload = async () => {
-  hasError.value = false
   await tableMethods.getList()
 }
 
@@ -232,21 +214,12 @@ watch(
       emit('loaded', {
         data: dataList,
         total: total,
-        success: !hasError.value
+        success: true
       })
     }
   }
 )
 
-// 监听错误状态
-watch(
-  () => hasError.value,
-  (val) => {
-    if (val) {
-      emit('error')
-    }
-  }
-)
 
 // 暴露方法
 defineExpose({
@@ -260,7 +233,6 @@ defineExpose({
   tableState,
   searchParams,
   setSearchParams,
-  hasError
 })
 </script>
 

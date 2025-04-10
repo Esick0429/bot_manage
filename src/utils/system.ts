@@ -1,5 +1,5 @@
 // 读取环境变量 (构建时确定)
-const systemTypeFromEnv = import.meta.env.VITE_SYSTEM_TYPE
+const systemTypeFromEnv = import.meta.env.VITE_SYSTEM_TYPE || 'Management'
 
 /**
  * 检查当前系统是否为管理系统
