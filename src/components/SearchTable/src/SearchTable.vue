@@ -30,6 +30,7 @@
       :currentPage="unref(tableState.currentPage)"
       @update:pageSize="handlePageSizeChange"
       @update:currentPage="handlePageChange"
+      :show-overflow-tooltip="true"
       :data="dataList"
       :loading="loading"
       :pagination="{
