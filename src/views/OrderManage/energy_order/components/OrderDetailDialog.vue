@@ -204,7 +204,7 @@ const orderDetailSchema = computed((): DescriptionsSchema[] => {
       field: 'pay_type',
       label: '支付类型',
       slots: {
-        default: (data: any) => h('span', {}, '余额支付')
+        default: (data: any) => h('span', {}, data.pay_type == 2 ? '波场钱包转账' : '余额支付')
       }
     },
     {
