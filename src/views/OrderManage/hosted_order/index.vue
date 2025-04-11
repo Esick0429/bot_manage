@@ -125,7 +125,7 @@ const hostedDetailSchema = computed(() => {
       slots: {
         default: (row: any) => {
           // if (!row || !row.payType) return h('span', '-')
-          return h('span', '余额支付')
+          return h('span', row.pay_type == 2 ? '波场钱包转账' : '余额支付')
         }
       }
     },
