@@ -44,7 +44,6 @@ const props = defineProps({
 
 const orderTypeMap = () => {
   return {
-    1: '充值',
     2: '托管',
     3: '兑换',
     4: '按笔数',
