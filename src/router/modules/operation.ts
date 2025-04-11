@@ -124,11 +124,28 @@ if (import.meta.env.VITE_SYSTEM_TYPE === 'Operation') {
       },
       children: [
         {
+          path: 'agent_list',
+          component: () => import('@/operationView/Agent/AgentList.vue'),
+          name: 'AgentList',
+          meta: {
+            title: '代理信息'
+          }
+        },
+        {
           path: 'ledger',
           component: () => import('@/operationView/Agent/Ledger.vue'),
           name: 'AgentLedger',
           meta: {
             title: '代理账本'
+          }
+        },
+        {
+          path: 'bot_list',
+          component: () => import('@/operationView/Agent/BotList.vue'),
+          name: 'AgentBotList',
+          meta: {
+            title: '机器人列表',
+            icon: 'vi-mdi:robot'
           }
         }
       ]
