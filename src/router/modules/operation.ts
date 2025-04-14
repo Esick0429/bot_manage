@@ -57,12 +57,11 @@ if (import.meta.env.VITE_SYSTEM_TYPE === 'Operation') {
       },
       children: [
         {
-          path: 'energy-transaction',
+          path: 'energy_transaction',
           component: () => import('@/operationView/OperationCenter/EnergyTransaction/index.vue'),
           name: 'EnergyTransactionList',
           meta: {
-            title: '能量交易订单',
-            icon: 'vi-mdi:flash'
+            title: '能量交易订单'
           }
         },
         {
@@ -70,8 +69,7 @@ if (import.meta.env.VITE_SYSTEM_TYPE === 'Operation') {
           component: () => import('@/operationView/OperationCenter/ExchangeTransaction/index.vue'),
           name: 'FlashExchange',
           meta: {
-            title: '闪兑明细',
-            icon: 'vi-mdi:flash'
+            title: '闪兑明细'
           }
         },
         {
@@ -79,8 +77,7 @@ if (import.meta.env.VITE_SYSTEM_TYPE === 'Operation') {
           component: () => import('@/operationView/OperationCenter/TrustTransaction/index.vue'),
           name: 'CustodyDetails',
           meta: {
-            title: '托管明细',
-            icon: 'vi-mdi:server'
+            title: '托管明细'
           }
         }
       ]
@@ -144,8 +141,7 @@ if (import.meta.env.VITE_SYSTEM_TYPE === 'Operation') {
           component: () => import('@/operationView/Agent/BotList.vue'),
           name: 'AgentBotList',
           meta: {
-            title: '机器人列表',
-            icon: 'vi-mdi:robot'
+            title: '机器人列表'
           }
         }
       ]
@@ -165,8 +161,7 @@ if (import.meta.env.VITE_SYSTEM_TYPE === 'Operation') {
           component: () => import('@/operationView/SystemConfig/ResourcePool.vue'),
           name: 'ResourcePool',
           meta: {
-            title: '资源池账户',
-            icon: 'vi-mdi:database'
+            title: '资源池账户'
           }
         }
       ]

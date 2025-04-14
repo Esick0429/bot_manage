@@ -22,8 +22,7 @@ const managementRoutes: AppRouteRecordRaw[] = [
         component: () => import('@/views/Bot_manage/bot_list/index.vue'),
         name: 'BotList',
         meta: {
-          title: '机器人列表',
-          icon: 'vi-bx:bxs-component'
+          title: '机器人列表'
         }
       },
       {
@@ -31,8 +30,7 @@ const managementRoutes: AppRouteRecordRaw[] = [
         component: () => import('@/views/Bot_manage/menu_list/index.vue'),
         name: 'MenuList',
         meta: {
-          title: '菜单列表',
-          icon: 'vi-bx:bx-menu'
+          title: '菜单列表'
         }
       }
       // {
@@ -40,8 +38,7 @@ const managementRoutes: AppRouteRecordRaw[] = [
       //   component: () => import('@/views/Bot_manage/reply_list/index.vue'),
       //   name: 'ReplyList',
       //   meta: {
-      //     title: '关键词回复',
-      //     icon: 'vi-bx:bx-message-square-dots'
+      //     title: '关键词回复'
       //   }
       // }
     ]
@@ -61,8 +58,7 @@ const managementRoutes: AppRouteRecordRaw[] = [
         component: () => import('@/views/UserGroup/user_list/index.vue'),
         name: 'UserList',
         meta: {
-          title: '用户列表',
-          icon: 'vi-ph:user-list-fill'
+          title: '用户列表'
         }
       }
     ]
@@ -82,8 +78,7 @@ const managementRoutes: AppRouteRecordRaw[] = [
         component: () => import('@/views/OrderManage/recharge_order/index.vue'),
         name: 'RechargeOrder',
         meta: {
-          title: '充值订单',
-          icon: 'vi-mdi:credit-card-plus-outline'
+          title: '充值订单'
         }
       },
       {
@@ -91,8 +86,7 @@ const managementRoutes: AppRouteRecordRaw[] = [
         component: () => import('@/views/OrderManage/energy_order/index.vue'),
         name: 'EnergyOrder',
         meta: {
-          title: '能量订单',
-          icon: 'vi-mdi:lightning-bolt'
+          title: '能量订单'
         }
       },
       {
@@ -100,8 +94,7 @@ const managementRoutes: AppRouteRecordRaw[] = [
         component: () => import('@/views/OrderManage/hosted_order/index.vue'),
         name: 'HostedOrder',
         meta: {
-          title: '托管订单',
-          icon: 'vi-mdi:server'
+          title: '托管订单'
         }
       },
       {
@@ -109,8 +102,7 @@ const managementRoutes: AppRouteRecordRaw[] = [
         component: () => import('@/views/OrderManage/exchange_order/index.vue'),
         name: 'ExchangeOrder',
         meta: {
-          title: '兑换订单',
-          icon: 'vi-mdi:swap-horizontal'
+          title: '兑换订单'
         }
       }
     ]
@@ -130,8 +122,7 @@ const managementRoutes: AppRouteRecordRaw[] = [
         component: () => import('@/views/DataStatistics/bot_summary/index.vue'),
         name: 'BotSummary',
         meta: {
-          title: '机器人汇总',
-          icon: 'vi-mdi:robot-industrial'
+          title: '机器人汇总'
         }
       }
     ]
@@ -151,8 +142,7 @@ const managementRoutes: AppRouteRecordRaw[] = [
         component: () => import('@/views/AccountManage/account_list/index.vue'),
         name: 'AccountList',
         meta: {
-          title: '账户信息',
-          icon: 'vi-mdi:format-list-bulleted'
+          title: '账户信息'
         }
       }
     ]
