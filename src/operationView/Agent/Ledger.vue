@@ -12,10 +12,10 @@
       >
         <!-- 自定义搜索按钮区域 -->
         <template #searchButtons>
-          <ElButton type="primary" @click="handleExport">
+          <BaseButton type="primary" @click="handleExport" disabled>
             <Icon icon="ep:download" class="mr-5px" />
             导出
-          </ElButton>
+          </BaseButton>
         </template>
       </SearchTable>
     </ContentWrap>
@@ -24,7 +24,8 @@
 
 <script setup lang="tsx">
 import { ref, reactive, onMounted } from 'vue'
-import { ElButton, ElTag, ElMessage } from 'element-plus'
+import { ElTag, ElMessage, ElLink } from 'element-plus'
+import { BaseButton } from '@/components/Button'
 import { Icon } from '@/components/Icon'
 import { SearchTable, useSearchTable } from '@/components/SearchTable'
 import { FormSchema } from '@/components/Form'
@@ -37,8 +38,11 @@ import {
   AgentLedgerItem
 } from '@/api/agent/ledger'
 import { ContentWrap } from '@/components/ContentWrap'
+import { isEmpty } from 'lodash-es'
+import { useRouter } from 'vue-router'
 // 引用SearchTable实例
 const searchTableRef = ref()
+const router = useRouter()
 
 // 定义API函数调用
 const getAgentLedgerList = async (params?: any): Promise<{ list: any[]; total?: number }> => {
@@ -76,7 +80,7 @@ const searchSchema = ref<FormSchema[]>([
     component: 'Input',
     label: '关键字',
     componentProps: {
-      placeholder: '请输入关键字'
+      placeholder: '请输入代理信息/关联订单ID'
     }
   },
   {
@@ -99,8 +103,47 @@ const searchSchema = ref<FormSchema[]>([
 // 表格列配置
 const columns = ref<TableColumn[]>([
   {
-    field: 'id',
-    label: '扣款ID'
+    field: 'order_num',
+    label: '关联订单ID',
+    minWidth: 120,
+    formatter: (row) => (isEmpty(row.order_num) ? '-' : row.order_num),
+    slots: {
+      default: ({ row }: any) => {
+        let href = '/operation'
+        switch (row.order_type) {
+          case 4:
+          case 5:
+          case 6:
+          case 7:
+          case 8:
+          case 9:
+            href = `${href}/energy_transaction`
+
+            break
+          case 3:
+            href = `${href}/flash_exchange`
+            break
+          case 2:
+            href = `${href}/custody_details`
+            break
+          case 1:
+            href = `${href}/recharge_order`
+            break
+          default:
+            href = ''
+        }
+        return (
+          <>
+            <ElLink
+              type="primary"
+              onClick={() => router.push({ path: href, query: { order_num: row.order_num } })}
+            >
+              {row.order_num}
+            </ElLink>
+          </>
+        )
+      }
+    }
   },
   // {
   //   field: 'user_id',
@@ -166,10 +209,6 @@ const columns = ref<TableColumn[]>([
       }
       return <ElTag type={type}>{statusMap[row.status]}</ElTag>
     }
-  },
-  {
-    field: 'order_num',
-    label: '关联订单ID'
   },
   {
     field: 'create_time',
