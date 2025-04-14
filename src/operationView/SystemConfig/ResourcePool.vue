@@ -82,9 +82,12 @@ const columns = ref<TableColumn[]>([
     minWidth: '180px'
   },
   {
-    field: 'private_key',
-    label: '私钥',
-    minWidth: '180px'
+    field: '',
+    label: '可用数量/阈值',
+    minWidth: '180px',
+    formatter: (row) => {
+      return `${row.amount == 0 ? '-' : row.amount} / ${row.amount_limit == 0 ? '-' : row.amount_limit}`
+    }
   },
   {
     field: 'create_by',
@@ -209,9 +212,11 @@ const reloadTable = () => {
 const handleToggleStatus = async (row) => {
   const targetStatus = row.status === 1 ? 2 : 1
   const actionText = row.status === 1 ? '禁用' : '启用'
-
+  let msg = `确认要${actionText}该账户吗？`
+  row.resource_type === 3 && (msg = `确认要${actionText}该账户为主账户吗？`)
   try {
-    await ElMessageBox.confirm(`确认要${actionText}该账户吗？`, '提示', {
+    
+    await ElMessageBox.confirm(msg, '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning'

@@ -80,6 +80,17 @@ const formSchema = reactive<FormSchema[]>([
       rules: [required()]
     }
   },
+  // 授权公钥
+  {
+    field: 'authPublicKey',
+    component: 'Input',
+    label: '授权公钥：',
+    componentProps: {
+      placeholder: '请输入授权公钥',
+      maxlength: 200
+    }
+  },
+  // 私钥
   {
     field: 'privateKey',
     component: 'Input',
@@ -88,16 +99,27 @@ const formSchema = reactive<FormSchema[]>([
       placeholder: '请输入私钥',
       maxlength: 200,
       type: 'password',
-      showPassword: true
+      showPassword: true    
     },
     formItemProps: {
       rules: [required()]
     }
   },
+  // 阈值
+  {
+    field: 'amount_limit',
+    component: 'InputNumber',
+    label: '阈值：',
+    componentProps: {
+      placeholder: '请输入阈值',
+      precision: 2,
+      remark: '说明：当达到阈值时，自动切换至最高优先级备用地址'
+    }
+  },
   {
     field: 'status',
-    component: 'RadioGroup',
     label: '状态：',
+    component: 'RadioGroup',
     componentProps: {
       options: [
         { label: '启用', value: 1 },
