@@ -228,6 +228,7 @@ defineExpose({
   search: handleSearch,
   delete: doDelete,
   currentRow,
+  getElTableExpose: tableMethods.getElTableExpose,
   tableMethods,
   searchMethods,
   tableState,
