@@ -27,10 +27,10 @@ type ApiResponse = Promise<{
   message?: string
 }>
 
-// 假设我们有一个成本价API
-const getCostPricesApi = () => {
-  return fetch('/bot/cost-prices').then((res) => res.json())
-}
+// 移除假设的成本价API调用
+// const getCostPricesApi = () => {
+//   return fetch('/bot/cost-prices').then((res) => res.json())
+// }
 
 export function useBotConfig() {
   // 共享状态
@@ -42,32 +42,8 @@ export function useBotConfig() {
   const loading = ref(false)
   const submitting = ref(false)
 
-  // 成本价配置
-  const costPrices = reactive({
-    timeEnergy1Hour: 1.0, // 默认成本价
-    timeEnergy1Day: 3.0,
-    timeEnergy3Days: 8.0,
-    timeEnergy7Days: 15.0,
-    timeEnergy15Days: 28.0
-  })
-
-  // 加载成本价格
-  const loadCostPrices = async () => {
-    try {
-      const response = await getCostPricesApi()
-      const data = response.data || {}
-
-      // 更新成本价配置
-      Object.keys(data).forEach((key) => {
-        if (costPrices[key] !== undefined) {
-          costPrices[key] = data[key]
-        }
-      })
-    } catch (error) {
-      console.error('加载成本价配置失败:', error)
-      ElMessage.warning('成本价配置加载失败，将使用默认值')
-    }
-  }
+  // 添加新的 agentPrices 状态来存储从 API 获取的成本价
+  const agentPrices = reactive<Record<string, any>>({})
 
   // TG状态同步
   const syncTgStatus = async () => {
@@ -163,16 +139,25 @@ export function useBotConfig() {
         // 时间能量加载策略
         timeEnergy: async () => {
           try {
-            // 获取运营后台配置的成本价
+            // 移除旧的成本价加载调用
             // await loadCostPrices()
 
             const timeEnergyConfigRes = await getBotTimeEnergyConfigApi(id)
             const timeEnergyConfig = timeEnergyConfigRes.data || {}
+            const fetchedAgentPrices = timeEnergyConfig.agent_price || {} // 获取 agent_price
+
+            // 更新 agentPrices 状态
+            Object.keys(fetchedAgentPrices).forEach((key) => {
+              agentPrices[key] = fetchedAgentPrices[key]
+            })
+            console.log('agentPrices', agentPrices)
+            // 如果需要，可以保留默认值或进行错误处理
+            // console.log('Fetched Agent Prices:', agentPrices)
 
             formMethods.timeEnergy.setValues({
               flash_price: timeEnergyConfig.flash_price,
               flash_time_max_num: timeEnergyConfig.flash_time_max_num,
-              // hour_1_price: timeEnergyConfig.hour_1_price ,
+              // hour_1_price: timeEnergyConfig.hour_1_price , // 注意：这个字段在提供的 agent_price 中不存在
               day_1_price: timeEnergyConfig.day_1_price,
               day_3_price: timeEnergyConfig.day_3_price,
               day_7_price: timeEnergyConfig.day_7_price,
@@ -505,7 +490,7 @@ export function useBotConfig() {
     syncing,
     loading,
     submitting,
-    costPrices,
+    agentPrices,
     syncTgStatus,
     loadBotAllConfigs,
     submitConfig

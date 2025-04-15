@@ -16,7 +16,7 @@
         </ElTabPane>
 
         <ElTabPane label="时间能量价格" name="timeEnergy">
-          <TimeEnergyTab ref="timeEnergyTabRef" :cost-prices="costPrices" />
+          <TimeEnergyTab ref="timeEnergyTabRef" :agent-prices="agentPrices" />
         </ElTabPane>
 
         <ElTabPane label="笔数能量价格" name="countEnergy">
@@ -79,7 +79,7 @@ const {
   syncing,
   loading,
   submitting,
-  costPrices,
+  agentPrices,
   syncTgStatus,
   loadBotAllConfigs,
   submitConfig
@@ -202,18 +202,6 @@ const submit = async () => {
   if (!valid) {
     ElMessage.warning('表单验证失败，请检查填写内容')
     return
-  }
-
-  // 如果是时间能量配置，进行额外验证
-  if (activeTab.value === 'timeEnergy') {
-    const { validateTimeEnergyPrices } = useFormValidation(costPrices)
-    const timeEnergyData = await timeEnergyTabRef.value?.formMethods.getFormData()
-    const validationResult = validateTimeEnergyPrices(timeEnergyData)
-
-    if (!validationResult.valid) {
-      ElMessage.error(validationResult.message)
-      return
-    }
   }
 
   // 构建表单方法对象，只包含当前激活的表单

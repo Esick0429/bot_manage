@@ -16,21 +16,15 @@ import { useForm } from '@/hooks/web/useForm'
 import { useFormValidation } from '../composables/useFormValidation'
 
 const props = defineProps({
-  costPrices: {
+  agentPrices: {
     type: Object,
-    default: () => ({
-      timeEnergy1Hour: 1.0,
-      timeEnergy1Day: 3.0,
-      timeEnergy3Days: 8.0,
-      timeEnergy7Days: 15.0,
-      timeEnergy15Days: 28.0
-    })
+    default: () => ({})
   }
 })
 
 // 表单相关
 const { formRegister, formMethods } = useForm()
-const { required, validateMinPrice } = useFormValidation(props.costPrices)
+const { required, validateMinPrice } = useFormValidation(props.agentPrices)
 
 // 时间能量价格表单
 const timeEnergySchema = reactive<FormSchema[]>([
@@ -104,7 +98,7 @@ const timeEnergySchema = reactive<FormSchema[]>([
     },
     formItemProps: {
       rules: [
-        { required: true, message: '1天价格是必填项' },
+        required('1天价格'),
         { validator: validateMinPrice, trigger: 'blur' }
       ]
     }
@@ -120,7 +114,7 @@ const timeEnergySchema = reactive<FormSchema[]>([
     },
     formItemProps: {
       rules: [
-        { required: true, message: '3天价格是必填项' },
+        required('3天价格'),
         { validator: validateMinPrice, trigger: 'blur' }
       ]
     }
@@ -136,7 +130,7 @@ const timeEnergySchema = reactive<FormSchema[]>([
     },
     formItemProps: {
       rules: [
-        { required: true, message: '7天价格是必填项' },
+        required('7天价格'),
         { validator: validateMinPrice, trigger: 'blur' }
       ]
     }
@@ -152,7 +146,7 @@ const timeEnergySchema = reactive<FormSchema[]>([
     },
     formItemProps: {
       rules: [
-        { required: true, message: '15天价格是必填项' },
+        required('15天价格'),
         { validator: validateMinPrice, trigger: 'blur' }
       ]
     }
