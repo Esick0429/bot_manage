@@ -11,9 +11,20 @@
 </template>
 
 <script setup lang="tsx">
-import { reactive, defineExpose } from 'vue'
+import { reactive, defineExpose, defineProps, computed } from 'vue'
 import { Form, FormSchema } from '@/components/Form'
 import { useForm } from '@/hooks/web/useForm'
+
+// 定义 props 来接收 agentPrices
+const props = defineProps({
+  agentPrices: {
+    type: Object,
+    default: () => ({})
+  }
+})
+
+// 使用 computed 来安全地访问嵌套属性
+const computedAgentPrices = computed(() => props.agentPrices || {})
 
 // 表单相关
 const { formRegister, formMethods } = useForm()
@@ -25,8 +36,7 @@ const countEnergySchema = reactive<FormSchema[]>([
     component: 'Tag' as const,
     label: '笔数能量：',
     value: (formData) => {
-      console.log('表单数据:', formData)
-
+      console.log('Form Data from useForm:', formData)
       return formData.count_pay_type === 1 ? '账号代扣' : '购买笔数'
     }
   },
@@ -42,10 +52,11 @@ const countEnergySchema = reactive<FormSchema[]>([
       min: 0,
       precision: 0,
       remark: () => {
+        const costKey = 'count_price'
+        const costPrice = computedAgentPrices.value[costKey]
         return (
           <>
-            <p>使用6.5W能量成本为：2.55TRX/笔</p>
-            <p>使用13.1W能量成本为：5.1TRX/笔</p>
+            <p>成本价: {costPrice !== undefined ? `${costPrice} TRX` : 'N/A'}</p>
           </>
         )
       }

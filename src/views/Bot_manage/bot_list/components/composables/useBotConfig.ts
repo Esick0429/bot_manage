@@ -85,6 +85,30 @@ export function useBotConfig() {
     loading.value = true
 
     try {
+      // --- 新增：提前获取成本价 ---
+      try {
+        const timeEnergyConfigRes = await getBotTimeEnergyConfigApi(id)
+        const fetchedAgentPrices = timeEnergyConfigRes.data?.agent_price || {} // 获取 agent_price
+        // 清空旧的 agentPrices，确保每次加载都是最新的
+        for (const key in agentPrices) {
+          delete agentPrices[key]
+        }
+        // 更新 agentPrices 状态
+        Object.keys(fetchedAgentPrices).forEach((key) => {
+          agentPrices[key] = fetchedAgentPrices[key]
+        })
+        console.log('Fetched agentPrices initially:', agentPrices)
+      } catch (error) {
+        console.error('加载成本价配置失败:', error)
+        // 这里可以选择是否提示用户，或者静默失败
+        // ElMessage.error('加载成本价配置失败')
+         // 即使成本价加载失败，也清空旧数据
+        for (const key in agentPrices) {
+          delete agentPrices[key]
+        }
+      }
+      // --- 结束新增 ---
+
       // 策略模式：定义加载各种表单类型的策略
       const loadStrategies = {
         // 基本信息加载策略
@@ -139,25 +163,22 @@ export function useBotConfig() {
         // 时间能量加载策略
         timeEnergy: async () => {
           try {
-            // 移除旧的成本价加载调用
-            // await loadCostPrices()
-
+            // 这里仍然需要获取时间能量配置以设置表单
             const timeEnergyConfigRes = await getBotTimeEnergyConfigApi(id)
             const timeEnergyConfig = timeEnergyConfigRes.data || {}
-            const fetchedAgentPrices = timeEnergyConfig.agent_price || {} // 获取 agent_price
 
-            // 更新 agentPrices 状态
-            Object.keys(fetchedAgentPrices).forEach((key) => {
-              agentPrices[key] = fetchedAgentPrices[key]
-            })
-            console.log('agentPrices', agentPrices)
-            // 如果需要，可以保留默认值或进行错误处理
-            // console.log('Fetched Agent Prices:', agentPrices)
+            // --- 移除：不再在此处获取和填充 agentPrices ---
+            // const fetchedAgentPrices = timeEnergyConfig.agent_price || {}
+            // Object.keys(fetchedAgentPrices).forEach((key) => {
+            //   agentPrices[key] = fetchedAgentPrices[key]
+            // })
+            // console.log('agentPrices in timeEnergy strategy:', agentPrices)
+            // --- 结束移除 ---
 
+            // 设置表单值 (保留)
             formMethods.timeEnergy.setValues({
               flash_price: timeEnergyConfig.flash_price,
               flash_time_max_num: timeEnergyConfig.flash_time_max_num,
-              // hour_1_price: timeEnergyConfig.hour_1_price , // 注意：这个字段在提供的 agent_price 中不存在
               day_1_price: timeEnergyConfig.day_1_price,
               day_3_price: timeEnergyConfig.day_3_price,
               day_7_price: timeEnergyConfig.day_7_price,

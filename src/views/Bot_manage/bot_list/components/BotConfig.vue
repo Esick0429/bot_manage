@@ -20,19 +20,19 @@
         </ElTabPane>
 
         <ElTabPane label="笔数能量价格" name="countEnergy">
-          <CountEnergyTab ref="countEnergyTabRef" />
+          <CountEnergyTab ref="countEnergyTabRef" :agent-prices="agentPrices" />
         </ElTabPane>
 
         <ElTabPane label="托管模式价格" name="managedMode">
-          <ManagedModeTab ref="managedModeTabRef" />
+          <ManagedModeTab ref="managedModeTabRef" :agent-prices="agentPrices" />
         </ElTabPane>
 
         <ElTabPane label="批量下单价格" name="batchOrder">
-          <BatchOrderTab ref="batchOrderTabRef" />
+          <BatchOrderTab ref="batchOrderTabRef" :agent-prices="agentPrices" />
         </ElTabPane>
 
         <ElTabPane label="闪兑配置" name="flashExchange">
-          <FlashExchangeTab ref="flashExchangeTabRef" />
+          <FlashExchangeTab ref="flashExchangeTabRef" :agent-prices="agentPrices" />
         </ElTabPane>
       </ElTabs>
     </div>

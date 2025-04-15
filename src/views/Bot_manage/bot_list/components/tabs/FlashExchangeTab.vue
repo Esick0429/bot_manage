@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="tsx">
-import { reactive, defineExpose, ref, watchEffect, onMounted } from 'vue'
+import { reactive, defineExpose, ref, watchEffect, onMounted, defineProps, computed } from 'vue'
 import { Form, FormSchema, FormSetProps } from '@/components/Form'
 import { useForm } from '@/hooks/web/useForm'
 import { ElInputNumber, ElCheckbox } from 'element-plus'
@@ -92,7 +92,7 @@ const flashExchangeSchema = reactive<FormSchema[]>([
       remark: () => {
         return (
           <>
-            <p>成本：8 USDT</p>
+            {/* <p>成本：8 USDT</p> */}
           </>
         )
       }
@@ -117,7 +117,6 @@ const flashExchangeSchema = reactive<FormSchema[]>([
   {
     field: 'stock_notice_trx_amount',
     component: 'InputNumber' as const,
-    label: '库存告警值',
     componentProps: {
       placeholder: '请输入库存告警值',
       min: 0,
@@ -132,13 +131,11 @@ const flashExchangeSchema = reactive<FormSchema[]>([
                 modelValue={isAlertEnabled.value}
                 onUpdate:modelValue={(val: boolean) => {
                   isAlertEnabled.value = val
-                  // 如果禁用，清空值
                   if (!val) {
                     formMethods.setValues({
                       stock_notice_trx_amount: undefined
                     })
                   }
-                  // 记录状态
                   formMethods.setValues({
                     stock_notice: val
                   })
@@ -159,4 +156,15 @@ const flashExchangeSchema = reactive<FormSchema[]>([
 defineExpose({
   formMethods
 })
+
+// 定义 props 来接收 agentPrices
+const props = defineProps({
+  agentPrices: {
+    type: Object,
+    default: () => ({})
+  }
+})
+
+// 使用 computed 来安全地访问嵌套属性
+const computedAgentPrices = computed(() => props.agentPrices || {})
 </script>

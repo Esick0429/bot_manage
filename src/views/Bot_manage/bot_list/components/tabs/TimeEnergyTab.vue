@@ -9,11 +9,10 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { reactive, defineExpose, defineProps } from 'vue'
+<script setup lang="tsx">
+import { reactive, defineExpose, defineProps, computed } from 'vue'
 import { Form, FormSchema } from '@/components/Form'
 import { useForm } from '@/hooks/web/useForm'
-import { useFormValidation } from '../composables/useFormValidation'
 
 const props = defineProps({
   agentPrices: {
@@ -22,11 +21,10 @@ const props = defineProps({
   }
 })
 
-// 表单相关
-const { formRegister, formMethods } = useForm()
-const { required, validateMinPrice } = useFormValidation(props.agentPrices)
+const computedAgentPrices = computed(() => props.agentPrices || {})
 
-// 时间能量价格表单
+const { formRegister, formMethods } = useForm()
+
 const timeEnergySchema = reactive<FormSchema[]>([
   {
     field: 'flash_price',
@@ -36,9 +34,14 @@ const timeEnergySchema = reactive<FormSchema[]>([
       tips: '最多支持保留一位小数，注意：此为1笔65000能量价格，不要设置0.1结尾的价格，避免和笔数价格冲突'
     },
     componentProps: {
-      placeholder: '请输入价格',
+      placeholder: '请输入时间能量价格',
       min: 0,
-      precision: 1
+      precision: 1,
+      remark: () => {
+        const costKey = 'flash_rent_price'
+        const costPrice = computedAgentPrices.value[costKey]
+        return costPrice !== undefined ? `成本价: ${costPrice} TRX` : '成本价: N/A'
+      }
     },
     formItemProps: {
       rules: [{ required: true, message: '时间能量价格是必填项' }]
@@ -64,96 +67,79 @@ const timeEnergySchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'priceConfig',
-    component: 'Divider' as const,
-    label: '按时间购买能量价格（1笔6.5W能量）：',
-    componentProps: {
-      contentPosition: 'left'
-    }
-  },
-  // {
-  //   field: 'hour_1_price',
-  //   component: 'InputNumber' as const,
-  //   label: '1小时价格：',
-  //   componentProps: {
-  //     placeholder: '请输入1小时价格',
-  //     min: 0,
-  //     precision: 1
-  //   },
-  //   formItemProps: {
-  //     rules: [
-  //       { required: true, message: '1小时价格是必填项' },
-  //       { validator: validateMinPrice, trigger: 'blur' }
-  //     ]
-  //   }
-  // },
-  {
     field: 'day_1_price',
     component: 'InputNumber' as const,
-    label: '1天价格：',
+    label: '1天租赁价格',
     componentProps: {
-      placeholder: '请输入1天价格',
+      placeholder: '请输入1天租赁价格',
       min: 0,
-      precision: 1
+      precision: 1,
+      remark: () => {
+        const costKey = 'day_1_price'
+        const costPrice = computedAgentPrices.value[costKey]
+        return costPrice !== undefined ? `成本价: ${costPrice} TRX` : '成本价: N/A'
+      }
     },
     formItemProps: {
-      rules: [
-        required('1天价格'),
-        { validator: validateMinPrice, trigger: 'blur' }
-      ]
+      rules: [{ required: true, message: '1天租赁价格不能为空' }]
     }
   },
   {
     field: 'day_3_price',
     component: 'InputNumber' as const,
-    label: '3天价格：',
+    label: '3天租赁价格',
     componentProps: {
-      placeholder: '请输入3天价格',
+      placeholder: '请输入3天租赁价格',
       min: 0,
-      precision: 1
+      precision: 1,
+      remark: () => {
+        const costKey = 'day_3_price'
+        const costPrice = computedAgentPrices.value[costKey]
+        return costPrice !== undefined ? `成本价: ${costPrice} TRX` : '成本价: N/A'
+      }
     },
     formItemProps: {
-      rules: [
-        required('3天价格'),
-        { validator: validateMinPrice, trigger: 'blur' }
-      ]
+      rules: [{ required: true, message: '3天租赁价格不能为空' }]
     }
   },
   {
     field: 'day_7_price',
     component: 'InputNumber' as const,
-    label: '7天价格：',
+    label: '7天租赁价格',
     componentProps: {
-      placeholder: '请输入7天价格',
+      placeholder: '请输入7天租赁价格',
       min: 0,
-      precision: 1
+      precision: 1,
+      remark: () => {
+        const costKey = 'day_7_price'
+        const costPrice = computedAgentPrices.value[costKey]
+        return costPrice !== undefined ? `成本价: ${costPrice} TRX` : '成本价: N/A'
+      }
     },
     formItemProps: {
-      rules: [
-        required('7天价格'),
-        { validator: validateMinPrice, trigger: 'blur' }
-      ]
+      rules: [{ required: true, message: '7天租赁价格不能为空' }]
     }
   },
   {
     field: 'day_15_price',
     component: 'InputNumber' as const,
-    label: '15天价格：',
+    label: '15天租赁价格',
     componentProps: {
-      placeholder: '请输入15天价格',
+      placeholder: '请输入15天租赁价格',
       min: 0,
-      precision: 1
+      precision: 1,
+      remark: () => {
+        const costKey = 'day_15_price'
+        const costPrice = computedAgentPrices.value[costKey]
+        return costPrice !== undefined ? `成本价: ${costPrice} TRX` : '成本价: N/A'
+      }
     },
     formItemProps: {
-      rules: [
-        required('15天价格'),
-        { validator: validateMinPrice, trigger: 'blur' }
-      ]
+      rules: [{ required: true, message: '15天租赁价格不能为空' }]
     }
   }
 ])
 
-// 暴露表单方法
 defineExpose({
   formMethods
 })

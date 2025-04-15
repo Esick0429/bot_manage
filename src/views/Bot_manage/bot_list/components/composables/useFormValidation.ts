@@ -1,32 +1,8 @@
 import { reactive } from 'vue'
 import { useValidator } from '@/hooks/web/useValidator'
 
-export function useFormValidation(agentPrices: Record<string, any>) {
-  console.log('agentPrices', agentPrices)
+export function useFormValidation() {
   const { required } = useValidator()
-
-  // 成本价验证函数
-  const validateMinPrice = (rule: any, value: any, callback: any) => {
-    const field = rule.field // e.g., 'day_1_price'
-    if (value === null || value === undefined || value === '') {
-      // 保留非空验证，如果需要的话
-      // return callback(new Error('该项不能为空'))
-      // 如果允许为空或者由 required 处理，则直接返回
-      return callback()
-    }
-
-    // 从 agentPrices 获取对应的成本价
-    // 注意：agentPrices 的 key 需要与表单的 field 完全匹配
-    const minCost = agentPrices[field]
-    console.log('minCost', minCost)
-      console.log('value', value)
-      if (value < minCost) {
-        // 更新错误提示信息
-        return callback(new Error(`不能低于成本价 ${minCost}`))
-      }
-
-    callback()
-  }
 
   // 验证时间能量价格配置 - 注意：此函数可能需要根据实际使用情况调整或移除
   // const validateTimeEnergyPrices = (timeEnergyData: any) => {
@@ -70,8 +46,7 @@ export function useFormValidation(agentPrices: Record<string, any>) {
   // }
 
   return {
-    required,
-    validateMinPrice
+    required
     // validateTimeEnergyPrices // 如果不再需要，可以考虑移除
   }
 }

@@ -5,10 +5,20 @@
 </template>
 
 <script setup lang="tsx">
-import { reactive, defineExpose } from 'vue'
+import { reactive, defineExpose, defineProps, computed } from 'vue'
 import { Form, FormSchema } from '@/components/Form'
 import { useForm } from '@/hooks/web/useForm'
-import { ElInputNumber } from 'element-plus'
+
+// 定义 props 来接收 agentPrices
+const props = defineProps({
+  agentPrices: {
+    type: Object,
+    default: () => ({})
+  }
+})
+
+// 使用 computed 来安全地访问嵌套属性
+const computedAgentPrices = computed(() => props.agentPrices || {})
 
 // 表单相关
 const { formRegister, formMethods } = useForm()
@@ -58,9 +68,11 @@ const managedModeSchema = reactive<FormSchema[]>([
       min: 0,
       precision: 2,
       remark: () => {
+        const costKey = 'manage_price_65000'
+        const costPrice = computedAgentPrices.value[costKey]
         return (
           <>
-            <p>成本为：2.55TRX/笔</p>
+            <p>成本为：{costPrice !== undefined ? `${costPrice} TRX/笔` : 'N/A'}</p>
           </>
         )
       }
@@ -78,9 +90,11 @@ const managedModeSchema = reactive<FormSchema[]>([
       min: 0,
       precision: 2,
       remark: () => {
+        const costKey = 'manage_price_13100'
+        const costPrice = computedAgentPrices.value[costKey]
         return (
           <>
-            <p>成本为：5.1TRX/笔</p>
+            <p>成本为：{costPrice !== undefined ? `${costPrice} TRX/笔` : 'N/A'}</p>
           </>
         )
       }

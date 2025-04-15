@@ -5,10 +5,21 @@
 </template>
 
 <script setup lang="tsx">
-import { reactive, defineExpose } from 'vue'
+import { reactive, defineExpose, defineProps, computed } from 'vue'
 import { Form, FormSchema } from '@/components/Form'
 import { useForm } from '@/hooks/web/useForm'
 import { ElInputNumber } from 'element-plus'
+
+// 定义 props 来接收 agentPrices
+const props = defineProps({
+  agentPrices: {
+    type: Object,
+    default: () => ({})
+  }
+})
+
+// 使用 computed 来安全地访问嵌套属性
+const computedAgentPrices = computed(() => props.agentPrices || {})
 
 // 表单相关
 const { formRegister, formMethods } = useForm()
