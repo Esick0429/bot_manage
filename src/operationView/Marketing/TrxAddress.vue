@@ -46,7 +46,9 @@
         <template #footer>
           <div class="flex justify-end">
             <ElButton @click="addDialogVisible = false">取消</ElButton>
-            <ElButton type="primary" @click="submitAddAddresses" :loading="submitting">确定</ElButton>
+            <ElButton type="primary" @click="submitAddAddresses" :loading="submitting"
+              >确定</ElButton
+            >
           </div>
         </template>
       </Dialog>
@@ -57,13 +59,21 @@
         <template #footer>
           <div class="flex justify-end">
             <ElButton @click="batchImportVisible = false">取消</ElButton>
-            <ElButton type="primary" @click="submitBatchImport" :loading="submitting">确定</ElButton>
+            <ElButton type="primary" @click="submitBatchImport" :loading="submitting"
+              >确定</ElButton
+            >
           </div>
         </template>
       </Dialog>
 
       <!-- 绑定代理弹窗 (重新添加) -->
-      <Dialog v-model="bindDialogVisible" title="绑定代理" width="500px" max-height="300px" @open="getAgentList">
+      <Dialog
+        v-model="bindDialogVisible"
+        title="绑定代理"
+        width="500px"
+        max-height="300px"
+        @open="getAgentList"
+      >
         <Form :schema="bindFormSchema" @register="bindFormRegister" :isCol="true" />
         <template #footer>
           <div class="flex justify-end">
@@ -152,10 +162,10 @@ const columns = ref<TableColumn[]>([
     minWidth: '240px'
   },
   {
-    field: 'user_name', // 使用 API 返回的 user_name
+    field: 'username', // 使用 API 返回的 username
     label: '所属代理',
     minWidth: '180px',
-    formatter: (row) => row.user_name || row.email || '-' // 优先显示 user_name, 否则 email
+    formatter: (row) => (row.username || row.email ? `${row.username} (${row.email})` : '-')
   },
   {
     field: 'create_by', // 使用 API 返回的 create_by
@@ -195,12 +205,19 @@ const columns = ref<TableColumn[]>([
       return (
         <>
           {isBound ? (
-            <BaseButton type="warning" onClick={() => handleUnbind(row)}>解绑</BaseButton>
+            <BaseButton type="warning" onClick={() => handleUnbind(row)}>
+              解绑
+            </BaseButton>
           ) : (
-            <BaseButton type="success" onClick={() => handleBind(row)}>绑定</BaseButton>
+            <BaseButton type="success" onClick={() => handleBind(row)}>
+              绑定
+            </BaseButton>
           )}
-          {/* <BaseButton type="primary" onClick={() => handleEdit(row)}>修改</BaseButton> */} {/* Commented out Edit button */}
-          <BaseButton type="danger" onClick={() => handleDelete(row)}>删除</BaseButton>
+          {/* <BaseButton type="primary" onClick={() => handleEdit(row)}>修改</BaseButton> */}{' '}
+          {/* Commented out Edit button */}
+          <BaseButton type="danger" onClick={() => handleDelete(row)}>
+            删除
+          </BaseButton>
         </>
       )
     }
@@ -210,7 +227,7 @@ const columns = ref<TableColumn[]>([
 // 搜索项配置 - 移除状态下拉框，只保留关键字
 const searchSchema = reactive<FormSchema[]>([
   {
-    field: 'query', 
+    field: 'query',
     component: 'Input',
     label: '关键字：',
     componentProps: {
@@ -225,42 +242,41 @@ const searchSchema = reactive<FormSchema[]>([
 const fetchData = async (params) => {
   try {
     // 直接将 useSearchTable 处理后的参数传递给 API
-    const res = await getTrxAddressListApi(params);
+    const res = await getTrxAddressListApi(params)
     // 直接返回 API 的原始响应，useSearchTable 会处理 list 和 totalCount
-    return res.data; 
-
+    return res.data
   } catch (error) {
-    console.error('获取地址列表失败:', error);
-    ElMessage.error('获取地址列表失败');
+    console.error('获取地址列表失败:', error)
+    ElMessage.error('获取地址列表失败')
     // 返回一个符合 useSearchTable 期望的空结构
-    return { list: [], totalCount: 0 }; 
+    return { list: [], totalCount: 0 }
   }
-};
+}
 
 // --- Agent List Loading ---
 const getAgentList = async () => {
   try {
     // Pass empty object {} as parameter, common for list APIs
-    const res = await getAgentListApi(); // <--- Pass empty object
+    const res = await getAgentListApi() // <--- Pass empty object
     if (res && res.data) {
-        agentList.value = res.data.map((agent: any) => ({
-          label: `${agent.user_name} ${agent.email ? `(${agent.email})` : ''}`,
-          value: agent.user_id
-        }));
-        console.log('Agent list loaded:', agentList.value);
+      agentList.value = res.data.map((agent: any) => ({
+        label: `${agent.username} ${agent.email ? `(${agent.email})` : ''}`,
+        value: agent.user_id
+      }))
+      console.log('Agent list loaded:', agentList.value)
     } else {
-       console.error('Failed to parse agent list from API response:', res);
-       agentList.value = [];
+      console.error('Failed to parse agent list from API response:', res)
+      agentList.value = []
     }
   } catch (error) {
-    console.error('获取代理列表失败:', error);
-    ElMessage.error('获取代理列表失败');
-    agentList.value = [];
+    console.error('获取代理列表失败:', error)
+    ElMessage.error('获取代理列表失败')
+    agentList.value = []
   }
-};
+}
 
 // Call after definition
-getAgentList();
+getAgentList()
 
 // 刷新表格方法
 const reloadTable = (resetPage = true) => {
@@ -284,7 +300,7 @@ const handleAdd = () => {
 //     data: {
 //       id: row.id,
 //       address: row.address
-//       // Pass other fields like user_id or user_name if the form needs them
+//       // Pass other fields like user_id or username if the form needs them
 //     }
 //   })
 // }
@@ -369,7 +385,7 @@ const handleBind = (row: any) => {
   bindDialogVisible.value = true
   nextTick(() => {
     // Reset Select value to undefined for proper placeholder display
-    bindFormMethods.setValues({ userId: undefined }) 
+    bindFormMethods.setValues({ userId: undefined })
     bindFormMethods.setValues({ address: row.address })
   })
 }
@@ -397,7 +413,7 @@ const bindFormSchema = reactive<FormSchema[]>([
       filterable: true // 允许搜索
     },
     formItemProps: {
-       rules: [{ required: true, message: '请选择所属代理', trigger: 'change' }] // Updated message
+      rules: [{ required: true, message: '请选择所属代理', trigger: 'change' }] // Updated message
     },
     colProps: {
       span: 24
@@ -410,7 +426,7 @@ const submitBindAgent = async () => {
   try {
     const formData = await bindFormMethods.getFormData()
     const userId = formData.userId
-    if(!userId){
+    if (!userId) {
       ElMessage.error('请选择所属代理')
       return
     }
@@ -450,8 +466,8 @@ const handleUnbind = async (row: any) => {
     submitting.value = true
     // Ensure payload matches API definition (lowercase snake_case)
     await updateTrxAddressApi({
-      id: row.id,          // Use lowercase 'id'
-      status: 2,         // Use lowercase 'status'
+      id: row.id, // Use lowercase 'id'
+      status: 2, // Use lowercase 'status'
       user_id: row.user_id // Use lowercase 'user_id'
     })
     ElMessage.success('解绑成功')
@@ -581,18 +597,18 @@ const handleExportTemplate = async () => {
     // 使用下载工具处理 blob 数据
     // Ensure res.data is a Blob before passing
     if (res.data instanceof Blob) {
-       downloadByData(res.data, '地址导入模版.xlsx')
-       ElMessage.success('模版下载成功') 
+      downloadByData(res.data, '地址导入模版.xlsx')
+      ElMessage.success('模版下载成功')
     } else {
-      console.error('Export failed: Response data is not a Blob', res.data);
-      ElMessage.error('导出失败: 文件数据格式错误');
+      console.error('Export failed: Response data is not a Blob', res.data)
+      ElMessage.error('导出失败: 文件数据格式错误')
     }
   } catch (error) {
-    console.error('模版下载失败:', error);
+    console.error('模版下载失败:', error)
     // Try to provide a more specific error message
-    const errorMsg = (error as any)?.response?.data?.message || (error as Error)?.message || '模版下载失败';
-    ElMessage.error(errorMsg);
+    const errorMsg =
+      (error as any)?.response?.data?.message || (error as Error)?.message || '模版下载失败'
+    ElMessage.error(errorMsg)
   }
 }
 </script>
-

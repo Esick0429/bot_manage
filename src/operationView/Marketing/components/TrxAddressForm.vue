@@ -65,7 +65,7 @@ const formSchema = reactive<FormSchema[]>([
     label: 'TRX收款地址：',
     componentProps: {
       maxlength: 100,
-      disabled:true
+      disabled: true
     },
     formItemProps: {
       rules: [required()]

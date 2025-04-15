@@ -138,7 +138,7 @@ const columns = ref<TableColumn[]>([
   {
     field: 'create_time',
     label: '创建时间',
-    formatter: (row: AgentItem) => row.create_time ? formatToDateTime(row.create_time) : '-'
+    formatter: (row: AgentItem) => (row.create_time ? formatToDateTime(row.create_time) : '-')
   },
   {
     field: 'action',
@@ -190,11 +190,10 @@ const handleUpdateStatus = (id: number | string, status: number, actionText: str
       ElMessage.info('操作已取消')
     })
 }
-
 </script>
 
 <style scoped>
 .app-container {
   padding: 20px;
 }
-</style> 
+</style>

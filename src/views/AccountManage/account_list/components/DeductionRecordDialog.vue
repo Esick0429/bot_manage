@@ -63,48 +63,6 @@ const searchTableRef = ref<InstanceType<typeof SearchTable> | null>(null)
 // 表格列配置
 const columns: TableColumn[] = [
   {
-    field: 'id',
-    label: '交易ID',
-    minWidth: 120
-  },
-  {
-    field: 'order_type',
-    label: '交易类型',
-    minWidth: 120,
-    formatter: (row) => {
-      return orderTypeMap()[row.order_type]
-    }
-  },
-  {
-    field: 'bot_name',
-    label: '所属机器人',
-    minWidth: 120
-  },
-  {
-    field: 'amount',
-    label: '交易金额',
-    minWidth: 120,
-    formatter: (row) => `${row.amount}${row.unit}`
-  },
-  {
-    field: 'after_trx',
-    label: '交易后TRX',
-    minWidth: 120,
-    formatter: (row) => `${row.after_amount}`
-  },
-  {
-    field: 'create_time',
-    label: '交易时间',
-    minWidth: 160,
-    formatter: (row) => formatToDateTime(row.create_time)
-  },
-  {
-    field: 'describe',
-    label: '备注',
-    minWidth: 120,
-    formatter: (row) => (isEmpty(row.describe) ? '-' : row.describe)
-  },
-  {
     field: 'order_num',
     label: '关联订单ID',
     minWidth: 120,
@@ -146,6 +104,43 @@ const columns: TableColumn[] = [
         )
       }
     }
+  },
+  {
+    field: 'order_type',
+    label: '交易类型',
+    minWidth: 120,
+    formatter: (row) => {
+      return orderTypeMap()[row.order_type]
+    }
+  },
+  {
+    field: 'bot_name',
+    label: '所属机器人',
+    minWidth: 120
+  },
+  {
+    field: 'amount',
+    label: '交易金额',
+    minWidth: 120,
+    formatter: (row) => `${row.amount}${row.unit}`
+  },
+  {
+    field: 'after_trx',
+    label: '交易后TRX',
+    minWidth: 120,
+    formatter: (row) => `${row.after_amount}`
+  },
+  {
+    field: 'create_time',
+    label: '交易时间',
+    minWidth: 160,
+    formatter: (row) => formatToDateTime(row.create_time)
+  },
+  {
+    field: 'describe',
+    label: '备注',
+    minWidth: 120,
+    formatter: (row) => (isEmpty(row.describe) ? '-' : row.describe)
   }
 ]
 

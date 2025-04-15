@@ -138,10 +138,12 @@ const columns = ref<TableColumn[]>([
       const status = row.status
       let text = '未知'
       let type: 'success' | 'danger' | 'info' = 'info'
-      if (status === 1) { // 假设 1 是启用
+      if (status === 1) {
+        // 假设 1 是启用
         text = '启用'
         type = 'success'
-      } else if (status === 2) { // 假设 2 是禁用
+      } else if (status === 2) {
+        // 假设 2 是禁用
         text = '禁用'
         type = 'danger'
       }
@@ -151,12 +153,12 @@ const columns = ref<TableColumn[]>([
   {
     field: 'create_time',
     label: '创建时间',
-    formatter: (row: AgentBotItem) => row.create_time ? formatToDateTime(row.create_time) : '-'
+    formatter: (row: AgentBotItem) => (row.create_time ? formatToDateTime(row.create_time) : '-')
   },
   {
     field: 'update_time',
     label: '最后活动时间',
-    formatter: (row: AgentBotItem) => row.update_time ? formatToDateTime(row.update_time) : '-'
+    formatter: (row: AgentBotItem) => (row.update_time ? formatToDateTime(row.update_time) : '-')
   },
   {
     field: 'action',
