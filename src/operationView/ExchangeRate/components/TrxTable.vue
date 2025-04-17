@@ -25,104 +25,104 @@ import axios from 'axios'
 
 // 定义数据结构
 interface TrxPriceData {
-  time: number;
-  date: string;
-  open: number | string;
-  high: number | string;
-  low: number | string;
-  close: number | string;
+  time: number
+  date: string
+  open: number | string
+  high: number | string
+  low: number | string
+  close: number | string
 }
 
 // TRX价格数据API服务
 const getTrxPriceData = async () => {
   try {
     // 获取近一个月的数据
-    const now = new Date();
-    const endTimestamp = now.getTime();
-    const oneMonthAgo = new Date();
-    oneMonthAgo.setMonth(now.getMonth() - 1);
-    const startTimestamp = oneMonthAgo.getTime();
-    
-    const {data} = await axios.get('https://apilist.tronscanapi.com/api/trx/volume', {
+    const now = new Date()
+    const endTimestamp = now.getTime()
+    const oneMonthAgo = new Date()
+    oneMonthAgo.setMonth(now.getMonth() - 1)
+    const startTimestamp = oneMonthAgo.getTime()
+
+    const { data } = await axios.get('https://apilist.tronscanapi.com/api/trx/volume', {
       params: {
         start_timestamp: startTimestamp,
         end_timestamp: endTimestamp,
         limit: 100,
         source: 'coinmarketcap'
       }
-    });
-    
+    })
+
     if (data.data && Array.isArray(data.data)) {
       // 处理并转换数据
-      const processedData = data.data.map(item => ({
+      const processedData = data.data.map((item) => ({
         time: item.time || item.timestamp,
         date: item.date,
         open: item.open || 0,
-        high: item.high || 0, 
+        high: item.high || 0,
         low: item.low || 0,
         close: item.close || 0
-      }));
-      
+      }))
+
       // 按时间降序排列
       return {
         list: [...processedData].sort((a, b) => b.time - a.time),
         total: processedData.length
-      };
+      }
     }
-    
+
     return {
       list: [],
       total: 0
-    };
+    }
   } catch (error) {
-    console.error('获取TRX价格数据失败:', error);
+    console.error('获取TRX价格数据失败:', error)
     return {
       list: [],
       total: 0
-    };
+    }
   }
-};
+}
 
 // 使用表格 hook
 const { tableRegister, tableMethods, tableState } = useTable({
   fetchDataApi: getTrxPriceData
-});
+})
 
 // 从tableState和tableMethods中解构需要的变量和方法
-const { loading, dataList } = tableState;
+const { loading, dataList } = tableState
 // const { refresh } = tableMethods;
 // 格式化价格
 const formatPrice = (price: number | string | null | undefined): string => {
-  if (!price && price !== 0) return '-';
-  const numPrice = typeof price === 'string' ? parseFloat(price) : price;
-  return numPrice.toFixed(4);
+  if (!price && price !== 0) return '-'
+  const numPrice = typeof price === 'string' ? parseFloat(price) : price
+  return numPrice.toFixed(4)
 }
 
 // 表格列定义
 const columns = reactive<TableColumn[]>([
   {
     field: 'time',
-    label: "日期",
+    label: '日期',
     formatter: (row: TrxPriceData) => formatToDate(row.time)
   },
   {
     field: 'open',
-    label: "开盘价",
+    label: '开盘价',
     formatter: (row: TrxPriceData) => formatPrice(row.open)
   },
   {
     field: 'high',
-    label: "最高价",
+    label: '最高价',
     formatter: (row: TrxPriceData) => formatPrice(row.high)
   },
   {
     field: 'low',
-    label: "最低价",
+    label: '最低价',
     formatter: (row: TrxPriceData) => formatPrice(row.low)
   },
   {
     field: 'close',
-    label: "收盘价",
+    label: '收盘价',
     formatter: (row: TrxPriceData) => formatPrice(row.close)
   }
 ])
@@ -156,4 +156,3 @@ const columns = reactive<TableColumn[]>([
   color: #333;
 }
 </style>
-
