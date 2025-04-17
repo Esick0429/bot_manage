@@ -31,6 +31,25 @@ const activationTotal = ref(0) // 激活详情 - 总条数
 const activationTransactionDialogVisible = ref(false) // 激活交易详情弹窗
 const selectedActivationTransaction = ref<any>(null) // 选中的激活交易
 
+// Helper function for TRANSACTION status text (1: 已完成, 2: 待处理)
+const getTransactionStatusText = (status: number): string => {
+  const statusMap: Record<number, string> = {
+    0: '-',
+    1: '已完成',
+    2: '待处理'
+  }
+  return statusMap[status] ?? '未知' // Default to '未知' if status is unexpected
+}
+
+// Helper function for TRANSACTION status tag type
+const getTransactionStatusTagType = (status: number): 'success' | 'warning' | 'info' | 'danger' => {
+  const typeMap: Record<number, 'success' | 'warning' | 'info' | 'danger'> = {
+    1: 'success', // 已完成
+    2: 'warning'  // 待处理 (Using warning, adjust if needed)
+  }
+  return typeMap[status] ?? 'info' // Default to 'info'
+}
+
 // --- 获取激活详情 (Type 5) 的函数 ---
 const fetchActivationDetails = async () => {
   if (!props.orderId) {
@@ -42,7 +61,7 @@ const fetchActivationDetails = async () => {
   activationLoading.value = true
   activationDetails.value = []
   try {
-    const params = { page: activationCurrentPage.value, pageSize: activationPageSize.value }
+    const params = { current_page: activationCurrentPage.value, page_size: activationPageSize.value }
     // Assuming getBatchActiveDetailApi works for type 5 with these params
     const response = await getBatchActiveDetailApi(props.orderId, params) // Pass params
     activationDetails.value = response?.data?.list || []
@@ -78,32 +97,56 @@ const handleViewActivationTransaction = (row: any) => {
   activationTransactionDialogVisible.value = true
 }
 
-// --- 激活详情 (Type 5) 表格列定义 ---
+// --- 激活详情 (Type 5) 表格列定义 (Updated based on BatchOrderDetails.vue) ---
 const activationTableColumns = ref<TableColumn[]>([
-  { type: 'index', label: '序号', width: 80, align: 'center', field: 'index' },
-  { prop: 'to_address', field: 'to_address', label: '地址', minWidth: 280 },
+  { type: 'index', label: '序号', width: 60, align: 'center', field: 'index' },
+  {
+    prop: 'to_address',
+    field: 'to_address',
+    label: '地址',
+    minWidth: 400, // Adjusted width
+    slots: {
+      default: ({ row }) => {
+        // Removed the wrapping span and the ElTag for activation status
+        return h('span', {}, row.to_address) // Only display the address text
+      }
+    }
+  },
   {
     prop: 'active_price',
     field: 'active_price',
     label: '激活单价',
     width: 150,
     align: 'center',
-    formatter: (row: any) => h('span', {}, `${row.active_price + ' TRX'}`)
+    formatter: (row: any) => h('span', {}, `${row.active_price} TRX`) // Kept original formatting
   },
   {
-    prop: 'status', // Assuming API returns a status field, otherwise adjust
+    prop: 'status', // Using 'status' as the prop
     field: 'status',
-    label: '状态',
+    label: '交易状态',
     width: 100,
     align: 'center',
-    // Assuming all entries in this list are 'activated'
-    slots: { default: () => h(ElTag, { type: 'success' }, () => '已激活') }
+    slots: {
+      default: ({ row }) => {
+        // Convert status to number for reliable comparison
+        const statusNum = Number(row.status)
+        if (isNaN(statusNum)) {
+          return h(ElTag, { type: 'info', size: 'small' }, () => '未知') // Handle invalid status
+        }
+        return h(
+          ElTag,
+          { type: getTransactionStatusTagType(statusNum), size: 'small' }, // Use helper for type
+          () => getTransactionStatusText(statusNum) // Use helper for text
+        )
+      }
+    }
   },
   {
     prop: 'create_time',
     field: 'create_time',
     label: '激活时间',
     width: 180,
+    align: 'center', // Added center alignment
     formatter: (row: any) => (row.create_time ? formatToDateTime(row.create_time) : '-')
   },
   {
@@ -112,6 +155,7 @@ const activationTableColumns = ref<TableColumn[]>([
     label: '操作',
     width: 120,
     align: 'center',
+    fixed: 'right', // Added fixed right
     slots: {
       default: ({ row }) => {
         return h(
@@ -157,7 +201,11 @@ const activationTransactionSchema = computed((): DescriptionsSchema[] => [
     label: '交易状态',
     slots: {
       // 直接显示 "已完成"，因为激活列表的交易通常是完成的
-      default: () => h(ElTag, { type: 'success' }, () => '已完成')
+      default: () => h(
+          ElTag,
+          { type: getTransactionStatusTagType(selectedActivationTransaction.value.status), size: 'small' }, // Use helper for type
+          () => getTransactionStatusText(selectedActivationTransaction.value.status) // Use helper for text
+        )
     }
   },
   {
@@ -237,4 +285,13 @@ watch(
 
 <style scoped>
 /* Add component-specific styles if needed */
+.flex {
+  display: flex;
+}
+.items-center {
+  align-items: center;
+}
+.justify-between {
+  justify-content: space-between;
+}
 </style>
