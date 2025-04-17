@@ -37,3 +37,7 @@ export const deleteResourcePoolAccountApi = (params: any) => {
 export const batchDeleteResourcePoolAccountApi = (data: any) => {
   return request.delete({ url: '/system/resource-pool-account/batch-delete', data })
 }
+
+export const changeResourcePoolAccountStatusApi = (params: any) => {
+  return request.post({ url: '/v2/manage/resource_pool/change', params })
+}

@@ -51,8 +51,8 @@ const formRef = ref()
 const searchTableRef = ref()
 
 const resourceTypeMap = {
-  1: 'USDT池子',
-  2: 'TRX池子',
+  1: 'TRX池子',
+  2: 'USDT池子',
   3: '能量池子',
   4: '带宽池子'
 }
@@ -61,7 +61,7 @@ const columns = ref<TableColumn[]>([
   {
     type: 'selection',
     field: 'selection',
-    width: '55px',
+    width: '55px'
   },
   {
     field: 'id',
@@ -82,11 +82,28 @@ const columns = ref<TableColumn[]>([
     minWidth: '180px'
   },
   {
+    field: 'permission_name',
+    label: '权限名称',
+    minWidth: '180px'
+  },
+  {
     field: '',
     label: '可用数量/阈值',
     minWidth: '180px',
     formatter: (row) => {
-      return `${row.amount == 0 ? '-' : row.amount} / ${row.amount_limit == 0 ? '-' : row.amount_limit}`
+      const displayValue = row.resource_type === 3
+        ? `${row.amount} / ${row.amount_limit == 0 ? '-' : row.amount_limit}`
+        : `${row.amount}`;
+
+      if (row.resource_type === 3) {
+        return (
+          <span onDblclick={() => handleEditThreshold(row)} style={{ cursor: 'pointer' }}>
+            {displayValue}
+          </span>
+        );
+      } else {
+        return <span>{displayValue}</span>;
+      }
     }
   },
   {
@@ -115,19 +132,26 @@ const columns = ref<TableColumn[]>([
     formatter: (row) => formatToDateTime(new Date(row.create_time * 1000))
   },
   {
+    field: 'update_time',
+    label: '更新时间',
+    width: '180px',
+    formatter: (row) => formatToDateTime(new Date(row.update_time * 1000))
+  },
+  {
     label: '操作',
     field: 'action',
     width: '210px',
     fixed: 'right',
-    formatter: ( row ) => (
+    formatter: (row) => (
       <>
         <BaseButton
           type={row.status === 1 ? 'warning' : 'success'}
           onClick={() => handleToggleStatus(row)}
+          disabled={row.status === 1}
         >
-          { row.status === 1 ? '禁用' : '启用' }
+          {row.status === 1 ? '禁用' : '启用'}
         </BaseButton>
-         {/* <BaseButton type="primary" plain onClick={() => handleEdit(row)}>
+        {/* <BaseButton type="primary" plain onClick={() => handleEdit(row)}>
           编辑
         </BaseButton> */}
         <BaseButton type="danger" onClick={() => handleDelete(row)}>
@@ -148,8 +172,8 @@ const searchSchema = reactive<FormSchema[]>([
       clearable: true,
       options: [
         { label: '全部', value: '' },
-        { label: 'USDT池子', value: 1 },
-        { label: 'TRX池子', value: 2 },
+        { label: 'TRX池子', value: 1 },
+        { label: 'USDT池子', value: 2 },
         { label: '能量池子', value: 3 },
         { label: '带宽池子', value: 4 }
       ]
@@ -213,9 +237,8 @@ const handleToggleStatus = async (row) => {
   const targetStatus = row.status === 1 ? 2 : 1
   const actionText = row.status === 1 ? '禁用' : '启用'
   let msg = `确认要${actionText}该账户吗？`
-  row.resource_type === 3 && (msg = `确认要${actionText}该账户为主账户吗？`)
+  row.resource_type === 3 && (msg = `确认要${actionText}该账户 ${row.status === 1 ? '' : '为主账户'}吗？`)
   try {
-    
     await ElMessageBox.confirm(msg, '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
@@ -263,7 +286,7 @@ const handleBatchDelete = async () => {
   const elTableRef = await searchTableRef.value?.getElTableExpose()
   if (!elTableRef) {
     console.error('无法获取 Table 实例')
-    return;
+    return
   }
   const selections = elTableRef.getSelectionRows() || []
 
@@ -300,6 +323,51 @@ const handleBatchDelete = async () => {
 
 const handleSuccess = () => {
   reloadTable()
+}
+
+const handleEditThreshold = async (row) => {
+  if (row.resource_type !== 3) return;
+
+  try {
+    const { value } = await ElMessageBox.prompt(
+      '请输入新的阈值 (输入0或留空表示不设阈值)',
+      '编辑阈值',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        inputValue: row.amount_limit === 0 ? '' : String(row.amount_limit),
+        inputPattern: /^\d*$/,
+        inputErrorMessage: '请输入有效的非负整数'
+      }
+    );
+
+    if (value === null) {
+      return;
+    }
+
+    const newThreshold = value === '' ? 0 : parseInt(value, 10);
+
+    if (newThreshold === row.amount_limit) {
+      ElMessage.info('阈值未改变');
+      return;
+    }
+
+    await updateResourcePoolAccountApi({
+      id: row.id,
+      amount_limit: newThreshold,
+      status: row.status
+    });
+
+    ElMessage.success('阈值更新成功');
+    reloadTable();
+
+  } catch (error) {
+    console.error('更新阈值失败:', error);
+    if (error !== 'cancel') {
+      const message = error instanceof Error ? error.message : '未知错误';
+      ElMessage.error(`更新阈值失败: ${message}`);
+    }
+  }
 }
 </script>
 
