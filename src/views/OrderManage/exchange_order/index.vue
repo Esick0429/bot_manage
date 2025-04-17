@@ -199,24 +199,24 @@ const transactionInSchema = computed<DescriptionsSchema[]>(() => [
   },
   { field: 'in_from_address', label: '发送人', span: 24 },
   { field: 'in_to_address', label: '接收人', span: 24 },
-  {
-    field: 'in_number',
-    label: '区块号',
-    span: 24,
-    slots: {
-      default: (row: any) => {
-        return h(
-          ElLink,
-          {
-            href: `https://tronscan.org/#/block/${row.in_number}`,
-            type: 'primary',
-            target: '_blank'
-          },
-          () => row.in_number
-        )
-      }
-    }
-  },
+  // {
+  //   field: 'in_number',
+  //   label: '区块号',
+  //   span: 24,
+  //   slots: {
+  //     default: (row: any) => {
+  //       return h(
+  //         ElLink,
+  //         {
+  //           href: `https://tronscan.org/#/block/${row.in_number}`,
+  //           type: 'primary',
+  //           target: '_blank'
+  //         },
+  //         () => row.in_number
+  //       )
+  //     }
+  //   }
+  // },
   {
     field: 'user_get_amount',
     label: 'TRX数量',
@@ -267,14 +267,14 @@ const transactionOutSchema = computed<DescriptionsSchema[]>(() => [
       return row.order_amount
     }
   },
-  {
-    field: 'out_number',
-    label: '区块号',
-    formatter: (row) => {
-      if (!row.out_number) return '0'
-      return row.out_number
-    }
-  },
+  // {
+  //   field: 'out_number',
+  //   label: '区块号',
+  //   formatter: (row) => {
+  //     if (!row.out_number) return '0'
+  //     return row.out_number
+  //   }
+  // },
   {
     field: 'out_time',
     label: '转出时间',

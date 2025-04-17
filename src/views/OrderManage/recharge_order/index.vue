@@ -169,7 +169,7 @@ const rechargeDetailSchema = computed(() => {
   const schema: DescriptionsSchema[] = [
     { field: 'to_address', label: '收款地址', span: 24 },
     { field: 'owner_address', label: '支付地址', span: 24 },
-    { field: 'number', label: '区块号', span: 24 },
+    // { field: 'number', label: '区块号', span: 24 },
     {
       field: 'hash',
       label: '交易哈希',
