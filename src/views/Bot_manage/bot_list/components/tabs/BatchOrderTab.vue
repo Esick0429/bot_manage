@@ -45,7 +45,6 @@ const batchOrderSchema = reactive<FormSchema[]>([
     label: '激活地址单价',
     componentProps: {
       placeholder: '请输入激活地址单价',
-      min: 1.1,
       precision: 2,
       remark: () => {
         return (

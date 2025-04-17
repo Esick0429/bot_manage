@@ -59,7 +59,6 @@ const timeEnergySchema = reactive<FormSchema[]>([
     },
     componentProps: {
       placeholder: '请输入倍数',
-      min: 1,
       precision: 2
     },
     colProps: {

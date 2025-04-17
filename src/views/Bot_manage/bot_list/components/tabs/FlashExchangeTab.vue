@@ -90,9 +90,11 @@ const flashExchangeSchema = reactive<FormSchema[]>([
       min: 0,
       precision: 2,
       remark: () => {
+        const costKey = 'flash_change_price'
+        const costPrice = computedAgentPrices.value[costKey]
         return (
           <>
-            {/* <p>成本：8 USDT</p> */}
+            <p>成本：{costPrice !== undefined ? `${costPrice} TRX` : 'N/A'}</p>
           </>
         )
       }
