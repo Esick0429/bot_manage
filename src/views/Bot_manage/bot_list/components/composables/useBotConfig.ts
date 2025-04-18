@@ -85,35 +85,12 @@ export function useBotConfig() {
     loading.value = true
 
     try {
-      // --- 新增：提前获取成本价 ---
-      try {
-        const timeEnergyConfigRes = await getBotTimeEnergyConfigApi(id)
-        const fetchedAgentPrices = timeEnergyConfigRes.data?.agent_price || {} // 获取 agent_price
-        // 清空旧的 agentPrices，确保每次加载都是最新的
-        for (const key in agentPrices) {
-          delete agentPrices[key]
-        }
-        // 更新 agentPrices 状态
-        Object.keys(fetchedAgentPrices).forEach((key) => {
-          agentPrices[key] = fetchedAgentPrices[key]
-        })
-        console.log('Fetched agentPrices initially:', agentPrices)
-      } catch (error) {
-        console.error('加载成本价配置失败:', error)
-        // 这里可以选择是否提示用户，或者静默失败
-        // ElMessage.error('加载成本价配置失败')
-         // 即使成本价加载失败，也清空旧数据
-        for (const key in agentPrices) {
-          delete agentPrices[key]
-        }
-      }
-      // --- 结束新增 ---
-
       // 策略模式：定义加载各种表单类型的策略
       const loadStrategies = {
         // 基本信息加载策略
         botInfo: async () => {
           try {
+            // 1. 先加载基本信息
             const botInfoRes = await getBotPaymentConfigApi(id)
             const botInfo = botInfoRes.data || {}
 
@@ -134,9 +111,38 @@ export function useBotConfig() {
 
             // 更新当前机器人对象
             currentBot.value = botInfo
+
+            // 2. --- 新增：在 botInfo 策略中获取成本价 ---
+            try {
+              const timeEnergyConfigRes = await getBotTimeEnergyConfigApi(id)
+              const fetchedAgentPrices = timeEnergyConfigRes.data?.agent_price || {} // 获取 agent_price
+              // 清空旧的 agentPrices，确保每次加载都是最新的
+              for (const key in agentPrices) {
+                delete agentPrices[key]
+              }
+              // 更新 agentPrices 状态
+              Object.keys(fetchedAgentPrices).forEach((key) => {
+                agentPrices[key] = fetchedAgentPrices[key]
+              })
+              console.log('Fetched agentPrices in botInfo strategy:', agentPrices)
+            } catch (error) {
+              console.error('加载成本价配置失败 (in botInfo strategy):', error)
+              // 清空旧数据，即使加载失败
+              for (const key in agentPrices) {
+                delete agentPrices[key]
+              }
+              // 这里可以选择是否提示用户，或者静默失败
+              // ElMessage.error('加载成本价配置失败')
+            }
+            // --- 结束新增 ---
+
             return true
           } catch (error) {
             console.error('加载基本信息失败:', error)
+            // 如果基本信息加载失败，也应该清空成本价
+            for (const key in agentPrices) {
+              delete agentPrices[key]
+            }
             return false
           }
         },
@@ -166,14 +172,6 @@ export function useBotConfig() {
             // 这里仍然需要获取时间能量配置以设置表单
             const timeEnergyConfigRes = await getBotTimeEnergyConfigApi(id)
             const timeEnergyConfig = timeEnergyConfigRes.data || {}
-
-            // --- 移除：不再在此处获取和填充 agentPrices ---
-            // const fetchedAgentPrices = timeEnergyConfig.agent_price || {}
-            // Object.keys(fetchedAgentPrices).forEach((key) => {
-            //   agentPrices[key] = fetchedAgentPrices[key]
-            // })
-            // console.log('agentPrices in timeEnergy strategy:', agentPrices)
-            // --- 结束移除 ---
 
             // 设置表单值 (保留)
             console.log('timeEnergyConfig', timeEnergyConfig)
