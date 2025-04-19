@@ -40,10 +40,12 @@ import { FormSchema } from '@/components/Form'
 import { formatToDateTime, formatToDate } from '@/utils/dateUtil'
 import OrderDetail from './components/OrderDetail.vue'
 import ResendTrx from './components/ResendTrx.vue'
-import {
-  getExchangeOrderListApi,
-} from '@/api/exchange_transaction'
-import type { ExchangeOrderListItem, ExchangeOrderListParams, ExchangeOrderListResult } from '@/api/exchange_transaction/types'
+import { getExchangeOrderListApi } from '@/api/exchange_transaction'
+import type {
+  ExchangeOrderListItem,
+  ExchangeOrderListParams,
+  ExchangeOrderListResult
+} from '@/api/exchange_transaction/types'
 import { BaseButton } from '@/components/Button'
 import { ContentWrap } from '@/components/ContentWrap'
 
@@ -79,13 +81,13 @@ const columns = reactive<TableColumn[]>([
     field: 'trx_price',
     label: '兑换TRX汇率',
     minWidth: 120,
-    formatter: (row) => '$'+row.trx_price || '-' // 显示价格，如 0.28114
+    formatter: (row) => '$' + row.trx_price || '-' // 显示价格，如 0.28114
   },
   {
     field: 'real_price',
     label: '实时汇率',
     minWidth: 100,
-    formatter: (row) => '$'+row.real_price || '-' // 显示价格，如 0.255
+    formatter: (row) => '$' + row.real_price || '-' // 显示价格，如 0.255
   },
   {
     field: 'exchange_amount', // 对应截图的 "支出TRX数量"
@@ -97,13 +99,15 @@ const columns = reactive<TableColumn[]>([
     field: 'plate_profit',
     label: '平台利润',
     minWidth: 120,
-    formatter: (row) => row.plate_profit ? `${row.plate_profit}${row.exchange_unit || ''}`.trim() : '-' // 格式如 3.55698TRX
+    formatter: (row) =>
+      row.plate_profit ? `${row.plate_profit}${row.exchange_unit || ''}`.trim() : '-' // 格式如 3.55698TRX
   },
   {
     field: 'agent_out_amount', // 对应截图的 "代理扣款"
     label: '代理扣款',
     minWidth: 150,
-    formatter: (row) => row.agent_out_amount ? `${row.agent_out_amount}${row.exchange_unit || ''}`.trim() : '-' // 格式如 74.69655TRX
+    formatter: (row) =>
+      row.agent_out_amount ? `${row.agent_out_amount}${row.exchange_unit || ''}`.trim() : '-' // 格式如 74.69655TRX
   },
   {
     field: 'status',
@@ -114,9 +118,18 @@ const columns = reactive<TableColumn[]>([
         let type: 'success' | 'warning' | 'info' | 'danger' = 'info'
         let label = '未知'
         switch (row.status) {
-          case 1: type = 'success'; label = '成功'; break; // 匹配截图 "成功"
-          case 2: type = 'danger'; label = '失败'; break;
-          case 3: type = 'warning'; label = '待支付'; break;
+          case 1:
+            type = 'success'
+            label = '成功'
+            break // 匹配截图 "成功"
+          case 2:
+            type = 'danger'
+            label = '失败'
+            break
+          case 3:
+            type = 'warning'
+            label = '待支付'
+            break
           // 可以根据需要添加其他状态
         }
         // 使用 BaseButton 或仅文本模仿截图中的链接样式
@@ -129,7 +142,7 @@ const columns = reactive<TableColumn[]>([
     field: 'finish_time', // 重复 finish_time 用于显示完整时间
     label: '完成时间',
     minWidth: 160,
-    formatter: (row) => row.finish_time ? formatToDateTime(row.finish_time * 1000) : '-' // 格式化为 YYYY-MM-DD HH:mm:ss
+    formatter: (row) => (row.finish_time ? formatToDateTime(row.finish_time * 1000) : '-') // 格式化为 YYYY-MM-DD HH:mm:ss
   },
   {
     field: 'describe',
@@ -212,24 +225,24 @@ const fetchExchangeTransactionList = async (params: any) => {
   try {
     // 移除 createTimeRange 的处理逻辑，因为搜索条件已改变
     // const { createTimeRange, ...restParams } = params;
-    const queryParams: ExchangeOrderListParams = { ...params }; // 直接使用 params
+    const queryParams: ExchangeOrderListParams = { ...params } // 直接使用 params
     // if (createTimeRange && createTimeRange.length === 2) {
     //   queryParams.start_time = Number(createTimeRange[0]);
     //   queryParams.end_time = Number(createTimeRange[1]);
     // }
 
-    const res = await getExchangeOrderListApi(queryParams) as any;
+    const res = (await getExchangeOrderListApi(queryParams)) as any
 
-    if (res?.data ) {
-       totalCount.value = res.data.total || 0
-       return {
-          list: res.data.list || [],
-          totalCount: res.data.totalCount || 0
-       }
+    if (res?.data) {
+      totalCount.value = res.data.total || 0
+      return {
+        list: res.data.list || [],
+        totalCount: res.data.totalCount || 0
+      }
     } else {
-       ElMessage.error(res?.message || '获取列表失败')
-       totalCount.value = 0
-       return { list: [], totalCount: 0 }
+      ElMessage.error(res?.message || '获取列表失败')
+      totalCount.value = 0
+      return { list: [], totalCount: 0 }
     }
   } catch (error) {
     console.error('获取闪兑订单列表出错:', error)

@@ -17,7 +17,6 @@ const props = defineProps({
   }
 })
 
-
 // 按时间详情 schema
 const byTimeDetailSchema = computed((): DescriptionsSchema[] => [
   {
@@ -76,16 +75,22 @@ const byTimeDetailSchema = computed((): DescriptionsSchema[] => [
         )
       }
     }
-  },
+  }
 ])
 </script>
 
 <template>
   <!-- 确保传递的是 orderData -->
-  <Descriptions v-if="orderData" :schema="byTimeDetailSchema" :data="orderData" :column="2" border />
+  <Descriptions
+    v-if="orderData"
+    :schema="byTimeDetailSchema"
+    :data="orderData"
+    :column="2"
+    border
+  />
   <div v-else>加载中...</div>
 </template>
 
 <style scoped>
 /* Add component-specific styles if needed */
-</style> 
+</style>

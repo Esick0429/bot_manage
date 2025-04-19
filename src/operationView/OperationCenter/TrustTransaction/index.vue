@@ -72,10 +72,14 @@ const getManageStatus = (status: number) => {
 
 const getHandleStatusText = (status: number) => {
   switch (status) {
-    case 1: return '已代理'
-    case 2: return '未代理'
-    case 3: return '已补发'
-    default: return '未知状态'
+    case 1:
+      return '已代理'
+    case 2:
+      return '未代理'
+    case 3:
+      return '已补发'
+    default:
+      return '未知状态'
   }
 }
 
@@ -90,13 +94,23 @@ const columns = reactive<TableColumn[]>([
     field: 'transactionType',
     label: '交易类型',
     minWidth: 100,
-    formatter: (row) => row.describe?.includes('托管') ? '托管' : '未知'
+    formatter: (row) => (row.describe?.includes('托管') ? '托管' : '未知')
   },
   { field: 'tg_id', label: 'TG用户ID', minWidth: 120 },
-  { field: 'tg_bot_id', label: '机器人ID', minWidth: 120 ,
+  {
+    field: 'tg_bot_id',
+    label: '机器人ID',
+    minWidth: 120,
     slots: {
       default: ({ row }) => {
-        return <RouterLink class="text-blue-500" to={{ path: '/agent/bot_list', query: { id: row.tg_bot_id } }}>{row.tg_bot_id}</RouterLink>
+        return (
+          <RouterLink
+            class="text-blue-500"
+            to={{ path: '/agent/bot_list', query: { id: row.tg_bot_id } }}
+          >
+            {row.tg_bot_id}
+          </RouterLink>
+        )
       }
     }
   },
@@ -113,7 +127,12 @@ const columns = reactive<TableColumn[]>([
     }
   },
   { field: 'address', label: '能量接收地址', minWidth: 260 },
-  { field: 'energy_num', label: '能量数量', minWidth: 100, formatter: (row) => formatToWan(row.energy_num) },
+  {
+    field: 'energy_num',
+    label: '能量数量',
+    minWidth: 100,
+    formatter: (row) => formatToWan(row.energy_num)
+  },
   { field: 'energy_rent_text', label: '能量有效期', minWidth: 100 },
   {
     field: 'pay_amount',
@@ -127,18 +146,18 @@ const columns = reactive<TableColumn[]>([
     minWidth: 100,
     slots: {
       default: ({ row }) => {
-        const status = row.delegate_status;
-        const text = getHandleStatusText(status);
+        const status = row.delegate_status
+        const text = getHandleStatusText(status)
         // 显式指定 tagType 的类型为 ElTag 允许的类型
-        let tagType: 'primary' | 'info' | 'success' | 'warning' | 'danger' = 'info';
+        let tagType: 'primary' | 'info' | 'success' | 'warning' | 'danger' = 'info'
 
         if (status === 1) {
-          tagType = 'success';
+          tagType = 'success'
         } else if (status === 0) {
-          tagType = 'warning';
+          tagType = 'warning'
         }
 
-        return <ElTag type={tagType}>{text}</ElTag>;
+        return <ElTag type={tagType}>{text}</ElTag>
       }
     }
   },
@@ -148,18 +167,18 @@ const columns = reactive<TableColumn[]>([
     minWidth: 100,
     slots: {
       default: ({ row }) => {
-        const recycleTime = row.recycle_time;
-        const text = getRecycleStatusText(recycleTime);
+        const recycleTime = row.recycle_time
+        const text = getRecycleStatusText(recycleTime)
         // 显式指定 tagType 的类型为 ElTag 允许的类型
-        let tagType: 'primary' | 'info' | 'success' | 'warning' | 'danger' = 'info';
+        let tagType: 'primary' | 'info' | 'success' | 'warning' | 'danger' = 'info'
 
         if (recycleTime) {
-          tagType = 'success';
+          tagType = 'success'
         } else {
-          tagType = 'info';
+          tagType = 'info'
         }
 
-        return <ElTag type={tagType}>{text}</ElTag>;
+        return <ElTag type={tagType}>{text}</ElTag>
       }
     }
   },
@@ -227,18 +246,10 @@ const actionColumn: TableColumn = {
 
       return (
         <>
-          <BaseButton
-            type="primary"
-            onClick={() => handleRecycle(row)}
-            disabled
-          >
+          <BaseButton type="primary" onClick={() => handleRecycle(row)} disabled>
             回收能量
           </BaseButton>
-          <BaseButton
-            type="primary"
-            onClick={() => handleResend(row)}
-            disabled
-          >
+          <BaseButton type="primary" onClick={() => handleResend(row)} disabled>
             补发能量
           </BaseButton>
           <BaseButton type="primary" onClick={() => handleDetail(row)}>
@@ -253,45 +264,45 @@ const actionColumn: TableColumn = {
 // --- Data Fetching (Simplified) ---
 const fetchHostedOrderList = async (params: any): Promise<{ list: any[]; total: number }> => {
   try {
-    console.log('搜索参数:', params);
-    
+    console.log('搜索参数:', params)
+
     // 处理dateRange
-    const apiParams = { ...params };
+    const apiParams = { ...params }
     if (params.dateRange && params.dateRange.length === 2) {
-      apiParams.start_time = params.dateRange[0];
-      apiParams.end_time = params.dateRange[1];
-      delete apiParams.dateRange;
+      apiParams.start_time = params.dateRange[0]
+      apiParams.end_time = params.dateRange[1]
+      delete apiParams.dateRange
     }
-    
-    console.log('调用API参数:', apiParams);
-    
+
+    console.log('调用API参数:', apiParams)
+
     // 使用非类型化的方式调用 API
-    const response: any = await getTrustTransactionListApi(apiParams);
-    console.log('API返回数据:', response);
-    
-    // 后端返回的结构是 
+    const response: any = await getTrustTransactionListApi(apiParams)
+    console.log('API返回数据:', response)
+
+    // 后端返回的结构是
     // {
     //   "list": [...],
     //   "pager": { "current_page": 1, "page_size": 10, "totalCount": 37 },
     //   "totalCount": 37
     // }
-    
+
     if (response?.data) {
-      const data = response.data;
+      const data = response.data
       return {
         // 数据列表在 data.list 中
         list: data.list || [],
         // 总数可能在 data.totalCount 或 data.pager.totalCount 中
-        total: data.totalCount || (data.pager?.totalCount) || 0
-      };
+        total: data.totalCount || data.pager?.totalCount || 0
+      }
     } else {
-      console.warn('API 返回格式异常', response);
-      return { list: [], total: 0 };
+      console.warn('API 返回格式异常', response)
+      return { list: [], total: 0 }
     }
   } catch (error) {
-    console.error('获取托管订单失败:', error);
-    ElMessage.error('获取托管订单列表失败');
-    return { list: [], total: 0 };
+    console.error('获取托管订单失败:', error)
+    ElMessage.error('获取托管订单列表失败')
+    return { list: [], total: 0 }
   }
 }
 

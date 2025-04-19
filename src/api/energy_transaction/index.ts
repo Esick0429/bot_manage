@@ -13,14 +13,15 @@ import {
 // --- 新增：精确匹配示例响应的 IResponse 接口 ---
 // !! 请确认所有 API 是否都遵循此结构 !!
 export interface ApiResponse<T = any> {
-  code: string; // 注意：code 是字符串 "000000"
-  data: T | null; // data 可能为 null 或包含具体类型
-  msg: string; // 注意：字段名是 msg
-  trace?: { // trace 结构是可选的
-      id?: string;
-      srcIp?: string;
-      timestamp?: number;
-  };
+  code: string // 注意：code 是字符串 "000000"
+  data: T | null // data 可能为 null 或包含具体类型
+  msg: string // 注意：字段名是 msg
+  trace?: {
+    // trace 结构是可选的
+    id?: string
+    srcIp?: string
+    timestamp?: number
+  }
 }
 
 /**
@@ -40,7 +41,7 @@ export const getEnergyTransactionListApi = (params: EnergyTransactionQueryParams
  */
 export const getEnergyTransactionDetailApi = (id: string) => {
   return request.get<ApiResponse<EnergyTransactionOrder>>({
-    url: `/v2/manage/energy_order/detail/${id}`,
+    url: `/v2/manage/energy_order/detail/${id}`
   })
 }
 
@@ -73,10 +74,10 @@ export const exportEnergyTransactionApi = (params: EnergyTransactionQueryParams)
  * @param params 分页参数
  */
 export const getEnergyCountListApi = (id: string | number, params: PageParams) => {
-    return request.get<ApiResponse<ListResult<EnergyCountListItem>>>({
-        url: `/v2/manage/energy_count/list/${id}`,
-        params
-    });
+  return request.get<ApiResponse<ListResult<EnergyCountListItem>>>({
+    url: `/v2/manage/energy_count/list/${id}`,
+    params
+  })
 }
 
 /**
@@ -85,10 +86,10 @@ export const getEnergyCountListApi = (id: string | number, params: PageParams) =
  * @param params 分页参数
  */
 export const getBatchActiveListApi = (id: string | number, params: PageParams) => {
-    return request.get<ApiResponse<ListResult<BatchActiveListItem>>>({
-        url: `/v2/manage/batch_active/list/${id}`,
-        params
-    });
+  return request.get<ApiResponse<ListResult<BatchActiveListItem>>>({
+    url: `/v2/manage/batch_active/list/${id}`,
+    params
+  })
 }
 
 // 导出所有类型

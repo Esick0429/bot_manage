@@ -45,7 +45,7 @@ const getTransactionStatusText = (status: number): string => {
 const getTransactionStatusTagType = (status: number): 'success' | 'warning' | 'info' | 'danger' => {
   const typeMap: Record<number, 'success' | 'warning' | 'info' | 'danger'> = {
     1: 'success', // 已完成
-    2: 'warning'  // 待处理 (Using warning, adjust if needed)
+    2: 'warning' // 待处理 (Using warning, adjust if needed)
   }
   return typeMap[status] ?? 'info' // Default to 'info'
 }
@@ -61,7 +61,10 @@ const fetchActivationDetails = async () => {
   activationLoading.value = true
   activationDetails.value = []
   try {
-    const params = { current_page: activationCurrentPage.value, page_size: activationPageSize.value }
+    const params = {
+      current_page: activationCurrentPage.value,
+      page_size: activationPageSize.value
+    }
     // Assuming getBatchActiveDetailApi works for type 5 with these params
     const response = await getBatchActiveDetailApi(props.orderId, params) // Pass params
     activationDetails.value = response?.data?.list || []
@@ -201,9 +204,13 @@ const activationTransactionSchema = computed((): DescriptionsSchema[] => [
     label: '交易状态',
     slots: {
       // 直接显示 "已完成"，因为激活列表的交易通常是完成的
-      default: () => h(
+      default: () =>
+        h(
           ElTag,
-          { type: getTransactionStatusTagType(selectedActivationTransaction.value.status), size: 'small' }, // Use helper for type
+          {
+            type: getTransactionStatusTagType(selectedActivationTransaction.value.status),
+            size: 'small'
+          }, // Use helper for type
           () => getTransactionStatusText(selectedActivationTransaction.value.status) // Use helper for text
         )
     }

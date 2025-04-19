@@ -91,18 +91,19 @@ const columns = ref<TableColumn[]>([
     label: '可用数量/阈值',
     minWidth: '180px',
     formatter: (row) => {
-      const displayValue = row.resource_type === 3
-        ? `${row.amount} / ${row.amount_limit == 0 ? '-' : row.amount_limit}`
-        : `${row.amount}`;
+      const displayValue =
+        row.resource_type === 3
+          ? `${row.amount} / ${row.amount_limit == 0 ? '-' : row.amount_limit}`
+          : `${row.amount}`
 
       if (row.resource_type === 3) {
         return (
           <span onDblclick={() => handleEditThreshold(row)} style={{ cursor: 'pointer' }}>
             {displayValue}
           </span>
-        );
+        )
       } else {
-        return <span>{displayValue}</span>;
+        return <span>{displayValue}</span>
       }
     }
   },
@@ -117,15 +118,16 @@ const columns = ref<TableColumn[]>([
     width: '100px',
     slots: {
       default: ({ row }) => {
-        const statusMap = row.resource_type === 3 ? { 1: '启用', 2: '禁用', 3: '备用' } : { 1: '启用', 2: '禁用' };
+        const statusMap =
+          row.resource_type === 3 ? { 1: '启用', 2: '禁用', 3: '备用' } : { 1: '启用', 2: '禁用' }
         const statusColors = {
           1: 'text-green-300 font-bold', // 启用 - 绿色
           2: 'text-red-300 font-bold', // 禁用 - 红色
-          3: 'text-orange-300 font-bold'  // 备用 - 橙色
-        };
+          3: 'text-orange-300 font-bold' // 备用 - 橙色
+        }
 
         // 判断是否应禁用非启用选项
-        const disableOthers = row.status === 1;
+        const disableOthers = row.status === 1
 
         return (
           <ElSelect
@@ -145,11 +147,11 @@ const columns = ref<TableColumn[]>([
                     value={parseInt(value, 10)}
                     disabled={disableOthers && parseInt(value, 10) !== 1}
                   />
-                ))}
+                ))
               }
-            }
+            }}
           </ElSelect>
-        );
+        )
       }
     }
   },
@@ -239,46 +241,45 @@ const reloadTable = () => {
 }
 
 const handleStatusChangeAttempt = async (row, newValue) => {
-  const originalStatus = row.status;
-  const intendedStatus = newValue;
+  const originalStatus = row.status
+  const intendedStatus = newValue
 
   if (originalStatus === intendedStatus) {
-    return;
+    return
   }
 
-  const statusMap = { 1: '启用', 2: '禁用', 3: '备用' };
-  const actionText = statusMap[intendedStatus];
-  let msg = `确认要将状态更改为 "${actionText}" 吗？`;
+  const statusMap = { 1: '启用', 2: '禁用', 3: '备用' }
+  const actionText = statusMap[intendedStatus]
+  let msg = `确认要将状态更改为 "${actionText}" 吗？`
   if (row.resource_type === 3) {
-    msg = `确认要将状态更改为 "${actionText}" ${intendedStatus === 1 ? '(设为主账户)' : intendedStatus === 3 ? '(设为备用账户)' : ''} 吗？`;
+    msg = `确认要将状态更改为 "${actionText}" ${intendedStatus === 1 ? '(设为主账户)' : intendedStatus === 3 ? '(设为备用账户)' : ''} 吗？`
   }
 
   try {
     await ElMessageBox.confirm(msg, '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
-      type: 'warning',
-    });
+      type: 'warning'
+    })
 
     await updateResourcePoolAccountApi({
       id: row.id,
       status: intendedStatus,
       amount_limit: parseFloat(row.amount_limit)
-    });
+    })
 
-    ElMessage.success(`状态已更新为 "${actionText}"`);
-    reloadTable();
-
+    ElMessage.success(`状态已更新为 "${actionText}"`)
+    reloadTable()
   } catch (error) {
-    console.error('操作失败:', error);
+    console.error('操作失败:', error)
     if (error === 'cancel') {
-      ElMessage.info('操作已取消');
+      ElMessage.info('操作已取消')
     } else {
-      const message = error instanceof Error ? error.message : '未知错误';
-      ElMessage.error(`操作失败: ${message}`);
+      const message = error instanceof Error ? error.message : '未知错误'
+      ElMessage.error(`操作失败: ${message}`)
     }
   }
-};
+}
 
 const handleDelete = async (row) => {
   try {
@@ -345,7 +346,7 @@ const handleSuccess = () => {
 }
 
 const handleEditThreshold = async (row) => {
-  if (row.resource_type !== 3) return;
+  if (row.resource_type !== 3) return
 
   try {
     const { value } = await ElMessageBox.prompt(
@@ -358,33 +359,32 @@ const handleEditThreshold = async (row) => {
         inputPattern: /^\d*$/,
         inputErrorMessage: '请输入有效的非负整数'
       }
-    );
+    )
 
     if (value === null) {
-      return;
+      return
     }
 
-    const newThreshold = value === '' ? 0 : parseInt(value, 10);
+    const newThreshold = value === '' ? 0 : parseInt(value, 10)
 
     if (newThreshold === row.amount_limit) {
-      ElMessage.info('阈值未改变');
-      return;
+      ElMessage.info('阈值未改变')
+      return
     }
 
     await updateResourcePoolAccountApi({
       id: row.id,
       amount_limit: newThreshold,
       status: row.status
-    });
+    })
 
-    ElMessage.success('阈值更新成功');
-    reloadTable();
-
+    ElMessage.success('阈值更新成功')
+    reloadTable()
   } catch (error) {
-    console.error('更新阈值失败:', error);
+    console.error('更新阈值失败:', error)
     if (error !== 'cancel') {
-      const message = error instanceof Error ? error.message : '未知错误';
-      ElMessage.error(`更新阈值失败: ${message}`);
+      const message = error instanceof Error ? error.message : '未知错误'
+      ElMessage.error(`更新阈值失败: ${message}`)
     }
   }
 }

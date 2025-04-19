@@ -100,52 +100,56 @@ const orderDetailRef = ref()
 const isLoaded = ref(false)
 
 // 定义 ElTag 允许的类型
-type ElTagType = 'success' | 'warning' | 'info' | 'primary' | 'danger';
+type ElTagType = 'success' | 'warning' | 'info' | 'primary' | 'danger'
 
 // --- 状态映射 (根据 Go Struct 更新) ---
 
 // 发放状态 (delegate_status: 1已发放 2待补发 3已补发)
 const issueStatusMap: Record<number, string> = {
-    1: '已发放', // Updated
-    2: '待补发', // Updated
-    3: '已补发', // Updated
-};
+  1: '已发放', // Updated
+  2: '待补发', // Updated
+  3: '已补发' // Updated
+}
 const issueStatusColorMap: Record<number, ElTagType> = {
-    1: 'success',
-    2: 'warning',
-    3: 'primary', // Or maybe success?
-    // 3: 'danger',
-};
+  1: 'success',
+  2: 'warning',
+  3: 'primary' // Or maybe success?
+  // 3: 'danger',
+}
 
 // 回收状态 (handle_status: 1已处理 2未处理 3处理失败)
 const recycleStatusMap: Record<number, string> = {
-    1: '已回收',   // Updated
-    2: '未回收',   // Updated
-    3: '回收失败', // Updated
-    // 0: '未回收', // 这个看起来不适用于 handle_status
-    // ... 其他可能的状态?
-};
+  1: '已回收', // Updated
+  2: '未回收', // Updated
+  3: '回收失败' // Updated
+  // 0: '未回收', // 这个看起来不适用于 handle_status
+  // ... 其他可能的状态?
+}
 const recycleStatusColorMap: Record<number, ElTagType> = {
-    1: 'success',
-    2: 'warning',
-    3: 'danger',
-    // ... 其他可能的状态?
-};
+  1: 'success',
+  2: 'warning',
+  3: 'danger'
+  // ... 其他可能的状态?
+}
 
 // 渲染状态标签的辅助函数
-const renderStatusTag = (status: number | string | undefined | null, map: Record<number, string>, colorMap: Record<number, ElTagType>) => {
+const renderStatusTag = (
+  status: number | string | undefined | null,
+  map: Record<number, string>,
+  colorMap: Record<number, ElTagType>
+) => {
   // 新增：如果 status 是 0，直接返回 '-' 标签
   if (status == 0) {
-      return '-'
+    return '-'
   }
-  const numStatus = Number(status);
+  const numStatus = Number(status)
   // 检查 NaN (现在排除了 0 的情况)
-  if (isNaN(numStatus)) return h('span', () => '无效');
-  const text = map[numStatus] || '未知';
+  if (isNaN(numStatus)) return h('span', () => '无效')
+  const text = map[numStatus] || '未知'
   // 确保 tagType 是 ElTagType，提供默认值 'info'
-  const tagType: ElTagType = colorMap[numStatus] || 'info';
-  return h(ElTag, { type: tagType, size: 'small' }, () => text); // 现在类型匹配
-};
+  const tagType: ElTagType = colorMap[numStatus] || 'info'
+  return h(ElTag, { type: tagType, size: 'small' }, () => text) // 现在类型匹配
+}
 
 // --- 表格列配置 (根据 Go Struct 更新字段名) ---
 const columns = [
@@ -158,11 +162,23 @@ const columns = [
     slots: {
       default: ({ row }) => {
         const type = Number(row.order_type)
-        const typeMap: Record<number, string> = { 1: '按笔数', 2: '按时间', 3: '批量下单', 4: '闪租', 5: '激活' };
-        const typeColorMap: Record<number, ElTagType> = { 1: 'primary', 2: 'success', 3: 'warning', 4: 'danger', 5: 'info' };
-        const text = typeMap[type] || '未知类型';
-        const tagType = typeColorMap[type] || 'info';
-        return h(ElTag, { type: tagType, size: 'small' }, () => text);
+        const typeMap: Record<number, string> = {
+          1: '按笔数',
+          2: '按时间',
+          3: '批量下单',
+          4: '闪租',
+          5: '激活'
+        }
+        const typeColorMap: Record<number, ElTagType> = {
+          1: 'primary',
+          2: 'success',
+          3: 'warning',
+          4: 'danger',
+          5: 'info'
+        }
+        const text = typeMap[type] || '未知类型'
+        const tagType = typeColorMap[type] || 'info'
+        return h(ElTag, { type: tagType, size: 'small' }, () => text)
       }
     }
   },
@@ -178,7 +194,7 @@ const columns = [
     width: 100,
     formatter: (row) => `${formatToWan(row.energy_num) ?? '-'}`
   },
-   {
+  {
     field: 'delegate_energy_num',
     label: '实际发放能量',
     width: 110,
@@ -191,14 +207,15 @@ const columns = [
     field: 'use_time',
     label: '使用时间',
     width: 160,
-    formatter: (row) => row.use_time ? formatToDateTime(row.use_time * 1000) : '-'
+    formatter: (row) => (row.use_time ? formatToDateTime(row.use_time * 1000) : '-')
   },
   {
     field: 'delegate_status', // Updated field: delegate_status
     label: '发放状态',
     width: 100,
     slots: {
-        default: ({ row }) => renderStatusTag(row.delegate_status, issueStatusMap, issueStatusColorMap) // Use delegate_status
+      default: ({ row }) =>
+        renderStatusTag(row.delegate_status, issueStatusMap, issueStatusColorMap) // Use delegate_status
     }
   },
   {
@@ -206,14 +223,15 @@ const columns = [
     label: '回收状态', // Note: field means "处理状态"
     width: 100,
     slots: {
-        default: ({ row }) => renderStatusTag(row.handle_status, recycleStatusMap, recycleStatusColorMap) // Use handle_status
+      default: ({ row }) =>
+        renderStatusTag(row.handle_status, recycleStatusMap, recycleStatusColorMap) // Use handle_status
     }
   },
   {
     field: 'create_time',
     label: '创建时间',
     width: 160,
-    formatter: (row) => row.create_time ? formatToDateTime(row.create_time * 1000) : '-'
+    formatter: (row) => (row.create_time ? formatToDateTime(row.create_time * 1000) : '-')
   },
   {
     field: 'describe',
@@ -270,9 +288,9 @@ const searchSchema = [
         { label: '全部', value: '' }, // Add "All" option
         // Dynamically generate options from issueStatusMap
         ...Object.entries(issueStatusMap).map(([value, label]) => ({
-           label: label,
-           // Convert value back to number for the option's value
-           value: Number(value) 
+          label: label,
+          // Convert value back to number for the option's value
+          value: Number(value)
         }))
       ]
     }
@@ -472,7 +490,8 @@ const fetchDataWrapper = async (params: any = {}) => {
       // 尝试获取列表和总数，提供默认值
       const resultList = data.list || []
       // 后端可能返回 total 或 totalCount
-      const resultTotal = data.total !== undefined ? data.total : data.totalCount !== undefined ? data.totalCount : 0
+      const resultTotal =
+        data.total !== undefined ? data.total : data.totalCount !== undefined ? data.totalCount : 0
 
       totalCount.value = resultTotal
 
@@ -482,8 +501,8 @@ const fetchDataWrapper = async (params: any = {}) => {
         total: resultTotal
       }
     } else {
-       totalCount.value = 0
-       return { list: [], total: 0 }
+      totalCount.value = 0
+      return { list: [], total: 0 }
     }
   } catch (error) {
     console.error('获取能量交易列表失败:', error)
@@ -517,7 +536,7 @@ const handleDataLoaded = ({ data, total, success }) => {
     isLoaded.value = true
   })
   if (!success) {
-     ElMessage.error('加载数据失败')
+    ElMessage.error('加载数据失败')
   } else if (data?.length === 0 && total === 0) {
     ElMessage.info('未查询到符合条件的数据')
   }

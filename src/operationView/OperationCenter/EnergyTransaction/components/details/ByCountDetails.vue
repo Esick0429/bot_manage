@@ -14,19 +14,19 @@ import isEmpty from 'lodash-es/isEmpty'
 // Helper function for formatting date/time
 const formatDisplayDateTime = (dateValue) => {
   // Reference file multiplies by 1000, assuming seconds timestamp
-  if (!dateValue || dateValue === 0) return '-';
-  const timestamp = Number(dateValue);
+  if (!dateValue || dateValue === 0) return '-'
+  const timestamp = Number(dateValue)
   if (!isNaN(timestamp) && timestamp > 0) {
-     // Assuming seconds timestamp based on reference file
-     const dateToFormat = timestamp * 1000;
-     try {
-       return formatToDateTime(dateToFormat);
-     } catch (e) {
-       console.error("Error formatting date:", dateValue, e);
-       return '日期无效';
-     }
-   }
-   return '-';
+    // Assuming seconds timestamp based on reference file
+    const dateToFormat = timestamp * 1000
+    try {
+      return formatToDateTime(dateToFormat)
+    } catch (e) {
+      console.error('Error formatting date:', dateValue, e)
+      return '日期无效'
+    }
+  }
+  return '-'
 }
 
 const props = defineProps({
@@ -69,10 +69,16 @@ const byCountDetailSchema = computed((): DescriptionsSchema[] => [
 const countOrderTableSchema = computed((): TableColumn[] => [
   { type: 'index', label: '序号', align: 'center', field: 'index' },
   {
-    prop: 'to_address', field: 'to_address', label: '地址', minWidth: 180
+    prop: 'to_address',
+    field: 'to_address',
+    label: '地址',
+    minWidth: 180
   },
   {
-    prop: 'status', field: 'status', label: '状态', align: 'center',
+    prop: 'status',
+    field: 'status',
+    label: '状态',
+    align: 'center',
     slots: {
       default: ({ row }) => {
         const status = Number(row.status)
@@ -84,11 +90,15 @@ const countOrderTableSchema = computed((): TableColumn[] => [
     }
   },
   {
-    prop: 'create_time', field: 'create_time', label: '创建时间',
+    prop: 'create_time',
+    field: 'create_time',
+    label: '创建时间',
     formatter: (row) => formatDisplayDateTime(row.create_time)
   },
   {
-    prop: 'end_time', field: 'end_time', label: '完成时间',
+    prop: 'end_time',
+    field: 'end_time',
+    label: '完成时间',
     formatter: (row) => formatDisplayDateTime(row.end_time)
   },
   {
@@ -120,10 +130,10 @@ const getCountStatusTagType = (status: number): 'success' | 'warning' | 'info' |
 // 修改：调用真实的（占位的）API 函数
 const fetchCountOrderDetails = async () => {
   if (!props.orderId) {
-    countOrderDetails.value = [];
-    apiTotalCount.value = 0;
-    console.warn("ByCountDetails (operationView): orderId prop is missing.");
-    return;
+    countOrderDetails.value = []
+    apiTotalCount.value = 0
+    console.warn('ByCountDetails (operationView): orderId prop is missing.')
+    return
   }
   countOrderLoading.value = true
   countOrderDetails.value = []
@@ -135,31 +145,31 @@ const fetchCountOrderDetails = async () => {
     }
     // !! Using getEnergyCountListApi !!
     const response: any = await getEnergyCountListApi(props.orderId, params as any) // Use 'any' for params type
-    console.log("ByCountDetails (operationView) API response:", response);
+    console.log('ByCountDetails (operationView) API response:', response)
 
     // Process response (assuming same structure as before)
     if (response && response.code === '000000' && response.data) {
-        const data: any = response.data; // Treat data as any
-        if (Array.isArray(data.list)) {
-            countOrderDetails.value = data.list
-            apiTotalCount.value = data.totalCount
-            if (countOrderDetails.value.length === 0 && countCurrentPage.value > 1) {
-              // 处理边缘情况：如果当前页没有数据，但不是第一页，回到上一页
-              countCurrentPage.value--
-              fetchCountOrderDetails()
-            }
-        } else {
-            countOrderDetails.value = []
-            apiTotalCount.value = 0
+      const data: any = response.data // Treat data as any
+      if (Array.isArray(data.list)) {
+        countOrderDetails.value = data.list
+        apiTotalCount.value = data.totalCount
+        if (countOrderDetails.value.length === 0 && countCurrentPage.value > 1) {
+          // 处理边缘情况：如果当前页没有数据，但不是第一页，回到上一页
+          countCurrentPage.value--
+          fetchCountOrderDetails()
         }
+      } else {
+        countOrderDetails.value = []
+        apiTotalCount.value = 0
+      }
     } else {
-        const errorMessage = response?.msg || '获取按笔数列表失败'; 
-        ElMessage.error(errorMessage);
-        countOrderDetails.value = [];
-        apiTotalCount.value = 0;
+      const errorMessage = response?.msg || '获取按笔数列表失败'
+      ElMessage.error(errorMessage)
+      countOrderDetails.value = []
+      apiTotalCount.value = 0
     }
   } catch (error: any) {
-    ElMessage.error(error?.message || '请求失败，请稍后重试');
+    ElMessage.error(error?.message || '请求失败，请稍后重试')
     countOrderDetails.value = []
     apiTotalCount.value = 0
   } finally {
@@ -191,7 +201,7 @@ watch(
   (newId, oldId) => {
     if (newId !== oldId && newId) {
       if (countCurrentPage.value !== 1) {
-          countCurrentPage.value = 1;
+        countCurrentPage.value = 1
       }
       fetchCountOrderDetails()
     }
@@ -201,7 +211,6 @@ watch(
 onMounted(() => {
   fetchCountOrderDetails()
 })
-
 </script>
 
 <template>
@@ -231,4 +240,4 @@ onMounted(() => {
 
 <style scoped>
 /* Add component-specific styles if needed */
-</style> 
+</style>

@@ -142,4 +142,3 @@ export const formatToWan = (num: number | string | null | undefined): string => 
   const result = (value / 10000).toFixed(1)
   return `${result}W`
 }
-

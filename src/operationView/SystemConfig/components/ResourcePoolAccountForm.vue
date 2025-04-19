@@ -59,9 +59,7 @@ const baseSchema: FormSchema[] = [
       placeholder: '请输入公钥',
       maxlength: 200,
       remark: () => {
-        return (
-          <span class="text-red-500 text-xs">请填写拥有者账户公钥地址</span>
-        )
+        return <span class="text-red-500 text-xs">请填写拥有者账户公钥地址</span>
       }
     },
     formItemProps: {
@@ -81,9 +79,7 @@ const trxPoolSchema: FormSchema[] = [
       type: 'password',
       showPassword: true,
       remark: () => {
-        return (
-          <span class="text-red-500 text-xs">请填写拥有者账户加密后的私钥</span>
-        )
+        return <span class="text-red-500 text-xs">请填写拥有者账户加密后的私钥</span>
       }
     },
     formItemProps: {
@@ -130,9 +126,7 @@ const energyPoolSchema: FormSchema[] = [
       placeholder: '请输入权限名称',
       maxlength: 100,
       remark: () => {
-        return (
-          <span class="text-red-500 text-xs">请填写活跃权限名称</span>
-        )
+        return <span class="text-red-500 text-xs">请填写活跃权限名称</span>
       }
     },
     formItemProps: {
@@ -143,9 +137,9 @@ const energyPoolSchema: FormSchema[] = [
 
 // 构建完整 Schema 的函数
 const buildSchema = (type: number | string | undefined): FormSchema[] => {
-  let numericType: number | undefined = typeof type === 'string' ? parseInt(type, 10) : type;
+  let numericType: number | undefined = typeof type === 'string' ? parseInt(type, 10) : type
   if (numericType === undefined || isNaN(numericType)) {
-      numericType = 1;
+    numericType = 1
   }
 
   const configSchema: FormSchema = {
@@ -180,33 +174,33 @@ const buildSchema = (type: number | string | undefined): FormSchema[] => {
 // --- 处理函数 --- START ---
 // 根据类型更新 Schema (现在是替换整个 schema)
 const handleConfigTypeChange = (value: number | string | undefined) => {
-  const newSchema = buildSchema(value);
-  formSchema.value = newSchema; // 直接替换 ref 的值
+  const newSchema = buildSchema(value)
+  formSchema.value = newSchema // 直接替换 ref 的值
 
   // 清理逻辑现在应该能正确处理 permission_name (作为字符串被设为 undefined)
   nextTick(async () => {
-    const { getFormData, setValues } = formMethods;
-    const currentValues = await getFormData();
-    const newSchemaFields = new Set(newSchema.map(item => item.field));
-    const valuesToClear: Record<string, any> = {};
+    const { getFormData, setValues } = formMethods
+    const currentValues = await getFormData()
+    const newSchemaFields = new Set(newSchema.map((item) => item.field))
+    const valuesToClear: Record<string, any> = {}
 
     for (const key in currentValues) {
-      if (key === 'configType') continue;
+      if (key === 'configType') continue
       if (!newSchemaFields.has(key)) {
-          valuesToClear[key] = undefined;
+        valuesToClear[key] = undefined
       }
     }
 
     if (Object.keys(valuesToClear).length > 0) {
-        console.log('Clearing values:', valuesToClear);
-        await setValues(valuesToClear);
+      console.log('Clearing values:', valuesToClear)
+      await setValues(valuesToClear)
     }
-  });
+  })
 }
 // --- 处理函数 --- END ---
 
 // 表单 Schema Ref
-const formSchema = ref<FormSchema[]>(buildSchema(1)); // 默认使用 TRX 池子 Schema 初始化
+const formSchema = ref<FormSchema[]>(buildSchema(1)) // 默认使用 TRX 池子 Schema 初始化
 
 // 使用表单Hook
 const { formRegister, formMethods } = useForm()
@@ -219,20 +213,21 @@ const open = async (params: OpenParams) => {
   currentData.value = params.data || {}
 
   // 确保 initialConfigType 是数字，并处理默认值
-  let initialConfigType: number | undefined = typeof currentData.value.configType === 'string'
-    ? parseInt(currentData.value.configType, 10) // 尝试解析字符串
-    : currentData.value.configType; // 如果已经是数字或undefined
+  let initialConfigType: number | undefined =
+    typeof currentData.value.configType === 'string'
+      ? parseInt(currentData.value.configType, 10) // 尝试解析字符串
+      : currentData.value.configType // 如果已经是数字或undefined
 
   // 如果解析失败(NaN)或本来就是undefined，则设为默认值 1 (TRX Pool)
   if (initialConfigType === undefined || isNaN(initialConfigType)) {
-    initialConfigType = 1;
+    initialConfigType = 1
   }
 
   // 1. 根据初始类型构建 Schema
-  formSchema.value = buildSchema(initialConfigType);
+  formSchema.value = buildSchema(initialConfigType)
 
   // 2. 等待 Form 组件更新完毕
-  await nextTick();
+  await nextTick()
 
   // 3. 获取 Form 实例 (可选)
   // const formExpose = await getFormExpose();
@@ -242,17 +237,19 @@ const open = async (params: OpenParams) => {
   const valuesToSet: Record<string, any> = {
     configType: initialConfigType, // 使用处理过的数字类型
     publicKey: currentData.value.publicKey || ''
-  };
-  // 现在可以安全地用 === 比较数字
-  if (initialConfigType === 1) { // TRX
-    valuesToSet.privateKey = currentData.value.privateKey || '';
-  } else if (initialConfigType === 3) { // Energy
-    valuesToSet.privateKey = currentData.value.privateKey || ''; // 注意字段名一致
-    // 使用 ?? undefined 确保数字字段在没有值时设置为 undefined
-    valuesToSet.amount_limit = currentData.value.amount_limit ?? undefined;
-    valuesToSet.permission_name = currentData.value.permission_name || ''; // <--- 修改：使用 permission_name，默认为空字符串
   }
-  await setValues(valuesToSet);
+  // 现在可以安全地用 === 比较数字
+  if (initialConfigType === 1) {
+    // TRX
+    valuesToSet.privateKey = currentData.value.privateKey || ''
+  } else if (initialConfigType === 3) {
+    // Energy
+    valuesToSet.privateKey = currentData.value.privateKey || '' // 注意字段名一致
+    // 使用 ?? undefined 确保数字字段在没有值时设置为 undefined
+    valuesToSet.amount_limit = currentData.value.amount_limit ?? undefined
+    valuesToSet.permission_name = currentData.value.permission_name || '' // <--- 修改：使用 permission_name，默认为空字符串
+  }
+  await setValues(valuesToSet)
 }
 
 // 提交表单
@@ -264,7 +261,10 @@ const handleSubmit = async () => {
     let formData = await getFormData()
 
     // 确保 formData.configType 是数字用于后续逻辑
-    const configTypeNum = typeof formData.configType === 'string' ? parseInt(formData.configType, 10) : formData.configType;
+    const configTypeNum =
+      typeof formData.configType === 'string'
+        ? parseInt(formData.configType, 10)
+        : formData.configType
 
     submitting.value = true
 
@@ -274,28 +274,29 @@ const handleSubmit = async () => {
     const dataToSubmit: any = {
       resource_type: configTypeNum, // 使用数字类型
       public_key: formData.publicKey,
-      private_key: formData.privateKey, // 两个类型都需要
+      private_key: formData.privateKey // 两个类型都需要
       // status: statusValue
     }
 
-    if (configTypeNum === 3) { // 能量池子
+    if (configTypeNum === 3) {
+      // 能量池子
       dataToSubmit.amount_limit = formData.amount_limit
       dataToSubmit.permission_name = formData.permission_name
     } else if (configTypeNum === 1) {
       // TRX 池子 - 确保不提交能量池字段 (如果清理逻辑未生效)
-      delete dataToSubmit.amount_limit;
-      delete dataToSubmit.permission_name; // <--- 修改：确保清理 permission_name
+      delete dataToSubmit.amount_limit
+      delete dataToSubmit.permission_name // <--- 修改：确保清理 permission_name
     } else {
-      console.error("Unhandled configType in handleSubmit:", configTypeNum)
-      ElMessage.error("未知的配置类型，无法提交")
+      console.error('Unhandled configType in handleSubmit:', configTypeNum)
+      ElMessage.error('未知的配置类型，无法提交')
       submitting.value = false
       return
     }
 
     // 再次清理确保只有需要的字段被提交
     if (configTypeNum === 1) {
-        delete dataToSubmit.amount_limit;
-        delete dataToSubmit.permission_name; // <--- 修改：确保清理 permission_name
+      delete dataToSubmit.amount_limit
+      delete dataToSubmit.permission_name // <--- 修改：确保清理 permission_name
     }
 
     try {

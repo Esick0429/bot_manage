@@ -66,7 +66,12 @@ const formSchema = reactive<FormSchema[]>([
     field: 'resendTrxAmount',
     component: 'InputNumber' as const,
     label: '补发数量:',
-    componentProps: { placeholder: '请输入补发TRX数量', min:0, precision: 2, slots: { suffix: () => <span>TRX</span> } },
+    componentProps: {
+      placeholder: '请输入补发TRX数量',
+      min: 0,
+      precision: 2,
+      slots: { suffix: () => <span>TRX</span> }
+    },
     formItemProps: { rules: [required()] },
     colProps: { span: 24 }
   },
@@ -74,7 +79,13 @@ const formSchema = reactive<FormSchema[]>([
     field: 'describe',
     component: 'Input' as const,
     label: '备注:',
-    componentProps: { placeholder: '请输入备注信息', type: 'textarea', rows: 3, maxlength: 200, showWordLimit: true },
+    componentProps: {
+      placeholder: '请输入备注信息',
+      type: 'textarea',
+      rows: 3,
+      maxlength: 200,
+      showWordLimit: true
+    },
     colProps: { span: 24 }
   }
 ]) as FormSchema[]
@@ -83,7 +94,8 @@ const formSchema = reactive<FormSchema[]>([
 const { formRegister, formMethods } = useForm()
 
 // 修改 open 函数以接收 ScreenshotTransactionItem
-const open = (order: ExchangeOrderListItem) => { // Use final type
+const open = (order: ExchangeOrderListItem) => {
+  // Use final type
   currentOrderDetail.value = order
   visible.value = true
 
@@ -91,9 +103,9 @@ const open = (order: ExchangeOrderListItem) => { // Use final type
   // !! CRITICAL: This logic needs verification. 'exchange_amount' is what the user RECEIVED.
   // What field represents the amount that *should* have been sent, which needs resending?
   // Using exchange_amount as a placeholder, likely incorrect.
-  let originalAmount: number | string = order.exchange_amount ?? 'N/A';
+  let originalAmount: number | string = order.exchange_amount ?? 'N/A'
   if (typeof originalAmount === 'string' && originalAmount !== 'N/A') {
-     originalAmount = isNaN(Number(originalAmount)) ? 'N/A' : Number(originalAmount);
+    originalAmount = isNaN(Number(originalAmount)) ? 'N/A' : Number(originalAmount)
   }
 
   // Initialize form using final type fields
@@ -108,7 +120,7 @@ const open = (order: ExchangeOrderListItem) => { // Use final type
   })
   // Clear validation state
   nextTick(() => {
-    formMethods.getElFormExpose().then(form => form?.clearValidate())
+    formMethods.getElFormExpose().then((form) => form?.clearValidate())
   })
 }
 
@@ -130,17 +142,18 @@ const handleSubmit = async () => {
         reason: formData.reason,
         remark: formData.remark
       }
-      
+
       // Recall: resendTrxApi implementation is currently commented out in index.ts
-      const result = await resendTrxApi(params) 
+      const result = await resendTrxApi(params)
 
       // Handle response (assuming { code: number, data: boolean, message: string })
       if ((result as any)?.code === 200 && (result as any)?.data === true) {
         ElMessage.success('TRX补发请求已提交') // Adjust message if needed
         visible.value = false
         emit('success')
-      } else if ((result as any)?.code === 999) { // Handle the placeholder response
-         ElMessage.warning((result as any)?.message || '补发功能暂未启用')
+      } else if ((result as any)?.code === 999) {
+        // Handle the placeholder response
+        ElMessage.warning((result as any)?.message || '补发功能暂未启用')
       } else {
         ElMessage.error((result as any)?.message || 'TRX补发失败')
       }

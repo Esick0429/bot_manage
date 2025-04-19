@@ -86,16 +86,16 @@ const totalActiveCost = computed(() => parseNum(props.statistics.total_active_co
           <template #default>
             <div class="min-h-[100px] flex justify-between">
               <div class="flex items-center">
-                <div
-                  class="p-4 inline-block rounded-[6px] text-[#40c9c6] hover:bg-[#40c9c6] group"
-                >
-                  <Icon icon="mdi:lightning-bolt" :size="50" class="group-hover:text-white transition duration-300 ease-out" />
+                <div class="p-4 inline-block rounded-[6px] text-[#40c9c6] hover:bg-[#40c9c6] group">
+                  <Icon
+                    icon="mdi:lightning-bolt"
+                    :size="50"
+                    class="group-hover:text-white transition duration-300 ease-out"
+                  />
                 </div>
               </div>
               <div class="flex flex-col justify-between text-right break-all min-w-0">
-                <div class="text-[16px] text-gray-500 mb-2">
-                  今日能量收入
-                </div>
+                <div class="text-[16px] text-gray-500 mb-2"> 今日能量收入 </div>
                 <div class="text-[20px] font-bold flex items-center justify-end min-w-0">
                   <CountTo
                     :start-val="0"
@@ -129,16 +129,16 @@ const totalActiveCost = computed(() => parseNum(props.statistics.total_active_co
           <template #default>
             <div class="min-h-[100px] flex justify-between">
               <div class="flex items-center">
-                <div
-                  class="p-4 inline-block rounded-[6px] text-[#36a3f7] hover:bg-[#36a3f7] group"
-                >
-                  <Icon icon="mdi:swap-horizontal" :size="50" class="group-hover:text-white transition duration-300 ease-out" />
+                <div class="p-4 inline-block rounded-[6px] text-[#36a3f7] hover:bg-[#36a3f7] group">
+                  <Icon
+                    icon="mdi:swap-horizontal"
+                    :size="50"
+                    class="group-hover:text-white transition duration-300 ease-out"
+                  />
                 </div>
               </div>
               <div class="flex flex-col justify-between text-right break-all min-w-0">
-                <div class="text-[16px] text-gray-500 mb-2">
-                  今日闪兑收入
-                </div>
+                <div class="text-[16px] text-gray-500 mb-2"> 今日闪兑收入 </div>
                 <div class="text-[20px] font-bold flex items-center justify-end min-w-0">
                   <CountTo
                     :start-val="0"
@@ -172,16 +172,16 @@ const totalActiveCost = computed(() => parseNum(props.statistics.total_active_co
           <template #default>
             <div class="min-h-[100px] flex justify-between">
               <div class="flex items-center">
-                <div
-                  class="p-4 inline-block rounded-[6px] text-[#ff9900] hover:bg-[#ff9900] group"
-                >
-                  <Icon icon="mdi:swap-vertical" :size="50" class="group-hover:text-white transition duration-300 ease-out" />
+                <div class="p-4 inline-block rounded-[6px] text-[#ff9900] hover:bg-[#ff9900] group">
+                  <Icon
+                    icon="mdi:swap-vertical"
+                    :size="50"
+                    class="group-hover:text-white transition duration-300 ease-out"
+                  />
                 </div>
               </div>
               <div class="flex flex-col justify-between text-right break-all min-w-0">
-                <div class="text-[16px] text-gray-500 mb-2">
-                  今日闪兑支出
-                </div>
+                <div class="text-[16px] text-gray-500 mb-2"> 今日闪兑支出 </div>
                 <div class="text-[20px] font-bold flex items-center justify-end min-w-0">
                   <CountTo
                     :start-val="0"
@@ -215,10 +215,12 @@ const totalActiveCost = computed(() => parseNum(props.statistics.total_active_co
           <template #default>
             <div class="min-h-[100px] flex justify-between">
               <div class="flex items-center">
-                 <div
-                  class="p-4 inline-block rounded-[6px] text-[#9c27b0] hover:bg-[#9c27b0] group"
-                >
-                  <Icon icon="mdi:cash-plus" :size="50" class="group-hover:text-white transition duration-300 ease-out" />
+                <div class="p-4 inline-block rounded-[6px] text-[#9c27b0] hover:bg-[#9c27b0] group">
+                  <Icon
+                    icon="mdi:cash-plus"
+                    :size="50"
+                    class="group-hover:text-white transition duration-300 ease-out"
+                  />
                 </div>
               </div>
               <div class="flex flex-col justify-between text-right break-all min-w-0">
@@ -246,16 +248,16 @@ const totalActiveCost = computed(() => parseNum(props.statistics.total_active_co
           <template #default>
             <div class="min-h-[100px] flex justify-between">
               <div class="flex items-center">
-                 <div
-                  class="p-4 inline-block rounded-[6px] text-[#ffcc00] hover:bg-[#ffcc00] group"
-                >
-                  <Icon icon="mdi:account-group" :size="50" class="group-hover:text-white transition duration-300 ease-out" />
+                <div class="p-4 inline-block rounded-[6px] text-[#ffcc00] hover:bg-[#ffcc00] group">
+                  <Icon
+                    icon="mdi:account-group"
+                    :size="50"
+                    class="group-hover:text-white transition duration-300 ease-out"
+                  />
                 </div>
               </div>
               <div class="flex flex-col justify-between text-right break-all min-w-0">
-                <div class="text-[16px] text-gray-500 mb-2">
-                  今日新增代理
-                </div>
+                <div class="text-[16px] text-gray-500 mb-2"> 今日新增代理 </div>
                 <div class="text-[20px] font-bold flex items-center justify-end min-w-0">
                   <CountTo :start-val="0" :end-val="dayNewAgents" :duration="2600" :decimals="0" />
                 </div>
@@ -277,16 +279,16 @@ const totalActiveCost = computed(() => parseNum(props.statistics.total_active_co
           <template #default>
             <div class="min-h-[100px] flex justify-between">
               <div class="flex items-center">
-                <div
-                  class="p-4 inline-block rounded-[6px] text-[#00bcd4] hover:bg-[#00bcd4] group"
-                >
-                  <Icon icon="mdi:robot" :size="50" class="group-hover:text-white transition duration-300 ease-out" />
+                <div class="p-4 inline-block rounded-[6px] text-[#00bcd4] hover:bg-[#00bcd4] group">
+                  <Icon
+                    icon="mdi:robot"
+                    :size="50"
+                    class="group-hover:text-white transition duration-300 ease-out"
+                  />
                 </div>
               </div>
               <div class="flex flex-col justify-between text-right break-all min-w-0">
-                <div class="text-[16px] text-gray-500 mb-2">
-                  今日机器人收入/数量
-                </div>
+                <div class="text-[16px] text-gray-500 mb-2"> 今日机器人收入/数量 </div>
                 <div class="text-[20px] font-bold flex items-center justify-end min-w-0">
                   <CountTo :start-val="0" :end-val="dayBotIncome" :duration="2600" :decimals="2" />
                   <span class="ml-[5px] text-[14px]">TRX</span>
@@ -322,16 +324,16 @@ const totalActiveCost = computed(() => parseNum(props.statistics.total_active_co
           <template #default>
             <div class="min-h-[100px] flex justify-between">
               <div class="flex items-center">
-                <div
-                  class="p-4 inline-block rounded-[6px] text-[#34d399] hover:bg-[#34d399] group"
-                >
-                  <Icon icon="mdi:arrow-up-bold-circle-outline" :size="50" class="group-hover:text-white transition duration-300 ease-out" />
+                <div class="p-4 inline-block rounded-[6px] text-[#34d399] hover:bg-[#34d399] group">
+                  <Icon
+                    icon="mdi:arrow-up-bold-circle-outline"
+                    :size="50"
+                    class="group-hover:text-white transition duration-300 ease-out"
+                  />
                 </div>
               </div>
               <div class="flex flex-col justify-between text-right break-all min-w-0">
-                <div class="text-[16px] text-gray-500 mb-2">
-                  今日激活收入
-                </div>
+                <div class="text-[16px] text-gray-500 mb-2"> 今日激活收入 </div>
                 <div class="text-[20px] font-bold flex items-center justify-end min-w-0">
                   <CountTo
                     :start-val="0"
