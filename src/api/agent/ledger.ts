@@ -41,7 +41,9 @@ interface AgentLedgerListResponseData {
  * @param params 查询参数
  * @returns Promise<IResponse<AgentLedgerListResponseData>>
  */
-export const getAgentLedgerListApi = (params: AgentLedgerQueryParams): Promise<IResponse<AgentLedgerListResponseData>> => {
+export const getAgentLedgerListApi = (
+  params: AgentLedgerQueryParams
+): Promise<IResponse<AgentLedgerListResponseData>> => {
   // 注意：此 URL 基于 Ledger.vue 中的 getAgentLedgerListApi 调用，请确认是否正确
   return request.get({ url: '/v2/manage/agent_balance/list', params })
 }

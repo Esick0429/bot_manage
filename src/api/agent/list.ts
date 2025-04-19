@@ -40,7 +40,9 @@ export interface UpdateAgentStatusPayload {
  * @param params 查询参数
  * @returns Promise<IResponse<AgentListResponseData>>
  */
-export const getAgentListApi = (params: AgentQueryParams): Promise<IResponse<AgentListResponseData>> => {
+export const getAgentListApi = (
+  params: AgentQueryParams
+): Promise<IResponse<AgentListResponseData>> => {
   return request.get({ url: '/v2/manage/agent/list', params })
 }
 
@@ -51,4 +53,4 @@ export const getAgentListApi = (params: AgentQueryParams): Promise<IResponse<Age
  */
 export const updateAgentStatusApi = (data: UpdateAgentStatusPayload): Promise<IResponse> => {
   return request.post({ url: '/v2/manage/agent/update', data })
-} 
+}

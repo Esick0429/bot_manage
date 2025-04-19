@@ -51,7 +51,9 @@ export interface UpdateAgentBotStatusPayload {
  * @param params 查询参数
  * @returns Promise<IResponse<AgentBotListResponseData>> // 修正返回类型
  */
-export const getAgentBotListApi = (params: AgentBotQueryParams): Promise<IResponse<AgentBotListResponseData>> => {
+export const getAgentBotListApi = (
+  params: AgentBotQueryParams
+): Promise<IResponse<AgentBotListResponseData>> => {
   return request.get({ url: '/v2/manage/agent_bot/list', params })
 }
 
@@ -62,4 +64,4 @@ export const getAgentBotListApi = (params: AgentBotQueryParams): Promise<IRespon
  */
 export const updateAgentBotStatusApi = (data: UpdateAgentBotStatusPayload): Promise<IResponse> => {
   return request.post({ url: '/v2/manage/agent_bot/update', data })
-} 
+}
