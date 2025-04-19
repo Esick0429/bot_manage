@@ -119,6 +119,7 @@ const flashExchangeSchema = reactive<FormSchema[]>([
   {
     field: 'stock_notice_trx_amount',
     component: 'InputNumber' as const,
+    hidden: true,
     componentProps: {
       placeholder: '请输入库存告警值',
       min: 0,

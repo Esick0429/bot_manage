@@ -44,13 +44,13 @@ const countEnergySchema = reactive<FormSchema[]>([
     field: 'count_price_trx',
     component: 'InputNumber' as const,
     label: {
-      text: '[1笔]能量TRX价格：',
-      tips: '只支持整数'
+      text: '[1笔]能量TRX价格：'
+      // tips: '只支持整数'
     },
     componentProps: {
       placeholder: '请输入TRX价格',
       min: 0,
-      precision: 0,
+      precision: 2,
       remark: () => {
         const costKey = 'count_price'
         const costPrice = computedAgentPrices.value[costKey]
@@ -85,6 +85,7 @@ const countEnergySchema = reactive<FormSchema[]>([
     field: 'notifyUser',
     component: 'Switch' as const,
     label: '地址笔数变更通知(用户)：',
+    hidden: true,
     value: false,
     componentProps: {
       disabled: true
@@ -94,6 +95,7 @@ const countEnergySchema = reactive<FormSchema[]>([
     field: 'notifyGroupOwner',
     component: 'Switch' as const,
     label: '地址笔数变更通知(群主)：',
+    hidden: true,
     value: false,
     componentProps: {
       disabled: true
@@ -103,6 +105,7 @@ const countEnergySchema = reactive<FormSchema[]>([
     field: 'notifyAdmin',
     component: 'Switch' as const,
     label: '地址笔数变更通知(机器人管理员)：',
+    hidden: true,
     value: false,
     componentProps: {
       disabled: true

@@ -73,6 +73,7 @@ const paymentSchema = reactive<FormSchema[]>([
       text: '订单通知机器人管理员',
       tips: '开启后，如果有新的订单，管理员将会接收到通知'
     },
+    hidden: true,
     value: false,
     componentProps: {
       disabled: true

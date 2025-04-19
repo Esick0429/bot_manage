@@ -53,6 +53,7 @@ const timeEnergySchema = reactive<FormSchema[]>([
   {
     field: 'flash_time_max_num',
     component: 'InputNumber' as const,
+    hidden: true,
     label: {
       text: '【1小时】能量闪租最大倍数',
       tips: '如果转账金额超过设置的倍数 * 单价，则不发货'

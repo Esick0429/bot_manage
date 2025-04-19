@@ -244,7 +244,7 @@ export function useBotConfig() {
 
             const batchOrderValues = {
               batch_energy_price: batchOrderConfig.batch_energy_price || 0,
-              batch_active_price: batchOrderConfig.batch_active_price || 1.1
+              batch_active_price: batchOrderConfig.batch_active_price || 0
             }
 
             // 设置表单值
