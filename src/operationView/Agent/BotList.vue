@@ -36,11 +36,19 @@ import {
 } from '@/api/agent/bot' // 更新导入路径
 import { ContentWrap } from '@/components/ContentWrap'
 import { BaseButton } from '@/components/Button'
+import { useRoute } from 'vue-router'
 
+const route = useRoute()
 // 引用SearchTable实例
 const searchTableRef = ref()
 
 // --- API 调用封装 ---
+onMounted(() => {
+  console.log('route', route.query)
+  searchTableRef.value?.setSearchParams({
+    query: route.query.id
+  })
+})
 
 // 获取机器人列表API封装
 const getAgentBotList = async (params?: any): Promise<{ list: AgentBotItem[]; total?: number }> => {
@@ -113,10 +121,7 @@ const columns = ref<TableColumn[]>([
     field: 'firstname',
     label: '机器人昵称',
     formatter: (row: AgentBotItem) => {
-      // TODO: 根据 src\views\Bot_manage\bot_list\index.vue 的实现添加链接
-      // 暂时只显示文本
-      // 例如: return <router-link to={`/bot-details/${row.id}`}>{row.name}</router-link>
-      return <span>{row.name}</span>
+      return <span>{row.firstname}</span>
     }
   },
   {

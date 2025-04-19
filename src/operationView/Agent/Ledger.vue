@@ -44,6 +44,19 @@ import { useRouter } from 'vue-router'
 const searchTableRef = ref()
 const router = useRouter()
 
+const orderTypeMap = () => {
+  return {
+    2: '托管',
+    3: '兑换',
+    4: '按笔数',
+    5: '按时间',
+    6: '批量下单',
+    7: '闪租',
+    8: '激活',
+    9: '机器人续费'
+  }
+}
+
 // 定义API函数调用
 const getAgentLedgerList = async (params?: any): Promise<{ list: any[]; total?: number }> => {
   try {
@@ -84,18 +97,16 @@ const searchSchema = ref<FormSchema[]>([
     }
   },
   {
-    field: 'status',
+    field: 'order_type',
     component: 'Select',
-    label: '扣款状态',
+    label: '交易类型',
     componentProps: {
-      placeholder: '请选择状态',
+      placeholder: '请选择交易类型',
       clearable: true,
-      options: [
-        { label: '全部', value: '' },
-        { label: '已完成', value: 1 },
-        { label: '已取消', value: 2 },
-        { label: '进行中', value: 3 }
-      ]
+      options: Object.entries(orderTypeMap()).map(([key, value]) => ({
+        label: value,
+        value: key
+      }))
     }
   }
 ])

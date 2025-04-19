@@ -101,7 +101,7 @@ const columns = ref<TableColumn[]>([
     label: '联系方式'
   },
   {
-    field: 'user_name',
+    field: 'username',
     label: '代理名称'
   },
   {
