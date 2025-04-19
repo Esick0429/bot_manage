@@ -47,6 +47,7 @@ const defaultResponseInterceptors = (response: AxiosResponse) => {
       const userStore = useUserStoreWithOut()
       userStore.logout()
     }
+    return Promise.reject(response?.data)
   }
 }
 
