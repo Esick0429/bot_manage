@@ -197,8 +197,8 @@ const transactionInSchema = computed<DescriptionsSchema[]>(() => [
       }
     }
   },
-  { field: 'in_from_address', label: '发送人', span: 24 },
-  { field: 'in_to_address', label: '接收人', span: 24 },
+  { field: 'in_to_address', label: '发送人', span: 24 },
+  { field: 'in_from_address', label: '接收人', span: 24 },
   // {
   //   field: 'in_number',
   //   label: '区块号',
@@ -257,8 +257,8 @@ const transactionOutSchema = computed<DescriptionsSchema[]>(() => [
       }
     }
   },
-  { field: 'out_from_address', label: '发送人', span: 24 },
-  { field: 'out_to_address', label: '接收人', span: 24 },
+  { field: 'out_to_address', label: '发送人', span: 24 },
+  { field: 'out_from_address', label: '接收人', span: 24 },
   {
     field: 'order_amount',
     label: 'USDT数量',
