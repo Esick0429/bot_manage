@@ -11,6 +11,7 @@
         ref="searchTableRef"
         @add="handleAdd"
         @search="onSearch"
+        :show-add-button="false"
       >
         <!-- 自定义搜索按钮 -->
         <template #searchButtons>
@@ -351,7 +352,7 @@ const actionColumn = {
           <BaseButton type="primary" onClick={() => handleEdit(row)}>
             编辑
           </BaseButton>
-          <BaseButton type="danger" onClick={() => handleDelete(row)}>
+          <BaseButton type="danger" v-show={false} onClick={() => handleDelete(row)}>
             删除
           </BaseButton>
         </>
