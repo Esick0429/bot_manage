@@ -90,6 +90,7 @@ import * as echarts from 'echarts/core'
 import { DataZoomComponent } from 'echarts/components'
 import axios from 'axios'
 import { debounce } from 'lodash-es'
+import { formatToDate } from '@/utils/dateUtil'
 
 // 注册DataZoom组件
 echarts.use([DataZoomComponent])
@@ -587,10 +588,10 @@ const dates = computed(() => {
     // 从时间戳创建日期 - 注意API时间戳是当天的结束时间
     // 确保time是数字
     const timeValue = typeof item.time === 'number' ? item.time : 0
-    const date = new Date(timeValue)
+    const date = new Date(timeValue - 8 * 60 * 60 * 1000)
 
     // 使用本地日期格式化
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+    return formatToDate(date)
   })
 })
 

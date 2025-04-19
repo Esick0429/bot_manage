@@ -103,7 +103,7 @@ const columns = reactive<TableColumn[]>([
   {
     field: 'time',
     label: '日期',
-    formatter: (row: TrxPriceData) => formatToDate(row.time)
+    formatter: (row: TrxPriceData) => formatToDate(row.time - 8 * 60 * 60 * 1000)
   },
   {
     field: 'open',
