@@ -28,10 +28,10 @@
             <Icon icon="ep:plus" class="mr-5px" />
             新增地址
           </ElButton>
-          <ElButton type="danger" @click="handleBatchDelete">
+          <!-- <ElButton type="danger" @click="handleBatchDelete">
             <Icon icon="ep:delete" class="mr-5px" />
             批量删除
-          </ElButton>
+          </ElButton> -->
         </template>
 
         <!-- 操作列内容通过 columns formatter 定义 -->
@@ -107,7 +107,7 @@ import { formatToDateTime } from '@/utils/dateUtil'
 import { BaseButton } from '@/components/Button'
 import { SearchTable } from '@/components/SearchTable' // 引入
 import type { TableColumn } from '@/components/Table' // 引入
-import { downloadByData } from '@/utils/download' // Revert import path
+import { downloadByData, downloadByBase64 } from '@/utils/download' // Revert import path
 
 import {
   getTrxAddressListApi,
@@ -146,16 +146,16 @@ const { formRegister: bindFormRegister, formMethods: bindFormMethods } = useForm
 
 // 表格列配置 - 根据实际 API 响应调整字段名
 const columns = ref<TableColumn[]>([
-  {
-    field: 'selection',
-    type: 'selection',
-    width: '55px'
-  },
-  {
-    field: 'id',
-    label: '序号',
-    width: '80px'
-  },
+  // {
+  //   field: 'selection',
+  //   type: 'selection',
+  //   width: '55px'
+  // },
+  // {
+  //   field: 'id',
+  //   label: '序号',
+  //   width: '80px'
+  // },
   {
     field: 'address',
     label: 'TRX收款地址',
@@ -365,15 +365,14 @@ const submitBatchImport = async () => {
     formData.append('file', file) // 将文件添加到 FormData
 
     submitting.value = true
-    await batchImportTrxAddressApi(formData) // 调用新的 API
+    const res = await batchImportTrxAddressApi(formData) // 调用新的 API
     ElMessage.success('批量导入成功')
     batchImportVisible.value = false
     reloadTable() // 刷新
-  } catch (error) {
+  } catch (error: any) {
     console.error('批量导入失败:', error)
     // 后端返回的错误信息可能在 error.response.data.message 或类似路径
-    const errorMsg = (error as any)?.response?.data?.message || '批量导入失败'
-    ElMessage.error(errorMsg)
+    downloadByBase64(error.data, '批量导入失败.xlsx')
   } finally {
     submitting.value = false
   }
@@ -502,37 +501,37 @@ const handleDelete = async (row) => {
 }
 
 // 处理批量删除 - 更新逻辑
-const handleBatchDelete = async () => {
-  const elTableRef = await searchTableRef.value?.getElTableExpose()
-  if (!elTableRef) {
-    console.error('无法获取 Table 实例')
-    return
-  }
-  const selections = elTableRef.getSelectionRows() || []
+// const handleBatchDelete = async () => {
+//   const elTableRef = await searchTableRef.value?.getElTableExpose()
+//   if (!elTableRef) {
+//     console.error('无法获取 Table 实例')
+//     return
+//   }
+//   const selections = elTableRef.getSelectionRows() || []
 
-  if (selections.length === 0) {
-    ElMessage.warning('请至少选择一项进行删除')
-    return
-  }
+//   if (selections.length === 0) {
+//     ElMessage.warning('请至少选择一项进行删除')
+//     return
+//   }
 
-  try {
-    await ElMessageBox.confirm(`确认要批量删除选中的 ${selections.length} 个地址吗？`, '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    })
-    const ids = selections.map((item: any) => item.id)
-    // Ensure payload matches API definition ({ id_list: [...] })
-    await batchDeleteTrxAddressApi({ id_list: ids })
-    ElMessage.success('批量删除成功')
-    reloadTable() // 刷新
-  } catch (error) {
-    if (error !== 'cancel') {
-      console.error('批量删除失败:', error)
-      ElMessage.error('批量删除失败')
-    }
-  }
-}
+//   try {
+//     await ElMessageBox.confirm(`确认要批量删除选中的 ${selections.length} 个地址吗？`, '提示', {
+//       confirmButtonText: '确定',
+//       cancelButtonText: '取消',
+//       type: 'warning'
+//     })
+//     const ids = selections.map((item: any) => item.id)
+//     // Ensure payload matches API definition ({ id_list: [...] })
+//     await batchDeleteTrxAddressApi({ id_list: ids })
+//     ElMessage.success('批量删除成功')
+//     reloadTable() // 刷新
+//   } catch (error) {
+//     if (error !== 'cancel') {
+//       console.error('批量删除失败:', error)
+//       ElMessage.error('批量删除失败')
+//     }
+//   }
+// }
 
 // 表单操作成功回调
 const handleSuccess = () => {
