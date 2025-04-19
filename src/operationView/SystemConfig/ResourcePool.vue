@@ -16,10 +16,10 @@
             <Icon icon="ep:plus" class="mr-5px" />
             新增
           </ElButton>
-          <ElButton type="danger" @click="handleBatchDelete">
+          <!-- <ElButton type="danger" @click="handleBatchDelete">
             <Icon icon="ep:delete" class="mr-5px" />
             批量删除
-          </ElButton>
+          </ElButton> -->
         </template>
       </SearchTable>
 
@@ -31,7 +31,7 @@
 
 <script setup lang="tsx">
 import { ref, reactive } from 'vue'
-import { ElButton, ElMessageBox, ElMessage, ElTag } from 'element-plus'
+import { ElButton, ElMessageBox, ElMessage, ElTag, ElSelect, ElOption } from 'element-plus'
 import { ContentWrap } from '@/components/ContentWrap'
 import { Icon } from '@/components/Icon'
 import { FormSchema } from '@/components/Form'
@@ -58,16 +58,16 @@ const resourceTypeMap = {
 }
 
 const columns = ref<TableColumn[]>([
-  {
-    type: 'selection',
-    field: 'selection',
-    width: '55px'
-  },
-  {
-    field: 'id',
-    label: '序号',
-    width: '80px'
-  },
+  // {
+  //   type: 'selection',
+  //   field: 'selection',
+  //   width: '55px'
+  // },
+  // {
+  //   field: 'id',
+  //   label: '序号',
+  //   width: '80px'
+  // },
   {
     field: 'resource_type',
     label: '配置类型',
@@ -115,14 +115,42 @@ const columns = ref<TableColumn[]>([
     field: 'status',
     label: '状态',
     width: '100px',
-    formatter: (row) => {
-      return row.status === 1 ? (
-        <ElTag type="success">启用</ElTag>
-      ) : row.status === 2 ? (
-        <ElTag type="danger">禁用</ElTag>
-      ) : (
-        <ElTag type="info">未知</ElTag>
-      )
+    slots: {
+      default: ({ row }) => {
+        const statusMap = row.resource_type === 3 ? { 1: '启用', 2: '禁用', 3: '备用' } : { 1: '启用', 2: '禁用' };
+        const statusColors = {
+          1: 'text-green-300 font-bold', // 启用 - 绿色
+          2: 'text-red-300 font-bold', // 禁用 - 红色
+          3: 'text-orange-300 font-bold'  // 备用 - 橙色
+        };
+
+        // 判断是否应禁用非启用选项
+        const disableOthers = row.status === 1;
+
+        return (
+          <ElSelect
+            modelValue={row.status}
+            onChange={(newValue) => handleStatusChangeAttempt(row, newValue)}
+            placeholder="请选择"
+          >
+            {{
+              prefix: () => {
+                return <span class={statusColors[row.status]}>{statusMap[row.status]}</span>
+              },
+              default: () => {
+                return Object.entries(statusMap).map(([value, label]) => (
+                  <ElOption
+                    key={value}
+                    label={label}
+                    value={parseInt(value, 10)}
+                    disabled={disableOthers && parseInt(value, 10) !== 1}
+                  />
+                ))}
+              }
+            }
+          </ElSelect>
+        );
+      }
     }
   },
   {
@@ -136,29 +164,6 @@ const columns = ref<TableColumn[]>([
     label: '更新时间',
     width: '180px',
     formatter: (row) => formatToDateTime(new Date(row.update_time * 1000))
-  },
-  {
-    label: '操作',
-    field: 'action',
-    width: '210px',
-    fixed: 'right',
-    formatter: (row) => (
-      <>
-        <BaseButton
-          type={row.status === 1 ? 'warning' : 'success'}
-          onClick={() => handleToggleStatus(row)}
-          disabled={row.status === 1}
-        >
-          {row.status === 1 ? '禁用' : '启用'}
-        </BaseButton>
-        {/* <BaseButton type="primary" plain onClick={() => handleEdit(row)}>
-          编辑
-        </BaseButton> */}
-        <BaseButton type="danger" onClick={() => handleDelete(row)}>
-          删除
-        </BaseButton>
-      </>
-    )
   }
 ])
 
@@ -233,33 +238,47 @@ const reloadTable = () => {
   searchTableRef.value?.reload()
 }
 
-const handleToggleStatus = async (row) => {
-  const targetStatus = row.status === 1 ? 2 : 1
-  const actionText = row.status === 1 ? '禁用' : '启用'
-  let msg = `确认要${actionText}该账户吗？`
-  row.resource_type === 3 && (msg = `确认要${actionText}该账户 ${row.status === 1 ? '' : '为主账户'}吗？`)
+const handleStatusChangeAttempt = async (row, newValue) => {
+  const originalStatus = row.status;
+  const intendedStatus = newValue;
+
+  if (originalStatus === intendedStatus) {
+    return;
+  }
+
+  const statusMap = { 1: '启用', 2: '禁用', 3: '备用' };
+  const actionText = statusMap[intendedStatus];
+  let msg = `确认要将状态更改为 "${actionText}" 吗？`;
+  if (row.resource_type === 3) {
+    msg = `确认要将状态更改为 "${actionText}" ${intendedStatus === 1 ? '(设为主账户)' : intendedStatus === 3 ? '(设为备用账户)' : ''} 吗？`;
+  }
+
   try {
     await ElMessageBox.confirm(msg, '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
-      type: 'warning'
-    })
+      type: 'warning',
+    });
 
     await updateResourcePoolAccountApi({
       id: row.id,
-      status: targetStatus
-    })
+      status: intendedStatus,
+      amount_limit: parseFloat(row.amount_limit)
+    });
 
-    ElMessage.success(`${actionText}成功`)
-    reloadTable()
+    ElMessage.success(`状态已更新为 "${actionText}"`);
+    reloadTable();
+
   } catch (error) {
-    console.error('操作失败:', error)
-    if (error !== 'cancel') {
-      const message = error instanceof Error ? error.message : '未知错误'
-      ElMessage.error(`操作失败: ${message}`)
+    console.error('操作失败:', error);
+    if (error === 'cancel') {
+      ElMessage.info('操作已取消');
+    } else {
+      const message = error instanceof Error ? error.message : '未知错误';
+      ElMessage.error(`操作失败: ${message}`);
     }
   }
-}
+};
 
 const handleDelete = async (row) => {
   try {

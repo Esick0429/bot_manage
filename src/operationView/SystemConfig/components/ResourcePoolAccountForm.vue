@@ -27,7 +27,7 @@ interface FormData {
   configType: string | number // 允许字符串或数字
   publicKey: string
   privateKey: string
-  status: number
+  // status: number
   amount_limit?: number // 可选
   permission_name?: string // <--- 修改：从 permission_group 改为 permission_name，类型为 string
   [key: string]: any
@@ -79,7 +79,12 @@ const trxPoolSchema: FormSchema[] = [
       placeholder: '请输入私钥：',
       maxlength: 200,
       type: 'password',
-      showPassword: true
+      showPassword: true,
+      remark: () => {
+        return (
+          <span class="text-red-500 text-xs">请填写拥有者账户加密后的私钥</span>
+        )
+      }
     },
     formItemProps: {
       rules: [{ required: true, message: ' ', trigger: 'blur' }]
@@ -263,14 +268,14 @@ const handleSubmit = async () => {
 
     submitting.value = true
 
-    const statusValue = currentData.value?.status ?? 2
+    // const statusValue = currentData.value?.status ?? 2
 
     // 根据最终的 formData 构建提交数据
     const dataToSubmit: any = {
       resource_type: configTypeNum, // 使用数字类型
       public_key: formData.publicKey,
       private_key: formData.privateKey, // 两个类型都需要
-      status: statusValue
+      // status: statusValue
     }
 
     if (configTypeNum === 3) { // 能量池子
