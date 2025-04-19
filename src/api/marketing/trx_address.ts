@@ -42,7 +42,6 @@ export const deleteTrxAddressApi = (id: number) => {
     url: `${BASE_URL}/delete`,
     data: { id }
   })
-
 }
 
 /**
@@ -74,11 +73,10 @@ export const batchImportTrxAddressApi = (formData: FormData) => {
  */
 export const exportAddressModuleApi = () => {
   return request.get({
-      url: `${BASE_URL}/module`,
-      responseType: 'blob'
-  });
-};
-
+    url: `${BASE_URL}/module`,
+    responseType: 'blob'
+  })
+}
 
 /**
  * 获取代理商列表
