@@ -3,7 +3,7 @@ import { StatisticsResponse } from './types'
 
 // 获取每日统计数据API
 export const getDailyStatisticsApi = () => {
-  return request.get<StatisticsResponse>({ url: '/statistics/daily' })
+  return request.get<StatisticsResponse>({ url: '/v2/manage/order/market' })
 }
 
 // 获取机器人摘要数据API
