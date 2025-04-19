@@ -34,3 +34,40 @@ export function downloadByData(data: any, filename: string, mimeType?: string) {
   document.body.removeChild(link)
   URL.revokeObjectURL(blobUrl)
 }
+
+/**
+ * 将 Base64 字符串转换为 Blob 对象并下载
+ * @param base64Data Base64 编码的字符串 (可以包含 data:mime/type;base64, 前缀)
+ * @param filename 下载的文件名
+ */
+export function downloadByBase64(base64Data: string, filename: string) {
+  // 移除 Base64 字符串前缀 (例如 "data:image/png;base64,") 并获取 MIME 类型
+  const parts = base64Data.match(/^data:(.+);base64,(.+)$/)
+  let base64String = base64Data
+  let mimeType: string | undefined
+
+  if (parts && parts.length === 3) {
+    mimeType = parts[1] // 获取 MIME 类型
+    base64String = parts[2] // 获取纯 Base64 数据
+  }
+
+  try {
+    // 解码 Base64
+    const byteCharacters = atob(base64String)
+    const byteNumbers = new Array(byteCharacters.length)
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i)
+    }
+    const byteArray = new Uint8Array(byteNumbers)
+
+    // 创建 Blob 对象
+    const blob = new Blob([byteArray], { type: mimeType }) // 使用提取的 MIME 类型
+
+    // 调用现有的下载函数
+    downloadByData(blob, filename)
+  } catch (error) {
+    console.error('Error decoding or downloading base64 data:', error)
+    // 在这里可以添加用户提示，例如使用 ElMessage
+    // ElMessage.error('下载失败，Base64 数据无效');
+  }
+}
