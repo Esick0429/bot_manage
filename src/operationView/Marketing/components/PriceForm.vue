@@ -24,7 +24,7 @@ import type { AddPriceParams, UpdatePriceParams, AgentPriceVO } from '@/api/mark
 // 类型定义 - 匹配后端 snake_case 结构
 interface FormData extends Omit<AddPriceParams, 'status'> {
   id?: number
-  status: number | string
+  // status: number | string
 }
 
 interface OpenParams {
@@ -148,22 +148,22 @@ const baseFormSchema = reactive<FormSchema[]>([
     componentProps: {
       // ... InputNumber props
     }
-  },
-  {
-    field: 'status',
-    component: 'RadioGroup',
-    label: '状态：',
-    value: 1,
-    componentProps: {
-      options: [
-        { label: '启用', value: 1 },
-        { label: '禁用', value: 2 }
-      ]
-    },
-    formItemProps: {
-      rules: [required()]
-    }
   }
+  // {
+  //   field: 'status',
+  //   component: 'RadioGroup',
+  //   label: '状态：',
+  //   value: 1,
+  //   componentProps: {
+  //     options: [
+  //       { label: '启用', value: 1 },
+  //       { label: '禁用', value: 2 }
+  //     ]
+  //   },
+  //   formItemProps: {
+  //     rules: [required()]
+  //   }
+  // }
 ]) as FormSchema[]
 
 // 根据产品类型更新表单字段的可见性和规则 (更新逻辑)
@@ -251,12 +251,12 @@ const open = async (params: OpenParams) => {
     price_type: initialPriceType,
     price_trx: currentData.value.price_trx ?? null,
     price_trx_65000: currentData.value.price_trx_65000 ?? null,
-    price_trx_131000: currentData.value.price_trx_131000 ?? null,
+    price_trx_131000: currentData.value.price_trx_131000 ?? null, 
     price_day_1: currentData.value.price_day_1 ?? null,
     price_day_3: currentData.value.price_day_3 ?? null,
     price_day_7: currentData.value.price_day_7 ?? null,
     price_day_15: currentData.value.price_day_15 ?? null,
-    status: currentData.value.status === undefined ? 1 : Number(currentData.value.status)
+    // status: currentData.value.status === undefined ? 1 : Number(currentData.value.status)
   })
 }
 
@@ -317,7 +317,7 @@ const submitLogic = async (formData: FormData) => {
       price_day_3: Number(formData.price_day_3) || 0,
       price_day_7: Number(formData.price_day_7) || 0,
       price_day_15: Number(formData.price_day_15) || 0,
-      status: Number(formData.status)
+      // status: Number(formData.status)
     }
 
     if (formMode.value === 'add') {

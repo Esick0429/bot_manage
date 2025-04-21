@@ -13,7 +13,7 @@ export interface AgentPriceVO {
   price_day_3: number // 按天数 - 3天价格(TRX)
   price_day_7: number // 按天数 - 7天价格(TRX)
   price_day_15: number // 按天数 - 15天价格(TRX)
-  status: number // 1: 启用, 2: 禁用
+  // status: number // 1: 启用, 2: 禁用
   creator_name?: string
   create_time?: string
   update_time?: string
@@ -30,7 +30,7 @@ export interface AddPriceParams {
   price_day_3?: number
   price_day_7?: number
   price_day_15?: number
-  status: number // 1: 启用, 2: 禁用
+  // status: number // 1: 启用, 2: 禁用
 }
 
 // 更新价格配置参数

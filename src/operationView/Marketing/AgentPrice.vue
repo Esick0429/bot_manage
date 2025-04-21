@@ -140,8 +140,7 @@ const columns = reactive<any[]>([
         // 托管
         content = (
           <div>
-            <div>6500能量: {formatPrice(row.price_trx_65000, 2)}(TRX)</div>
-            <div>131000能量: {formatPrice(row.price_trx_131000, 2)}(TRX)</div>
+            {`6500能量：${formatPrice(row.price_trx_65000, 2)}(TRX) ; 131000能量：${formatPrice(row.price_trx_131000, 2)}(TRX)`}
           </div>
         )
       } else if (type === 3) {
