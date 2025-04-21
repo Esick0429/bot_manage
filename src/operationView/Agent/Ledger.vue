@@ -137,9 +137,9 @@ const columns = ref<TableColumn[]>([
           case 2:
             href = `${href}/custody_details`
             break
-          case 1:
-            href = `${href}/recharge_order`
-            break
+          // case 1:
+          //   href = `${href}/recharge_order`
+          //   break
           default:
             href = ''
         }

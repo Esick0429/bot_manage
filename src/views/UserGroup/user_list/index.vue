@@ -9,7 +9,7 @@
         :showAddButton="false"
         ref="searchTableRef"
       >
-        <template #searchButtons>
+        <!-- <template #searchButtons>
           <BaseButton
             type="primary"
             disabled
@@ -20,7 +20,7 @@
           <BaseButton type="success" disabled @click="openMassSendRecordDialog()"
             >群发记录</BaseButton
           >
-        </template>
+        </template> -->
       </SearchTable>
 
       <!-- 充值弹窗 -->
@@ -179,9 +179,9 @@ const columns: TableColumn[] = [
       default: ({ row }) => {
         return (
           <div>
-            <BaseButton type="primary" disabled onClick={() => openSendMessageDialog(row)}>
+            {/* <BaseButton type="primary" disabled onClick={() => openSendMessageDialog(row)}>
               发送消息
-            </BaseButton>
+            </BaseButton> */}
             <BaseButton
               type="success"
               style="margin-left: 8px"

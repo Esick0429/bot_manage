@@ -294,7 +294,7 @@ const totalActiveCost = computed(() => parseNum(props.statistics.total_active_co
                   <span class="ml-[5px] text-[14px]">TRX</span>
                   <span class="ml-[5px] text-[14px]">/</span>
                   <CountTo :start-val="0" :end-val="dayBotNum" :duration="2600" :decimals="0" />
-                  <span class="ml-[5px] text-[14px]">台</span>
+                  <span class="ml-[5px] text-[14px]">只</span>
                 </div>
                 <div class="text-[12px] text-gray-400 mt-[4px]">
                   <span>总收入 </span>
@@ -317,7 +317,7 @@ const totalActiveCost = computed(() => parseNum(props.statistics.total_active_co
       </ElCard>
     </ElCol>
 
-    <!-- 今日激活收入 -->
+    <!-- 今日激活利润 -->
     <ElCol :xs="24" :sm="12" :md="8" :lg="8" :xl="8">
       <ElCard shadow="hover" class="mb-[20px]">
         <ElSkeleton :loading="props.isLoading" animated :rows="3">
@@ -333,7 +333,7 @@ const totalActiveCost = computed(() => parseNum(props.statistics.total_active_co
                 </div>
               </div>
               <div class="flex flex-col justify-between text-right break-all min-w-0">
-                <div class="text-[16px] text-gray-500 mb-2"> 今日激活收入 </div>
+                <div class="text-[16px] text-gray-500 mb-2"> 今日激活利润 </div>
                 <div class="text-[20px] font-bold flex items-center justify-end min-w-0">
                   <CountTo
                     :start-val="0"
@@ -344,7 +344,7 @@ const totalActiveCost = computed(() => parseNum(props.statistics.total_active_co
                   <span class="ml-[5px] text-[14px]">TRX</span>
                 </div>
                 <div class="text-[12px] text-gray-400 mt-[4px]">
-                  <span>总激活收入 </span>
+                  <span>总激活利润 </span>
                   <CountTo
                     :start-val="0"
                     :end-val="totalActiveIncome"

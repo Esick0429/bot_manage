@@ -28,7 +28,7 @@ const batchOrderSchema = reactive<FormSchema[]>([
         const costPrice = computedAgentPrices.value[costKey]
         return (
           <>
-            <p>激活成本为：{costPrice}TRX</p>
+            <p>成本为：{costPrice}TRX</p>
           </>
         )
       }
