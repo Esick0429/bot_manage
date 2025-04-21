@@ -8,6 +8,7 @@ import LockPage from './components/LockPage.vue'
 import { useLockStore } from '@/store/modules/lock'
 import { useUserStore } from '@/store/modules/user'
 import { useRouter } from 'vue-router'
+import ChangePasswordDialog from './components/ChangePasswordDialog.vue'
 
 const { push } = useRouter()
 
@@ -28,6 +29,7 @@ const loginOut = () => {
 }
 
 const dialogVisible = ref<boolean>(false)
+const changePasswordDialogVisible = ref<boolean>(false)
 
 // 锁定屏幕
 const lockScreen = () => {
@@ -41,16 +43,20 @@ const toDocument = () => {
 const toPage = (path: string) => {
   push(path)
 }
+
+const changePassword = () => {
+  changePasswordDialogVisible.value = true
+}
 </script>
 
 <template>
   <ElDropdown class="custom-hover" :class="prefixCls" trigger="click">
     <div class="flex items-center">
-      <img
+      <!-- <img
         src="@/assets/imgs/avatar.jpg"
         alt=""
         class="w-[calc(var(--logo-height)-25px)] rounded-[50%]"
-      />
+      /> -->
       <span class="<lg:hidden text-14px pl-[5px] text-[var(--top-header-text-color)]">{{
         userStore.getUserInfo?.username
       }}</span>
@@ -58,16 +64,21 @@ const toPage = (path: string) => {
     <template #dropdown>
       <ElDropdownMenu>
         <!-- <ElDropdownItem>
-          <div @click="toPage('/personal/personal-center')">
-            {{ t('router.personalCenter') }}
-          </div>
-        </ElDropdownItem> -->
+        <div @click="toPage('/personal/personal-center')">
+          {{ t('router.personalCenter') }}
+        </div>
+      </ElDropdownItem> -->
         <!-- <ElDropdownItem>
-          <div @click="toDocument">{{ t('common.document') }}</div>
-        </ElDropdownItem> -->
+        <div @click="toDocument">{{ t('common.document') }}</div>
+      </ElDropdownItem> -->
         <!-- <ElDropdownItem divided>
-          <div @click="lockScreen">{{ t('lock.lockScreen') }}</div>
-        </ElDropdownItem> -->
+        <div @click="lockScreen">{{ t('lock.lockScreen') }}</div>
+      </ElDropdownItem> -->
+        <ElDropdownItem>
+          <div @click="changePassword">
+            {{ '修改密码' }}
+          </div>
+        </ElDropdownItem>
         <ElDropdownItem>
           <div @click="loginOut">{{ t('common.loginOut') }}</div>
         </ElDropdownItem>
@@ -76,6 +87,7 @@ const toPage = (path: string) => {
   </ElDropdown>
 
   <LockDialog v-if="dialogVisible" v-model="dialogVisible" />
+  <ChangePasswordDialog v-model="changePasswordDialogVisible" />
   <teleport to="body">
     <transition name="fade-bottom" mode="out-in">
       <LockPage v-if="getIsLock" />
