@@ -9,6 +9,7 @@ import { useLockStore } from '@/store/modules/lock'
 import { useUserStore } from '@/store/modules/user'
 import { useRouter } from 'vue-router'
 import ChangePasswordDialog from './components/ChangePasswordDialog.vue'
+import { isOperationSystem } from '@/utils/system'
 
 const { push } = useRouter()
 
@@ -74,7 +75,7 @@ const changePassword = () => {
         <!-- <ElDropdownItem divided>
         <div @click="lockScreen">{{ t('lock.lockScreen') }}</div>
       </ElDropdownItem> -->
-        <ElDropdownItem>
+        <ElDropdownItem v-if="isOperationSystem()">
           <div @click="changePassword">
             {{ '修改密码' }}
           </div>
