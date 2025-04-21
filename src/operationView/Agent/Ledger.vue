@@ -11,12 +11,12 @@
         :show-add-button="false"
       >
         <!-- 自定义搜索按钮区域 -->
-        <template #searchButtons>
+        <!-- <template #searchButtons>
           <BaseButton type="primary" @click="handleExport" disabled>
             <Icon icon="ep:download" class="mr-5px" />
             导出
           </BaseButton>
-        </template>
+        </template> -->
       </SearchTable>
     </ContentWrap>
   </div>

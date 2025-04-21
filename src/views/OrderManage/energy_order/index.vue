@@ -14,9 +14,9 @@
         @search="onSearch"
       >
         <!-- 自定义搜索按钮 -->
-        <template #searchButtons>
+        <!-- <template #searchButtons>
           <BaseButton @click="handleExport" disabled>导出订单</BaseButton>
-        </template>
+        </template> -->
       </SearchTable>
 
       <!-- 订单详情弹窗 (使用新组件) -->
