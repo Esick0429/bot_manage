@@ -30,8 +30,10 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
   } else {
     env = loadEnv(mode, root)
   }
+  console.log('Current VITE_SYSTEM_TYPE:', env.VITE_SYSTEM_TYPE);
+
   return {
-    base: env.VITE_BASE_PATH,
+    base: env.VITE_SYSTEM_TYPE === 'Management' ? '/management' : '/operation',
     plugins: [
       Vue({
         script: {
@@ -125,7 +127,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
     },
     build: {
       target: 'es2015',
-      outDir: env.VITE_OUT_DIR || 'dist',
+      outDir: env.VITE_SYSTEM_TYPE === 'Management' ? 'dist-management' : 'dist-operation',
       sourcemap: env.VITE_SOURCEMAP === 'true',
       // brotliSize: false,
       rollupOptions: {
