@@ -81,13 +81,13 @@ const columns = reactive<TableColumn[]>([
     field: 'trx_price',
     label: '兑换TRX汇率',
     minWidth: 120,
-    formatter: (row) => '$' + row.trx_price || '-' // 显示价格，如 0.28114
+    formatter: (row) => row.trx_price || '-' // 显示价格，如 0.28114
   },
   {
     field: 'real_price',
     label: '实时汇率',
     minWidth: 100,
-    formatter: (row) => '$' + row.real_price || '-' // 显示价格，如 0.255
+    formatter: (row) => row.real_price || '-' // 显示价格，如 0.255
   },
   {
     field: 'exchange_amount', // 对应截图的 "支出TRX数量"
@@ -183,7 +183,7 @@ const searchSchema = reactive<FormSchema[]>([
 const actionColumn = {
   field: 'action',
   label: '操作',
-  width: 200,
+  minWidth: 120,
   fixed: 'right' as const,
   slots: {
     default: ({ row }: { row: ExchangeOrderListItem }) => {
@@ -192,13 +192,13 @@ const actionColumn = {
           <BaseButton type="primary" onClick={() => handleDetail(row)}>
             详情
           </BaseButton>
-          <BaseButton
+          {/* <BaseButton
             type="primary"
             onClick={() => handleResend(row)}
             disabled={row.status !== 1 && row.status !== 2}
           >
             补发TRX
-          </BaseButton>
+          </BaseButton> */}
         </>
       )
     }

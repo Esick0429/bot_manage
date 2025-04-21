@@ -244,19 +244,19 @@ const columns = [
 const actionColumn = {
   field: 'action',
   label: '操作',
-  width: 280,
+  minWidth: 120,
   fixed: 'right' as const,
   slots: {
     default: (data: any) => {
       const row = data.row
       return (
         <>
-          <BaseButton type="warning" disabled onClick={() => handleRecycle(row)}>
+          {/* <BaseButton type="warning" disabled onClick={() => handleRecycle(row)}>
             回收
           </BaseButton>
           <BaseButton type="success" disabled onClick={() => handleResend(row)}>
             补发
-          </BaseButton>
+          </BaseButton> */}
           <BaseButton type="primary" onClick={() => handleDetail(row)}>
             详情
           </BaseButton>

@@ -88,9 +88,9 @@ const formatAmount = (amount: string | number | undefined, unit: string | undefi
   return amountStr !== '-' && unit ? `${amountStr}${unit}` : amountStr.toString()
 }
 
-const formatRate = (rate: string | number | undefined) => {
-  return rate !== undefined && rate !== null ? `$${rate}` : '-'
-}
+// const formatRate = (rate: string | number | undefined) => {
+//   return rate !== undefined && rate !== null ? `$${rate}` : '-'
+// }
 
 const formatNullableDateTime = (timestamp: number | undefined) => {
   return timestamp && !isNaN(timestamp) ? formatToDateTime(timestamp * 1000) : '-'
@@ -121,7 +121,6 @@ const detailSchema = computed<DescriptionsSchema[]>(() => [
     label: '兑换汇率',
     field: 'trx_price',
     span: 8,
-    slots: { default: (data) => h('span', { class: 'text-blue-500' }, formatRate(data.trx_price)) }
   },
 
   {
@@ -140,7 +139,6 @@ const detailSchema = computed<DescriptionsSchema[]>(() => [
     label: '实时汇率',
     field: 'real_price',
     span: 8,
-    slots: { default: (data) => formatRate(data.real_price) }
   },
 
   // { label: '补发TRX', field: 'resend_amount', span: 8, slots: { default: (data) => formatAmount(data.resend_amount, data.resend_unit ?? data.exchange_unit) } },

@@ -52,9 +52,9 @@ const searchTableRef = ref()
 
 const resourceTypeMap = {
   1: 'TRX池子',
-  2: 'USDT池子',
+  // 2: 'USDT池子',
   3: '能量池子',
-  4: '带宽池子'
+  // 4: '带宽池子'
 }
 
 const columns = ref<TableColumn[]>([
@@ -118,8 +118,7 @@ const columns = ref<TableColumn[]>([
     width: '100px',
     slots: {
       default: ({ row }) => {
-        const statusMap =
-          row.resource_type === 3 ? { 1: '启用', 2: '禁用', 3: '备用' } : { 1: '启用', 2: '禁用' }
+        const statusMap = { 1: '启用', 2: '禁用', 3: '备用' }
         const statusColors = {
           1: 'text-green-300 font-bold', // 启用 - 绿色
           2: 'text-red-300 font-bold', // 禁用 - 红色
@@ -180,9 +179,9 @@ const searchSchema = reactive<FormSchema[]>([
       options: [
         { label: '全部', value: '' },
         { label: 'TRX池子', value: 1 },
-        { label: 'USDT池子', value: 2 },
-        { label: '能量池子', value: 3 },
-        { label: '带宽池子', value: 4 }
+        // { label: 'USDT池子', value: 2 },
+        { label: '能量池子', value: 3 }
+        // { label: '带宽池子', value: 4 }
       ]
     }
   },

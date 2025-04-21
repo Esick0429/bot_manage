@@ -70,20 +70,34 @@ const getManageStatus = (status: number) => {
   }
 }
 
-const getHandleStatusText = (status: number) => {
+
+const getDelegateStatusText = (status: number) => {
   switch (status) {
     case 1:
-      return '已代理'
-    case 2:
-      return '未代理'
-    case 3:
-      return '已补发'
+      return '已发放'
     default:
-      return '未知状态'
+      return '-'
+  }
+}
+const getHandleStatusText = (status: number) => {
+  switch (status) {
+    case 0:
+      return '-'
+    case 1:
+      return '已回收'
+    case 2:
+      return '未回收'
+    case 3:
+      return '回收失败'
+    default:
+      return '-'
   }
 }
 
 const getRecycleStatusText = (recycleTime: number) => {
+  if (recycleTime === 0) {
+    return '-'
+  }
   return recycleTime > 0 ? '已回收' : '待回收'
 }
 
@@ -142,19 +156,16 @@ const columns = reactive<TableColumn[]>([
   },
   {
     field: 'delegate_status',
-    label: '补充状态',
+    label: '发放状态',
     minWidth: 100,
     slots: {
       default: ({ row }) => {
         const status = row.delegate_status
-        const text = getHandleStatusText(status)
-        // 显式指定 tagType 的类型为 ElTag 允许的类型
+        const text = getDelegateStatusText(status)
         let tagType: 'primary' | 'info' | 'success' | 'warning' | 'danger' = 'info'
 
         if (status === 1) {
           tagType = 'success'
-        } else if (status === 0) {
-          tagType = 'warning'
         }
 
         return <ElTag type={tagType}>{text}</ElTag>
@@ -162,17 +173,16 @@ const columns = reactive<TableColumn[]>([
     }
   },
   {
-    field: 'recycle_status',
+    field: 'handle_status',
     label: '回收状态',
     minWidth: 100,
     slots: {
       default: ({ row }) => {
-        const recycleTime = row.recycle_time
-        const text = getRecycleStatusText(recycleTime)
-        // 显式指定 tagType 的类型为 ElTag 允许的类型
+        const handle_status = row.handle_status
+        const text = getHandleStatusText(handle_status)
         let tagType: 'primary' | 'info' | 'success' | 'warning' | 'danger' = 'info'
 
-        if (recycleTime) {
+        if (handle_status) {
           tagType = 'success'
         } else {
           tagType = 'info'
@@ -237,7 +247,7 @@ const searchSchema = reactive<FormSchema[]>([
 const actionColumn: TableColumn = {
   field: 'action',
   label: '操作',
-  minWidth: 300,
+  minWidth: 120,
   fixed: 'right' as const,
   slots: {
     default: ({ row }) => {
@@ -246,12 +256,12 @@ const actionColumn: TableColumn = {
 
       return (
         <>
-          <BaseButton type="primary" onClick={() => handleRecycle(row)} disabled>
+          {/* <BaseButton type="primary" onClick={() => handleRecycle(row)} disabled>
             回收能量
           </BaseButton>
           <BaseButton type="primary" onClick={() => handleResend(row)} disabled>
             补发能量
-          </BaseButton>
+          </BaseButton> */}
           <BaseButton type="primary" onClick={() => handleDetail(row)}>
             详情
           </BaseButton>
