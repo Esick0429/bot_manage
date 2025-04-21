@@ -10,17 +10,6 @@ import { Form, FormSchema } from '@/components/Form'
 import { useForm } from '@/hooks/web/useForm'
 import { ElInputNumber } from 'element-plus'
 
-// 定义 props 来接收 agentPrices
-const props = defineProps({
-  agentPrices: {
-    type: Object,
-    default: () => ({})
-  }
-})
-
-// 使用 computed 来安全地访问嵌套属性
-const computedAgentPrices = computed(() => props.agentPrices || {})
-
 // 表单相关
 const { formRegister, formMethods } = useForm()
 
@@ -33,7 +22,16 @@ const batchOrderSchema = reactive<FormSchema[]>([
     componentProps: {
       placeholder: '请输入能量单价',
       min: 0,
-      precision: 2
+      precision: 2,
+      remark: () => {
+        const costKey = 'flash_rent_price'
+        const costPrice = computedAgentPrices.value[costKey]
+        return (
+          <>
+            <p>激活成本为：{costPrice}TRX</p>
+          </>
+        )
+      }
     },
     formItemProps: {
       rules: [{ required: true, message: '能量单价是必填项' }]
@@ -47,9 +45,11 @@ const batchOrderSchema = reactive<FormSchema[]>([
       placeholder: '请输入激活地址单价',
       precision: 2,
       remark: () => {
+        const costKey = 'batch_active_price'
+        const costPrice = computedAgentPrices.value[costKey]
         return (
           <>
-            <p>激活成本为：1.1TRX</p>
+            <p>激活成本为：{costPrice}TRX</p>
           </>
         )
       }
@@ -64,4 +64,15 @@ const batchOrderSchema = reactive<FormSchema[]>([
 defineExpose({
   formMethods
 })
+
+
+const props = defineProps({
+  agentPrices: {
+    type: Object,
+    default: () => ({})
+  }
+})
+
+const computedAgentPrices = computed(() => props.agentPrices || {})
+console.log(computedAgentPrices.value, 'computedAgentPrices?')
 </script>
