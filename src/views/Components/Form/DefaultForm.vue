@@ -1798,7 +1798,7 @@ const schema = reactive<FormSchema[]>([
   </ContentWrap>
 </template>
 
-<style lang="less">
+<style lang="less" scoped>
 .cell {
   height: 30px;
   padding: 3px 0;
