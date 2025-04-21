@@ -71,8 +71,8 @@ const activationSchema = computed((): DescriptionsSchema[] => [
 ])
 
 // --- Status Maps for Table (Using handle_status based on screenshot) ---
-const handleStatusMap: Record<number, string> = { 0: '待处理', 1: '已完成' /* other? */ }
-const handleStatusColorMap: Record<number, string> = { 0: 'warning', 1: 'success' /* other? */ }
+const handleStatusMap: Record<number, string> = { 1: '已完成', 2: '待处理', 3: '已取消' /* other? */ }
+const handleStatusColorMap: Record<number, string> = { 1: 'success', 2: 'warning', 3: 'danger' /* other? */ }
 const dialogStatusMap: Record<number, string> = {
   1: '已完成' /* Other statuses from screenshot/data? */
 }
@@ -186,12 +186,12 @@ const activationTableColumns = ref<TableColumn[]>([
   },
   {
     // Use handle_status based on screenshot "已完成/待处理"
-    prop: 'handle_status',
-    field: 'handle_status',
+    prop: 'status',
+    field: 'status',
     label: '状态',
     width: 120,
     align: 'center',
-    slots: { default: ({ row }) => getStatusTag('handle_status', row.handle_status) }
+    slots: { default: ({ row }) => getStatusTag('status', row.status) }
   },
   {
     // Assuming "激活时间" corresponds to create_time
