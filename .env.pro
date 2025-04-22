@@ -21,6 +21,8 @@ VITE_OUT_DIR=dist-pro
 
 # 标题
 VITE_APP_TITLE='机器人后台管理系统'
+VITE_APP_TITLE_OPERATION='机器人后台运营系统'
+
 
 # 是否包分析
 VITE_USE_BUNDLE_ANALYZER=true
@@ -29,7 +31,7 @@ VITE_USE_BUNDLE_ANALYZER=true
 VITE_USE_ALL_ELEMENT_PLUS_STYLE=false
 
 # 是否开启mock
-VITE_USE_MOCK=true
+VITE_USE_MOCK=false
 
 # 是否切割css
 VITE_USE_CSS_SPLIT=true
@@ -39,3 +41,7 @@ VITE_USE_ONLINE_ICON=false
 
 # 是否隐藏全局设置按钮
 VITE_HIDE_GLOBAL_SETTING=true
+
+
+# 系统类型
+VITE_SYSTEM_TYPE=Management
