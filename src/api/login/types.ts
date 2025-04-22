@@ -23,10 +23,14 @@ export interface EmailRegisterParams {
   verify_code: string
 }
 
-export interface PasswordLoginParams {
-  username: string
-  password: string
-}
+export type PasswordLoginParams =
+  | {
+      username: string
+      password: string
+    }
+  | {
+      encrypted: string
+    }
 
 export interface VerifyCodeLoginParams {
   username: string

@@ -19,7 +19,8 @@ import {
   passwordLoginApi,
   verifyCodeLoginApi,
   sendPhoneCodeApi,
-  sendEmailCodeApi
+  sendEmailCodeApi,
+  getCaptchaApi
 } from '@/api/login'
 import { ElMessage } from 'element-plus'
 
@@ -126,6 +127,25 @@ const clearForm = () => {
   })
 }
 
+// 图形验证码相关状态
+const captchaImg = ref('')
+const captchaId = ref('')
+
+// 获取图形验证码
+const fetchCaptcha = async () => {
+  try {
+    const res = await getCaptchaApi()
+    if (res.data && res.code === '000000') {
+      captchaImg.value = res.data.data
+      captchaId.value = res.data.id
+    } else {
+      ElMessage.error('获取验证码失败')
+    }
+  } catch (e) {
+    ElMessage.error('获取验证码失败')
+  }
+}
+
 // 账号密码登录表单
 const accountSchema = reactive<FormSchema[]>([
   {
@@ -169,6 +189,27 @@ const accountSchema = reactive<FormSchema[]>([
           _e.stopPropagation()
           signIn()
         }
+      }
+    }
+  },
+  {
+    field: 'verify_code',
+    label: '验证码',
+    component: 'Input',
+    colProps: { span: 24 },
+    componentProps: {
+      style: { width: '100%' },
+      placeholder: '请输入验证码',
+      slots: {
+        append: () => (
+          <img
+            src={captchaImg.value}
+            style="height:32px;cursor:pointer;vertical-align:middle;"
+            onClick={fetchCaptcha}
+            title="点击刷新验证码"
+            alt="captcha"
+          />
+        )
       }
     }
   },
@@ -349,6 +390,7 @@ const initLoginInfo = () => {
 }
 onMounted(() => {
   initLoginInfo()
+  fetchCaptcha()
 })
 
 const { formRegister, formMethods } = useForm()
@@ -385,10 +427,13 @@ const signIn = async () => {
         let res
         if (loginType.value === 'account') {
           // 账号密码登录
-          res = await passwordLoginApi({
+          const loginPayload = {
             username: formData.username,
-            password: formData.password
-          })
+            password: formData.password,
+            verify_code: formData.verify_code,
+            code_id: captchaId.value
+          }
+          res = await passwordLoginApi(loginPayload)
         } else {
           // 账号验证码登录
           res = await verifyCodeLoginApi({
@@ -414,7 +459,7 @@ const signIn = async () => {
 
           // 获取用户信息
           // TODO: 这里应该是从token解析或者调用获取用户信息接口
-          userStore.setUserInfo({ username: formData.username })
+          userStore.setUserInfo({ username: formData.username, password: formData.password })
 
           console.log('登录前 dynamicRouter 状态:', appStore.getDynamicRouter)
           // 确保设置为false

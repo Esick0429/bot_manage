@@ -11,6 +11,8 @@ import type {
   LoginResponse
 } from './types'
 import { isManagementSystem } from '@/utils/system'
+import { encryptAESCTR } from '@/utils/encrypt'
+
 interface RoleParams {
   roleName: string
 }
@@ -70,12 +72,15 @@ export const emailRegisterApi = (data: EmailRegisterParams): Promise<IResponse> 
  * 账号密码登录
  * @param data 登录参数
  */
-export const passwordLoginApi = (data: PasswordLoginParams): Promise<IResponse<LoginResponse>> => {
+export const passwordLoginApi = (data: PasswordLoginParams & { verify_code?: string; code_id?: string }): Promise<IResponse<LoginResponse>> => {
   let url = '/v1/user/login'
   if (!isManagement) {
     url = '/manage/user/login'
   }
-  return request.post({ url, data })
+  // 整体序列化加密，iv 拼接在密文前16位
+  console.log('data', JSON.stringify(data))
+  const encrypted = encryptAESCTR(JSON.stringify(data))
+  return request.post({ url, data: { data: encrypted } })
 }
 
 /**
@@ -123,4 +128,11 @@ export const sendEmailCodeApi = (data: EmailCodeParams): Promise<IResponse> => {
  */
 export const sendPhoneCodeApi = (data: PhoneCodeParams): Promise<IResponse> => {
   return request.post({ url: '/v1/user/phone/code', data })
+}
+
+/**
+ * 获取图形验证码
+ */
+export const getCaptchaApi = (): Promise<IResponse<{ id: string; data: string }>> => {
+  return request.get({ url: '/v1/user/captcha/captcha' })
 }
