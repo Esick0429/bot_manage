@@ -51,7 +51,7 @@ const delegateStatusMap: Record<number, string> = { 1: '已委托', 2: '未委�
 const delegateStatusColorMap: Record<number, string> = { 1: 'success', 2: 'info' }
 
 const getStatusTag = (field: string, value: number) => {
-  let text = '未知'
+  let text = '-'
   let type: any = 'info' // Use string type for broader compatibility
   const numValue = Number(value)
   if (isNaN(numValue)) return h(ElTag, { type, size: 'small' }, () => text)

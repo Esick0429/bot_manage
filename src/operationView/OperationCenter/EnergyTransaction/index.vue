@@ -25,6 +25,7 @@
         :pagination="{
           total: totalCount
         }"
+        @ready="onSearchTableReady"
       />
 
       <!-- 详情弹窗 -->
@@ -75,22 +76,7 @@ import { Tips } from '@/components/Tips'
 import { formatToDateTime } from '@/utils/dateUtil'
 import { useRoute } from 'vue-router'
 import { formatToWan } from '@/utils'
-
-interface SearchTableInstance {
-  reload: () => Promise<void>
-  reset: () => Promise<any>
-  search: () => Promise<any>
-  delete: (row: any) => Promise<boolean>
-  currentRow: any
-  tableMethods: any
-  searchMethods: any
-  tableState: any
-  searchParams: any
-  setSearchParams: (params: any) => any
-  hasError: boolean
-}
-
-const searchTableRef = ref<SearchTableInstance | null>(null)
+import { useSearchTable } from '@/hooks/web/useSearchTable'
 
 const { t } = useI18n()
 const { required } = useValidator()
@@ -140,15 +126,15 @@ const renderStatusTag = (
 ) => {
   // 新增：如果 status 是 0，直接返回 '-' 标签
   if (status == 0) {
-    return '-'
+    return h('span', null, '-')
   }
   const numStatus = Number(status)
   // 检查 NaN (现在排除了 0 的情况)
-  if (isNaN(numStatus)) return h('span', () => '无效')
+  if (isNaN(numStatus)) return h('span', null, '无效')
   const text = map[numStatus] || '未知'
   // 确保 tagType 是 ElTagType，提供默认值 'info'
   const tagType: ElTagType = colorMap[numStatus] || 'info'
-  return h(ElTag, { type: tagType, size: 'small' }, () => text) // 现在类型匹配
+  return h(ElTag, { type: tagType, size: 'small' }, () => text)
 }
 
 // --- 表格列配置 (根据 Go Struct 更新字段名) ---
@@ -577,17 +563,21 @@ const handleResendSuccess = () => {
   }
 }
 
-// 手动触发加载
-onMounted(() => {
-  const query = useRoute().query
-  // 确保组件挂载后可以访问表格实例
-  setTimeout(() => {
-    if (searchTableRef.value) {
-      searchTableRef.value.setSearchParams({
-        query: query.query
-      })
-      searchTableRef.value.reload()
-    }
-  }, 100)
+const route = useRoute()
+const { searchTableRef, searchTableInstance, handleReady } = useSearchTable({
+  searchSchema,
+  tableColumns: columns,
+  fetchDataApi: fetchDataWrapper,
+  fetchDelApi: fetchEnergyTransactionDelete,
+  actionColumn,
+  immediate: false // 由ready事件控制首次加载
 })
+
+// 手动触发加载
+// 移除setTimeout，改为ready事件
+function onSearchTableReady(instance) {
+  const query = route.query
+  instance.setSearchParams({ query: query.query })
+  instance.reload()
+}
 </script>

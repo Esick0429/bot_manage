@@ -8,6 +8,7 @@
         :fetch-data-api="fetchAccountList"
         :showAddButton="false"
         ref="searchTableRef"
+        @ready="onSearchTableReady"
       >
         <!-- <template #searchButtons>
           <BaseButton
@@ -72,12 +73,12 @@ import MassSendRecordDialog from './components/MassSendRecordDialog.vue'
 import { useRoute, useRouter } from 'vue-router'
 import RechargeDialog from './components/RechargeDialog.vue'
 import BalanceRecordDialog from './components/BalanceRecordDialog.vue'
+import { useSearchTable } from '@/hooks/web/useSearchTable'
 
 const router = useRouter()
 // 表单校验
 const { required } = useValidator()
 
-const searchTableRef = ref<InstanceType<typeof SearchTable> | null>(null)
 const massSendRecordDialogRef = ref<InstanceType<typeof MassSendRecordDialog> | null>(null)
 
 // State for conditional rendering
@@ -236,6 +237,13 @@ const fetchAccountList = async (params: any) => {
     return { list: [], total: 0 }
   }
 }
+// useSearchTable hooks 只保留searchTableRef
+const { searchTableRef } = useSearchTable({
+  searchSchema: searchSchema.value,
+  tableColumns: columns,
+  fetchDataApi: fetchAccountList,
+  immediate: false // 由ready事件控制首次加载
+})
 
 const openBotList = (botId: number) => {
   router.push({
@@ -298,22 +306,18 @@ const handleMessageSent = () => {
   messageDialogVisible.value = false
 }
 
+// SearchTable ready事件处理
+function onSearchTableReady(instance) {
+  const query = useRoute().query
+  if (query.tg_id) {
+    instance.setSearchParams({ tg_id: query.tg_id })
+  }
+  instance.reload()
+}
+
 onMounted(() => {
   // 获取机器人列表
   fetchBotList()
-  // 组件加载后自动调用首次查询
-  const query = useRoute().query
-  console.log('query', query)
-  // 确保组件挂载后可以访问表格实例
-  setTimeout(() => {
-    if (searchTableRef.value) {
-      searchTableRef.value.setSearchParams({
-        tg_id: query.tg_id
-      })
-      console.log('手动触发数据刷新')
-      searchTableRef.value.reload()
-    }
-  }, 100)
 })
 </script>
 

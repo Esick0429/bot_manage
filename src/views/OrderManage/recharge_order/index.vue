@@ -211,8 +211,8 @@ const columns: TableColumn[] = [
             style={{ color: '#409EFF', cursor: 'pointer' }}
             onClick={() => {
               router.push({
-                path: `/bot_manage/bot_list`,
-                query: { tgUserId: row.tg_id }
+                path: `/user_group/user_list`,
+                query: { tg_id: row.tg_id }
               })
             }}
           >
