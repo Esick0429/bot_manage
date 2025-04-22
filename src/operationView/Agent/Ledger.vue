@@ -147,7 +147,7 @@ const columns = ref<TableColumn[]>([
           <>
             <ElLink
               type="primary"
-              onClick={() => router.push({ path: href, query: { order_num: row.order_num } })}
+              onClick={() => router.push({ path: href, query: { query: row.order_num } })}
             >
               {row.order_num}
             </ElLink>

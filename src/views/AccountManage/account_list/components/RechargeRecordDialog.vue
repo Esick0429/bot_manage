@@ -72,10 +72,10 @@ const columns: TableColumn[] = [
     minWidth: 150
   },
   {
-    field: 'trx_mount',
+    field: 'after_amount',
     label: 'TRX余额',
     minWidth: 120,
-    formatter: (row) => `${row.trx_mount} TRX`
+    formatter: (row) => `${row.after_amount} TRX`
   },
   {
     field: 'amount',

@@ -201,7 +201,7 @@ const columns = [
     formatter: (row) => `${formatToWan(row.delegate_energy_num) ?? '-'}`
   },
   { field: 'receive_address', label: '接收地址', minWidth: 200 },
-  { field: 'stroke_num', label: '笔数', width: 100 },
+  { field: 'stroke_num', label: '笔数', width: 100 ,formatter: (row) => row.stroke_num == 0 ? '-' : row.stroke_num},
   { field: 'energy_rent_text', label: '有效时长', width: 100 },
   {
     field: 'use_time',
@@ -292,6 +292,22 @@ const searchSchema = [
           // Convert value back to number for the option's value
           value: Number(value)
         }))
+      ]
+    }
+  },
+  {
+    field: 'order_type',
+    component: 'Select' as const,
+    label: '订单类型：',
+    componentProps: {
+      placeholder: '请选择订单类型',
+      options: [
+        { label: '全部', value: '' },
+        { label: '按笔数', value: 1 },
+        { label: '按时间', value: 2 },
+        { label: '批量下单', value: 3 },
+        { label: '闪租', value: 4 },
+        { label: '激活', value: 5 }
       ]
     }
   }
@@ -568,7 +584,7 @@ onMounted(() => {
   setTimeout(() => {
     if (searchTableRef.value) {
       searchTableRef.value.setSearchParams({
-        keyword: query.keyword
+        query: query.query
       })
       searchTableRef.value.reload()
     }
