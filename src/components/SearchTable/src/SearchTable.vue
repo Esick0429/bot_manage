@@ -134,7 +134,8 @@ const emit = defineEmits([
   'delete',
   'update:searchParams',
   'error',
-  'loaded'
+  'loaded',
+  'ready'
 ])
 
 // 使用hook
@@ -220,6 +221,22 @@ watch(
     }
   }
 )
+
+onMounted(() => {
+  // 触发ready事件，暴露核心方法
+  emit('ready', {
+    setSearchParams,
+    reload: tableMethods.getList,
+    search: handleSearch,
+    reset: handleReset,
+    delete: doDelete,
+    currentRow,
+    tableMethods,
+    searchMethods,
+    tableState,
+    searchParams
+  })
+})
 
 // 暴露方法
 defineExpose({

@@ -4,6 +4,7 @@ import { ref, unref, onMounted, watch } from 'vue'
 import { FormSchema } from '@/components/Form'
 import { TableColumn } from '@/components/Table'
 import { ElMessage } from 'element-plus'
+import { ref as vueRef } from 'vue'
 
 export interface SearchTableState {
   loading: boolean
@@ -24,9 +25,51 @@ interface UseSearchTableConfig {
   actionColumn?: TableColumn // 操作列配置
 }
 
-export const useSearchTable = (config: UseSearchTableConfig) => {
+export const useSearchTable = (config: UseSearchTableConfig, onReady?: (instance: any) => void) => {
   const searchParams = ref<Recordable>(config.defaultParams || {})
   const currentRow = ref<Recordable | null>(null)
+  const searchTableRef = vueRef<any>(null)
+  const searchTableInstance = vueRef<any>(null)
+
+  // 注册追踪
+  const searchRegistered = ref(false)
+  const tableRegistered = ref(false)
+
+  // 延迟初始化
+  function tryInit() {
+    if (searchRegistered.value && tableRegistered.value) {
+      init()
+    }
+  }
+
+  // 包装register方法
+  const { searchRegister: _searchRegister, searchMethods } = useSearch()
+  const { tableRegister: _tableRegister, tableMethods, tableState } = useTable({
+    immediate: false,
+    fetchDataApi: async () => {
+      try {
+        const apiParams = buildApiParams()
+        const result = await config.fetchDataApi(apiParams)
+        return adaptResponseData(result)
+      } catch (error) {
+        console.error('Data fetch failed:', error)
+        return { list: [], total: 0 }
+      }
+    },
+    fetchDelApi: config.fetchDelApi
+  })
+
+  // 包装后的register
+  function searchRegister(instance: any) {
+    _searchRegister(instance)
+    searchRegistered.value = true
+    tryInit()
+  }
+  function tableRegister(instance: any, el?: any) {
+    _tableRegister(instance, el)
+    tableRegistered.value = true
+    tryInit()
+  }
 
   const adaptRequestParams = (params: Recordable): Recordable => {
     const adaptedParams = { ...params }
@@ -47,23 +90,7 @@ export const useSearchTable = (config: UseSearchTableConfig) => {
     return { list, total }
   }
 
-  const { tableRegister, tableMethods, tableState } = useTable({
-    immediate: false,
-    fetchDataApi: async () => {
-      try {
-        const apiParams = buildApiParams()
-        const result = await config.fetchDataApi(apiParams)
-        return adaptResponseData(result)
-      } catch (error) {
-        console.error('Data fetch failed:', error)
-        return { list: [], total: 0 }
-      }
-    },
-    fetchDelApi: config.fetchDelApi
-  })
   const { dataList, loading, total } = tableState
-
-  const { searchRegister, searchMethods } = useSearch()
 
   const buildApiParams = (): Recordable => {
     const baseSearchParams = { ...unref(searchParams) }
@@ -167,13 +194,20 @@ export const useSearchTable = (config: UseSearchTableConfig) => {
 
   const setSearchParams = (params: Recordable) => {
     searchParams.value = { ...unref(searchParams), ...params }
+    console.log('searchParams.value', searchParams.value)
     searchMethods.setValues(searchParams.value)
     return unref(searchParams)
   }
 
-  onMounted(() => {
-    init()
-  })
+  // onMounted(() => {
+  //   init()
+  // })
+
+  // 供父组件绑定ready事件
+  function handleReady(instance: any) {
+    searchTableInstance.value = instance
+    if (onReady) onReady(instance)
+  }
 
   return {
     searchRegister,
@@ -190,6 +224,9 @@ export const useSearchTable = (config: UseSearchTableConfig) => {
     loading,
     dataList,
     total,
-    loadData
+    loadData,
+    searchTableRef,
+    searchTableInstance,
+    handleReady
   }
 }
