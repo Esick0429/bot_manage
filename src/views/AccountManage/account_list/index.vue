@@ -428,12 +428,14 @@ onMounted(() => {
 .app-container {
   padding: 20px;
 }
+
 .loading-container {
-  min-height: 200px;
   display: flex;
+  min-height: 200px;
   align-items: center;
   justify-content: center;
 }
+
 .pw-reset-container {
   width: 100%;
 }

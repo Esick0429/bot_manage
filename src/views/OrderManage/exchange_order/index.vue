@@ -557,8 +557,8 @@ onMounted(() => {
 }
 
 .empty-transaction {
-  padding: 30px 0;
   display: flex;
+  padding: 30px 0;
   justify-content: center;
 }
 

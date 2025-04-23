@@ -282,11 +282,11 @@ const handleClose = () => {
 
 <style scoped>
 .menu-preview {
+  position: relative; /* 添加相对定位，使子元素可以参照它进行定位 */
+  min-height: 300px;
   padding: 20px;
   background-color: #f5f7fa;
   border-radius: 8px;
-  min-height: 300px;
-  position: relative; /* 添加相对定位，使子元素可以参照它进行定位 */
 }
 
 /* 确保元素能接收loading遮罩 */
@@ -296,27 +296,27 @@ const handleClose = () => {
 }
 
 .menu-item {
-  margin-bottom: 20px;
-  padding: 0 10px;
   height: 100%;
   min-height: 48px;
+  padding: 0 10px;
+  margin-bottom: 20px;
 }
 
 .menu-button {
   width: 100%;
   height: 48px;
-  font-size: 15px;
-  white-space: normal;
-  word-break: break-all;
   padding: 0 15px;
+  font-size: 15px;
+  word-break: break-all;
+  white-space: normal;
+  cursor: move;
   border-radius: 8px;
   transition: all 0.3s;
-  cursor: move;
 }
 
 .menu-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
 }
 
 .empty-slot {
@@ -331,15 +331,15 @@ const handleClose = () => {
 }
 
 .preview-controls {
-  margin-top: 20px;
   display: flex;
+  margin-top: 20px;
   align-items: center;
   justify-content: flex-end;
 }
 
 .unsaved-changes-tip {
   margin-left: 10px;
-  color: #e6a23c;
   font-size: 14px;
+  color: #e6a23c;
 }
 </style>

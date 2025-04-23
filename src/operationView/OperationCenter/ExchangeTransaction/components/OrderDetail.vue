@@ -120,7 +120,7 @@ const detailSchema = computed<DescriptionsSchema[]>(() => [
   {
     label: '兑换汇率',
     field: 'trx_price',
-    span: 8,
+    span: 8
   },
 
   {
@@ -138,7 +138,7 @@ const detailSchema = computed<DescriptionsSchema[]>(() => [
   {
     label: '实时汇率',
     field: 'real_price',
-    span: 8,
+    span: 8
   },
 
   // { label: '补发TRX', field: 'resend_amount', span: 8, slots: { default: (data) => formatAmount(data.resend_amount, data.resend_unit ?? data.exchange_unit) } },
@@ -273,6 +273,7 @@ defineExpose({ open })
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }

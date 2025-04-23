@@ -258,9 +258,10 @@ defineExpose({
 .search-table-container {
   width: 100%;
 }
+
 .empty-data {
-  margin-top: 20px;
   display: flex;
+  margin-top: 20px;
   justify-content: center;
 }
 </style>

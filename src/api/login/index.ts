@@ -72,7 +72,9 @@ export const emailRegisterApi = (data: EmailRegisterParams): Promise<IResponse> 
  * 账号密码登录
  * @param data 登录参数
  */
-export const passwordLoginApi = (data: PasswordLoginParams & { verify_code?: string; code_id?: string }): Promise<IResponse<LoginResponse>> => {
+export const passwordLoginApi = (
+  data: PasswordLoginParams & { verify_code?: string; code_id?: string }
+): Promise<IResponse<LoginResponse>> => {
   let url = '/v1/user/login'
   if (!isManagement) {
     url = '/manage/user/login'

@@ -881,8 +881,8 @@ onUnmounted(() => {
 .chart-wrapper {
   width: 100%;
   height: 100%;
-  border-radius: 8px;
   overflow: hidden;
+  border-radius: 8px;
 }
 
 .chart-header {
@@ -890,10 +890,10 @@ onUnmounted(() => {
 }
 
 .chart-header h3 {
-  font-size: 18px;
   margin: 0;
-  color: #333;
   margin-bottom: 12px;
+  font-size: 18px;
+  color: #333;
 }
 
 .chart-filters {
@@ -913,7 +913,7 @@ onUnmounted(() => {
   min-width: 300px;
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .chart-filters {
     flex-direction: column;
     align-items: flex-start;
@@ -925,16 +925,16 @@ onUnmounted(() => {
 }
 
 .current-price-panel {
+  display: flex;
   width: 20%;
-  background-color: #f9f9f9;
-  border-radius: 8px;
   padding: 12px 16px;
   margin-bottom: 16px;
-  display: flex;
+  background-color: #f9f9f9;
+  border-left: 4px solid #ff5200;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgb(0 0 0 / 5%);
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  border-left: 4px solid #ff5200;
 }
 
 .price-display {
@@ -949,9 +949,9 @@ onUnmounted(() => {
 }
 
 .price-label {
+  margin-bottom: 4px;
   font-size: 14px;
   color: #666;
-  margin-bottom: 4px;
 }
 
 .price-value {
@@ -970,12 +970,14 @@ onUnmounted(() => {
     color: #333;
     background-color: transparent;
   }
+
   30% {
+    padding: 2px 8px;
     color: #fff;
     background-color: #ff5200;
-    padding: 2px 8px;
     border-radius: 4px;
   }
+
   100% {
     color: #333;
     background-color: transparent;
@@ -989,12 +991,12 @@ onUnmounted(() => {
 }
 
 .price-change {
+  display: inline-flex;
+  padding: 4px 10px;
   font-size: 16px;
   font-weight: bold;
-  padding: 4px 10px;
   border-radius: 4px;
   justify-content: center;
-  display: inline-flex;
   align-items: center;
   gap: 6px;
 }
@@ -1006,17 +1008,17 @@ onUnmounted(() => {
 
 .price-up {
   color: #41b883;
-  background-color: rgba(65, 184, 131, 0.1);
+  background-color: rgb(65 184 131 / 10%);
 }
 
 .price-down {
   color: #e74c3c;
-  background-color: rgba(231, 76, 60, 0.1);
+  background-color: rgb(231 76 60 / 10%);
 }
 
 .price-unchanged {
   color: #7f8c8d;
-  background-color: rgba(127, 140, 141, 0.1);
+  background-color: rgb(127 140 141 / 10%);
 }
 
 .price-update {
@@ -1032,10 +1034,10 @@ onUnmounted(() => {
 }
 
 .refresh-btn {
+  display: flex;
+  padding: 2px 8px;
   font-size: 12px;
   color: #666;
-  padding: 2px 8px;
-  display: flex;
   align-items: center;
   gap: 4px;
 }
@@ -1044,7 +1046,7 @@ onUnmounted(() => {
   color: #ff5200;
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .current-price-panel {
     flex-direction: column;
     align-items: flex-start;
@@ -1060,8 +1062,8 @@ onUnmounted(() => {
 }
 
 .chart-controls {
-  margin: 10px 0;
   display: flex;
+  margin: 10px 0;
   justify-content: flex-end;
   gap: 10px;
 }
@@ -1077,13 +1079,13 @@ onUnmounted(() => {
   position: fixed !important;
   top: 0;
   left: 0;
+  z-index: 9999;
   width: 100vw !important;
   height: 100vh !important;
-  z-index: 9999;
-  border-radius: 0;
-  margin: 0;
   padding: 20px;
-  background-color: rgba(255, 255, 255, 0.98);
+  margin: 0;
   overflow: auto;
+  background-color: rgb(255 255 255 / 98%);
+  border-radius: 0;
 }
 </style>

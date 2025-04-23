@@ -169,9 +169,9 @@ defineExpose({
 }
 
 .label-col {
-  text-align: right;
   padding-right: 12px;
   color: var(--el-text-color-regular);
+  text-align: right;
 }
 
 .el-form-item__label {
@@ -187,6 +187,7 @@ defineExpose({
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
