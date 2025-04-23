@@ -188,7 +188,7 @@ const transactionInSchema = computed<DescriptionsSchema[]>(() => [
         return h(
           ElLink,
           {
-            href: `https://nile.tronscan.org/#/transaction/${row.in_txid}`,
+            href: `https://tronscan.org/#/transaction/${row.in_txid}`,
             type: 'primary',
             target: '_blank'
           },
@@ -248,7 +248,7 @@ const transactionOutSchema = computed<DescriptionsSchema[]>(() => [
         return h(
           ElLink,
           {
-            href: `https://nile.tronscan.org/#/transaction/${row.out_txid}`,
+            href: `https://tronscan.org/#/transaction/${row.out_txid}`,
             type: 'primary',
             target: '_blank'
           },

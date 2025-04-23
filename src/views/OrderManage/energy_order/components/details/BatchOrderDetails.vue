@@ -223,7 +223,7 @@ const batchOrderTransactionSchema = computed((): DescriptionsSchema[] => [
         return h(
           ElLink,
           {
-            href: `https://nile.tronscan.org/#/transaction/${data.txid}`,
+            href: `https://tronscan.org/#/transaction/${data.txid}`,
             type: 'primary',
             target: '_blank'
           },
@@ -242,7 +242,7 @@ const batchOrderTransactionSchema = computed((): DescriptionsSchema[] => [
         return h(
           ElLink,
           {
-            href: `https://nile.tronscan.org/#/transaction/${data.energy_txid}`,
+            href: `https://tronscan.org/#/transaction/${data.energy_txid}`,
             type: 'primary',
             target: '_blank'
           },

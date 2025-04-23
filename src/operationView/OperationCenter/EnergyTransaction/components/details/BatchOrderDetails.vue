@@ -16,7 +16,7 @@ const renderTxidLink = (txid: string | null | undefined, label = '交易hash') =
   return h(
     ElLink,
     {
-      href: `https://nile.tronscan.org/#/transaction/${txid}`,
+      href: `https://tronscan.org/#/transaction/${txid}`,
       type: 'primary',
       target: '_blank'
     },

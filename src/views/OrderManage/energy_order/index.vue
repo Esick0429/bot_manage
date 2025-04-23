@@ -441,7 +441,7 @@ const transactionDetailSchema = computed((): DescriptionsSchema[] => [
         return h(
           ElLink,
           {
-            href: `https://nile.tronscan.org/#/transaction/${data.txid}`,
+            href: `https://tronscan.org/#/transaction/${data.txid}`,
             type: 'primary',
             target: '_blank'
           },

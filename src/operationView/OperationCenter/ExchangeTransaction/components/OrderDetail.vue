@@ -170,7 +170,7 @@ const detailSchema = computed<DescriptionsSchema[]>(() => [
           ElLink,
           {
             type: 'primary',
-            href: `https://nile.tronscan.org/#/transaction/${data.out_txid}`,
+            href: `https://tronscan.org/#/transaction/${data.out_txid}`,
             target: '_blank'
           },
           () => data.out_txid || '-'
@@ -187,7 +187,7 @@ const detailSchema = computed<DescriptionsSchema[]>(() => [
           ElLink,
           {
             type: 'primary',
-            href: `https://nile.tronscan.org/#/transaction/${data.in_txid}`,
+            href: `https://tronscan.org/#/transaction/${data.in_txid}`,
             target: '_blank'
           },
           () => data.in_txid || '-'

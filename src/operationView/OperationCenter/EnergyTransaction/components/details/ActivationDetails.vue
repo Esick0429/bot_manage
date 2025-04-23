@@ -274,7 +274,7 @@ const renderTxidLink = (txid: string | null | undefined) => {
   return h(
     ElLink,
     {
-      href: `https://nile.tronscan.org/#/transaction/${txid}`, // Use mainnet for example
+      href: `https://tronscan.org/#/transaction/${txid}`, // Use mainnet for example
       type: 'primary',
       target: '_blank'
     },
