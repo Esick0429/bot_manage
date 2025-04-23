@@ -35,6 +35,9 @@ const layout = computed(() => appStore.getLayout)
 // 多语言图标
 const locale = computed(() => appStore.getLocale)
 
+// 交易钩子
+const trxHook = computed(() => appStore.getTrxHook)
+
 export default defineComponent({
   name: 'ToolHeader',
   components: { WebhookFormModal },
@@ -70,16 +73,18 @@ export default defineComponent({
           </div>
         ) : undefined}
         <div class="h-full flex items-center">
-          <div
-            class="custom-hover mr-2 flex items-center cursor-pointer"
-            onClick={handleOpenWebhookForm}
-          >
+          {trxHook.value ? (
+            <div
+              class="custom-hover mr-2 flex items-center cursor-pointer"
+              onClick={handleOpenWebhookForm}
+            >
             <Icon
               icon="ant-design:form-outlined"
               size={18}
               color="var(--top-header-text-color)"
-            ></Icon>
-          </div>
+              ></Icon>
+            </div>
+          ) : undefined}
           {screenfull.value ? (
             <Screenfull class="custom-hover" color="var(--top-header-text-color)"></Screenfull>
           ) : undefined}

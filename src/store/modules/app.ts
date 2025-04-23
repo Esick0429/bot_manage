@@ -33,6 +33,7 @@ interface AppState {
   footer: boolean
   theme: ThemeTypes
   fixedMenu: boolean
+  TrxHook:boolean
 }
 
 // 获取环境变量
@@ -99,7 +100,8 @@ export const useAppStore = defineStore('app', {
         topHeaderHoverColor: '#f6f6f6',
         // 头部边框颜色
         topToolBorderColor: '#eee'
-      }
+      },
+      TrxHook:false
     }
   },
   getters: {
@@ -177,6 +179,9 @@ export const useAppStore = defineStore('app', {
     },
     getFooter(): boolean {
       return this.footer
+    },
+    getTrxHook(): boolean {
+      return this.TrxHook
     }
   },
   actions: {
