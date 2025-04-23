@@ -238,6 +238,12 @@ const batchItemDetailSchema = computed((): DescriptionsSchema[] => [
     slots: { default: (data) => renderTxidLink(data?.energy_txid) } // Use link renderer
   },
   {
+    field: 'recycle_txid', // Field from reference
+    label: '回收hash', // Label from reference
+    span: 24,
+    slots: { default: (data) => renderTxidLink(data?.recycle_txid) } // Use link renderer
+  },
+  {
     field: 'from_address', // Field from reference
     label: '发起地址',
     span: 24
