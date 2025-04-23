@@ -89,7 +89,7 @@ const dialogStatusColorMap: Record<number, string> = {
 }
 
 const getStatusTag = (field: string, value: number) => {
-  let text = '未知'
+  let text = '-'
   let type: any = 'info'
   const numValue = Number(value)
   if (isNaN(numValue)) return h(ElTag, { type, size: 'small' }, () => text)
