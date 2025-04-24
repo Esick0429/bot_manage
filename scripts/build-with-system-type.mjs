@@ -2,21 +2,24 @@ import { spawn } from 'child_process';
 import process from 'process';
 
 // 这是一个 Node.js 脚本，用于通过 --key=<value> 参数构建项目
-// 它会解析 --key 参数，并将其值设置为 VITE_SYSTEM_TYPE 环境变量
-// 使用方法：pnpm build:test --key=<value> [其他vite参数...]
+// 支持：pnpm build:pro --key=<value> [其他vite参数...]
+// 自动根据 npm_lifecycle_event（如 build:pro、build:test）推断 mode
 
 const args = process.argv.slice(2); // 获取传递给脚本的参数，跳过 node 和脚本文件名
 
 let systemType = null;
-const viteArgs = []; // 存放要传递给 vite build 的参数
+const viteArgs = [];
+let hasMode = false;
 
 // 解析参数
 for (const arg of args) {
   if (arg.startsWith('--key=')) {
     systemType = arg.substring('--key='.length);
     console.log(`从参数中解析到 VITE_SYSTEM_TYPE: ${systemType}`);
+  } else if (arg.startsWith('--mode')) {
+    hasMode = true;
+    viteArgs.push(arg);
   } else {
-    // 将其他参数传递给 vite build
     viteArgs.push(arg);
   }
 }
@@ -24,15 +27,26 @@ for (const arg of args) {
 // 检查是否成功获取到 systemType
 if (systemType === null) {
   console.error('错误：未找到 --key=<value> 参数。');
-  console.log('用法：pnpm build:test --key=<value> [其他vite参数...]');
-  process.exit(1); // 退出并报错
+  console.log('用法：pnpm build:pro --key=<value> [其他vite参数...]');
+  process.exit(1);
+}
+
+// 自动根据 npm_lifecycle_event 推断 mode
+if (!hasMode) {
+  const npmEvent = process.env.npm_lifecycle_event;
+  let mode = 'pro'; // 默认 pro
+  if (npmEvent && npmEvent.startsWith('build:')) {
+    mode = npmEvent.split(':')[1] || 'pro';
+  }
+  viteArgs.unshift('--mode', mode);
+  console.log(`未检测到 --mode 参数，已根据命令自动推断并添加: --mode ${mode}`);
 }
 
 // 准备环境变量
 const env = { ...process.env, VITE_SYSTEM_TYPE: systemType };
 
 // 执行 vite build 命令
-const command = `pnpm vite build --mode test ${viteArgs.join(' ')}`;
+const command = `pnpm vite build ${viteArgs.join(' ')}`;
 console.log(`正在使用 VITE_SYSTEM_TYPE=${systemType} 执行构建命令: ${command}`);
 
 const viteProcess = spawn(command, {

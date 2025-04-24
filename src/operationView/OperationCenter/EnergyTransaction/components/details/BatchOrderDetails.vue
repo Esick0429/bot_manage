@@ -16,7 +16,7 @@ const renderTxidLink = (txid: string | null | undefined, label = '交易hash') =
   return h(
     ElLink,
     {
-      href: `https://nile.tronscan.org/#/transaction/${txid}`,
+      href: `https://tronscan.org/#/transaction/${txid}`,
       type: 'primary',
       target: '_blank'
     },
@@ -164,14 +164,14 @@ const batchOrderTableColumns = ref<TableColumn[]>([
     field: 'addr_energy_num',
     label: '能量数',
     width: 100,
-    formatter: (row) => row.addr_energy_num == 0 ? '-' : formatToWan(row.addr_energy_num) // From sample data
+    formatter: (row) => (row.addr_energy_num == 0 ? '-' : formatToWan(row.addr_energy_num)) // From sample data
   },
   {
     prop: 'active_price',
     field: 'active_price',
     label: '激活单价',
     width: 100,
-    formatter: (row) => row.active_price == 0 ? '-' : row.active_price // From sample data
+    formatter: (row) => (row.active_price == 0 ? '-' : row.active_price) // From sample data
   },
   {
     // !! 需要确认此字段 !! 使用 status 作为占位符 (from sample data)
@@ -195,14 +195,14 @@ const batchOrderTableColumns = ref<TableColumn[]>([
     field: 'create_time',
     label: '激活时间',
     width: 160,
-    formatter: (row) => row.create_time == 0 ? '-' : formatToDateTime(row.create_time)
+    formatter: (row) => (row.create_time == 0 ? '-' : formatToDateTime(row.create_time))
   },
   {
     prop: 'finish_time',
     field: 'finish_time',
     label: '完成时间',
     width: 160,
-    formatter: (row) => row.finish_time == 0 ? '-' : formatToDateTime(row.finish_time) // From sample data
+    formatter: (row) => (row.finish_time == 0 ? '-' : formatToDateTime(row.finish_time)) // From sample data
   },
   {
     prop: 'action',

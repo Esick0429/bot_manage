@@ -22,6 +22,7 @@ provide('systemType', systemType)
 
 // 可以在控制台输出当前系统类型（开发调试用）
 console.log('当前系统类型:', systemType)
+console.log('当前系统类型:', systemType)
 
 appStore.initTheme()
 

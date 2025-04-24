@@ -281,7 +281,7 @@ onMounted(() => {
 
 <style scoped>
 .exchange-transaction-container {
-  padding: 16px;
   height: 100%;
+  padding: 16px;
 }
 </style>

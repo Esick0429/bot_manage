@@ -258,7 +258,7 @@ const handleSubmit = async () => {
   await elForm?.validate(async (valid: boolean) => {
     if (!valid) return
 
-    let formData = await getFormData()
+    const formData = await getFormData()
 
     // 确保 formData.configType 是数字用于后续逻辑
     const configTypeNum =

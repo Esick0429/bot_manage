@@ -35,7 +35,7 @@ import {
   ElTag,
   ElMessage,
   ElTabs,
-  ElTabPane,
+  ElTabPane
 } from 'element-plus'
 import { Dialog } from '@/components/Dialog'
 import { formatToDateTime } from '@/utils/dateUtil'
@@ -140,7 +140,7 @@ const getTagType = (field, value) => {
 const getTagText = (field, value) => {
   if (isNaN(value)) return '未知'
   if (field === 'order_type') return orderTypeMap[value] || '未知类型'
-  if (field === 'status') return statusMap[value] || '未知状态'
+  if (field === 'status') return statusMap[value] || '-'
   return '未知'
 }
 
@@ -212,9 +212,11 @@ defineExpose({
 .order-detail {
   width: 100%;
 }
+
 .order-detail-tabs .el-tabs__content {
   min-height: 150px;
 }
+
 :deep(.descriptions-label) {
   /* width: 100px; */
 }

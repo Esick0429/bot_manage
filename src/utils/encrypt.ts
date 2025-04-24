@@ -27,8 +27,7 @@ export function encryptAESCTR(plaintext: string): string {
   const result = ivBytes.clone().concat(cipherBytes)
   // base64 编码
   return CryptoES.enc.Base64.stringify(result)
-} 
-
+}
 
 export function decryptAESCTR(ciphertext: string): string {
   // TODO: 替换为后端下发的密钥
@@ -37,19 +36,12 @@ export function decryptAESCTR(ciphertext: string): string {
   const result = CryptoES.enc.Base64.parse(ciphertext)
   // 取前16字节为iv，后面为密文
   const iv = CryptoES.lib.WordArray.create(result.words.slice(0, 4), 16)
-  const cipherBytes = CryptoES.lib.WordArray.create(
-    result.words.slice(4),
-    result.sigBytes - 16
-  )
+  const cipherBytes = CryptoES.lib.WordArray.create(result.words.slice(4), result.sigBytes - 16)
   // 解密
-  const decrypted = CryptoES.AES.decrypt(
-    { ciphertext: cipherBytes } as any,
-    key,
-    {
-      iv,
-      mode: CryptoES.mode.CTR,
-      padding: CryptoES.pad.NoPadding
-    }
-  )
+  const decrypted = CryptoES.AES.decrypt({ ciphertext: cipherBytes } as any, key, {
+    iv,
+    mode: CryptoES.mode.CTR,
+    padding: CryptoES.pad.NoPadding
+  })
   return decrypted.toString(CryptoES.enc.Utf8)
 }

@@ -179,7 +179,7 @@ const rechargeDetailSchema = computed(() => {
           if (!row || !row.hash) return h('span', '-')
           return (
             <ElLink
-              href={`https://nile.tronscan.org/#/transaction/${row.hash}`}
+              href={`https://tronscan.org/#/transaction/${row.hash}`}
               type="primary"
               target="_blank"
             >
@@ -369,7 +369,7 @@ const getStatusText = (status: number): string => {
     2: '待支付',
     3: '已取消'
   }
-  return statusMap[status] || '未知状态'
+  return statusMap[status] || '-'
 }
 
 // API 封装

@@ -150,7 +150,7 @@ const hostedDetailSchema = computed(() => {
           return h(
             ElLink,
             {
-              href: `https://nile.tronscan.org/#/transaction/${row.txid}`,
+              href: `https://tronscan.org/#/transaction/${row.txid}`,
               type: 'primary',
               target: '_blank'
             },
@@ -207,7 +207,7 @@ const transactionDetailSchema = computed(() => {
           return h(
             ElLink,
             {
-              href: `https://nile.tronscan.org/#/transaction/${row.txid}`,
+              href: `https://tronscan.org/#/transaction/${row.txid}`,
               type: 'primary',
               target: '_blank'
             },
@@ -415,7 +415,7 @@ const getStatusText = (status: number): string => {
     2: '待支付',
     3: '已取消'
   }
-  return statusMap[status] || '未知状态'
+  return statusMap[status] || '-'
 }
 
 // 跳转到用户列表

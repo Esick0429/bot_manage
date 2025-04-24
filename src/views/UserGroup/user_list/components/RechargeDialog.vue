@@ -83,11 +83,12 @@ const rechargeSchema = computed<DescriptionsSchema[]>(() => {
     {
       field: 'trx_mount',
       label: 'TRX余额'
-    },
-    {
-      field: 'usdt_mount',
-      label: 'USDT余额'
     }
+    // {
+    //   field: 'usdt_mount',
+    //   label: 'USDT余额',
+    //   hidden: true
+    // }
   ]
 })
 
@@ -103,11 +104,11 @@ const rechargeFormSchema = reactive<FormSchema[]>([
         {
           label: '充值TRX',
           value: 'TRX'
-        },
-        {
-          label: '充值USDT',
-          value: 'USDT'
         }
+        // {
+        //   label: '充值USDT',
+        //   value: 'USDT'
+        // }
       ]
     }
   },

@@ -172,7 +172,7 @@ const updateFormSchemaVisibility = (priceType: number | string) => {
   baseFormSchema.forEach((item) => {
     let isVisible = false
     let isRequired = false
-    let rules: FormItemRule[] = []
+    const rules: FormItemRule[] = []
 
     switch (item.field) {
       case 'price_trx':
@@ -251,11 +251,11 @@ const open = async (params: OpenParams) => {
     price_type: initialPriceType,
     price_trx: currentData.value.price_trx ?? null,
     price_trx_65000: currentData.value.price_trx_65000 ?? null,
-    price_trx_131000: currentData.value.price_trx_131000 ?? null, 
+    price_trx_131000: currentData.value.price_trx_131000 ?? null,
     price_day_1: currentData.value.price_day_1 ?? null,
     price_day_3: currentData.value.price_day_3 ?? null,
     price_day_7: currentData.value.price_day_7 ?? null,
-    price_day_15: currentData.value.price_day_15 ?? null,
+    price_day_15: currentData.value.price_day_15 ?? null
     // status: currentData.value.status === undefined ? 1 : Number(currentData.value.status)
   })
 }
@@ -316,7 +316,7 @@ const submitLogic = async (formData: FormData) => {
       price_day_1: Number(formData.price_day_1) || 0,
       price_day_3: Number(formData.price_day_3) || 0,
       price_day_7: Number(formData.price_day_7) || 0,
-      price_day_15: Number(formData.price_day_15) || 0,
+      price_day_15: Number(formData.price_day_15) || 0
       // status: Number(formData.status)
     }
 

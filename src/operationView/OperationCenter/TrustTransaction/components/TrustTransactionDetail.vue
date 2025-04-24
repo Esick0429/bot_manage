@@ -49,7 +49,7 @@ const getHandleStatusText = (status: number) => {
     case 3:
       return '已补发'
     default:
-      return '未知状态'
+      return '-'
   }
 }
 
@@ -133,7 +133,7 @@ const detailSchema = computed<DescriptionsSchema[]>(() => [
           ElLink,
           {
             type: 'primary',
-            href: `https://nile.tronscan.org/#/transaction/${data.recycle_txid}`,
+            href: `https://tronscan.org/#/transaction/${data.recycle_txid}`,
             target: '_blank'
           },
           () => data.recycle_txid || '-'
@@ -151,7 +151,7 @@ const detailSchema = computed<DescriptionsSchema[]>(() => [
           ElLink,
           {
             type: 'primary',
-            href: `https://nile.tronscan.org/#/transaction/${data.txid}`,
+            href: `https://tronscan.org/#/transaction/${data.txid}`,
             target: '_blank'
           },
           () => data.txid || '-'

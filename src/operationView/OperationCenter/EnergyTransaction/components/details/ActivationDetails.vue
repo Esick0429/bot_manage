@@ -71,8 +71,16 @@ const activationSchema = computed((): DescriptionsSchema[] => [
 ])
 
 // --- Status Maps for Table (Using handle_status based on screenshot) ---
-const handleStatusMap: Record<number, string> = { 1: '已完成', 2: '待处理', 3: '已取消' /* other? */ }
-const handleStatusColorMap: Record<number, string> = { 1: 'success', 2: 'warning', 3: 'danger' /* other? */ }
+const handleStatusMap: Record<number, string> = {
+  1: '已完成',
+  2: '待处理',
+  3: '已取消' /* other? */
+}
+const handleStatusColorMap: Record<number, string> = {
+  1: 'success',
+  2: 'warning',
+  3: 'danger' /* other? */
+}
 const dialogStatusMap: Record<number, string> = {
   1: '已完成' /* Other statuses from screenshot/data? */
 }
@@ -81,7 +89,7 @@ const dialogStatusColorMap: Record<number, string> = {
 }
 
 const getStatusTag = (field: string, value: number) => {
-  let text = '未知'
+  let text = '-'
   let type: any = 'info'
   const numValue = Number(value)
   if (isNaN(numValue)) return h(ElTag, { type, size: 'small' }, () => text)
@@ -274,7 +282,7 @@ const renderTxidLink = (txid: string | null | undefined) => {
   return h(
     ElLink,
     {
-      href: `https://nile.tronscan.org/#/transaction/${txid}`, // Use mainnet for example
+      href: `https://tronscan.org/#/transaction/${txid}`, // Use mainnet for example
       type: 'primary',
       target: '_blank'
     },
