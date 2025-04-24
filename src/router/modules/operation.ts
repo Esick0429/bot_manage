@@ -146,6 +146,28 @@ if (import.meta.env.VITE_SYSTEM_TYPE === 'Operation') {
         }
       ]
     },
+    // 系统管理
+    {
+      path: '/authorization',
+      component: Layout,
+      redirect: '/authorization/user',
+      name: 'Authorization',
+      meta: {
+        title: '权限管理',
+        icon: 'vi-eos-icons:role-binding',
+        alwaysShow: true
+      },
+      children: [
+        {
+          path: 'role',
+          component: () => import('@/operationView/Authorization/Role/Role.vue'),
+          name: 'Role',
+          meta: {
+            title: '角色管理'
+          }
+        }
+      ]
+    },
     {
       path: '/system_config',
       component: Layout,
