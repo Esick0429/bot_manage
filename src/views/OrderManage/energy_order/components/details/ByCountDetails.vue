@@ -89,7 +89,7 @@ const countOrderTableSchema = computed((): TableColumn[] => [
         return h(
           ElLink,
           {
-            href: `https://nile.tronscan.org/#/transaction/${row.energy_txid}`,
+            href: `https://tronscan.org/#/transaction/${row.energy_txid}`,
             type: 'primary',
             target: '_blank'
           },

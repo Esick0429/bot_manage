@@ -44,7 +44,11 @@ export const useSearchTable = (config: UseSearchTableConfig, onReady?: (instance
 
   // 包装register方法
   const { searchRegister: _searchRegister, searchMethods } = useSearch()
-  const { tableRegister: _tableRegister, tableMethods, tableState } = useTable({
+  const {
+    tableRegister: _tableRegister,
+    tableMethods,
+    tableState
+  } = useTable({
     immediate: false,
     fetchDataApi: async () => {
       try {

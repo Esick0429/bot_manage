@@ -188,7 +188,7 @@ const activationTransactionSchema = computed((): DescriptionsSchema[] => [
         return h(
           ElLink,
           {
-            href: `https://nile.tronscan.org/#/transaction/${data.txid}`,
+            href: `https://tronscan.org/#/transaction/${data.txid}`,
             type: 'primary',
             target: '_blank'
           },
@@ -295,9 +295,11 @@ watch(
 .flex {
   display: flex;
 }
+
 .items-center {
   align-items: center;
 }
+
 .justify-between {
   justify-content: space-between;
 }

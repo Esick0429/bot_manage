@@ -78,10 +78,10 @@ export default defineComponent({
               class="custom-hover mr-2 flex items-center cursor-pointer"
               onClick={handleOpenWebhookForm}
             >
-            <Icon
-              icon="ant-design:form-outlined"
-              size={18}
-              color="var(--top-header-text-color)"
+              <Icon
+                icon="ant-design:form-outlined"
+                size={18}
+                color="var(--top-header-text-color)"
               ></Icon>
             </div>
           ) : undefined}

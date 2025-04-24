@@ -53,7 +53,7 @@ const searchTableRef = ref()
 const resourceTypeMap = {
   1: 'TRX池子',
   // 2: 'USDT池子',
-  3: '能量池子',
+  3: '能量池子'
   // 4: '带宽池子'
 }
 

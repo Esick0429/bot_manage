@@ -187,7 +187,12 @@ const columns = [
     formatter: (row) => `${formatToWan(row.delegate_energy_num) ?? '-'}`
   },
   { field: 'receive_address', label: '接收地址', minWidth: 200 },
-  { field: 'stroke_num', label: '笔数', width: 100 ,formatter: (row) => row.stroke_num == 0 ? '-' : row.stroke_num},
+  {
+    field: 'stroke_num',
+    label: '笔数',
+    width: 100,
+    formatter: (row) => (row.stroke_num == 0 ? '-' : row.stroke_num)
+  },
   { field: 'energy_rent_text', label: '有效时长', width: 100 },
   {
     field: 'use_time',

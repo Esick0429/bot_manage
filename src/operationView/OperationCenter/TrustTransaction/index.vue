@@ -70,7 +70,6 @@ const getManageStatus = (status: number) => {
   }
 }
 
-
 const getDelegateStatusText = (status: number) => {
   switch (status) {
     case 1:
@@ -352,7 +351,7 @@ onMounted(() => {
 
 <style scoped>
 .trust-transaction-container {
-  padding: 16px;
   height: 100%;
+  padding: 16px;
 }
 </style>

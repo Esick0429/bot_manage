@@ -65,7 +65,6 @@ defineExpose({
   formMethods
 })
 
-
 const props = defineProps({
   agentPrices: {
     type: Object,

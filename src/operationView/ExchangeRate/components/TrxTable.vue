@@ -136,23 +136,23 @@ const columns = reactive<TableColumn[]>([
 .table-wrapper {
   width: 100%;
   height: 100%;
-  border-radius: 8px;
-  background-color: #fff;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
   padding: 16px;
   overflow: hidden;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgb(0 0 0 / 10%);
 }
 
 .table-header {
-  margin-bottom: 16px;
   display: flex;
+  margin-bottom: 16px;
   justify-content: space-between;
   align-items: center;
 }
 
 .table-header h3 {
-  font-size: 18px;
   margin: 0;
+  font-size: 18px;
   color: #333;
 }
 </style>

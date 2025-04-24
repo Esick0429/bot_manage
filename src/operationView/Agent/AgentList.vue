@@ -9,8 +9,7 @@
         :fetchDataApi="getAgentList"
         @search="handleSearch"
         :show-add-button="false"
-      >
-      </SearchTable>
+      />
     </ContentWrap>
   </div>
 </template>

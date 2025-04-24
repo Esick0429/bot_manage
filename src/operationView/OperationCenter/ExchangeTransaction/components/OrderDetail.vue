@@ -120,7 +120,7 @@ const detailSchema = computed<DescriptionsSchema[]>(() => [
   {
     label: '兑换汇率',
     field: 'trx_price',
-    span: 8,
+    span: 8
   },
 
   {
@@ -138,7 +138,7 @@ const detailSchema = computed<DescriptionsSchema[]>(() => [
   {
     label: '实时汇率',
     field: 'real_price',
-    span: 8,
+    span: 8
   },
 
   // { label: '补发TRX', field: 'resend_amount', span: 8, slots: { default: (data) => formatAmount(data.resend_amount, data.resend_unit ?? data.exchange_unit) } },
@@ -155,7 +155,7 @@ const detailSchema = computed<DescriptionsSchema[]>(() => [
     slots: { default: (data) => data.in_from_address || '-' }
   },
   {
-    label: '代理接受地址',
+    label: '代理接收地址',
     field: 'in_to_address',
     span: 16,
     slots: { default: (data) => data.in_to_address || '-' }
@@ -170,7 +170,7 @@ const detailSchema = computed<DescriptionsSchema[]>(() => [
           ElLink,
           {
             type: 'primary',
-            href: `https://nile.tronscan.org/#/transaction/${data.out_txid}`,
+            href: `https://tronscan.org/#/transaction/${data.out_txid}`,
             target: '_blank'
           },
           () => data.out_txid || '-'
@@ -187,7 +187,7 @@ const detailSchema = computed<DescriptionsSchema[]>(() => [
           ElLink,
           {
             type: 'primary',
-            href: `https://nile.tronscan.org/#/transaction/${data.in_txid}`,
+            href: `https://tronscan.org/#/transaction/${data.in_txid}`,
             target: '_blank'
           },
           () => data.in_txid || '-'
@@ -273,6 +273,7 @@ defineExpose({ open })
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }

@@ -48,7 +48,7 @@ const byTimeDetailSchema = computed((): DescriptionsSchema[] => [
         return h(
           ElLink,
           {
-            href: `https://nile.tronscan.org/#/transaction/${data.txid}`,
+            href: `https://tronscan.org/#/transaction/${data.txid}`,
             type: 'primary',
             target: '_blank'
           },
@@ -67,7 +67,7 @@ const byTimeDetailSchema = computed((): DescriptionsSchema[] => [
         return h(
           ElLink,
           {
-            href: `https://nile.tronscan.org/#/transaction/${data.recycle_txid}`,
+            href: `https://tronscan.org/#/transaction/${data.recycle_txid}`,
             type: 'primary',
             target: '_blank'
           },

@@ -1,0 +1,47 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v3
+
+      - name: 安装 pnpm
+        run: npm install -g pnpm
+
+      - name: 安装依赖
+        run: pnpm install
+
+      - name: 构建 Operation
+        run: pnpm run build:pro --key=Operation
+
+      - name: 构建 Management
+        run: pnpm run build:pro --key=Management
+
+      - name: 部署 Operation
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan 8.208.101.199 >> ~/.ssh/known_hosts
+          scp -r ./dist-operation/* root@8.208.101.199:/usr/share/nginx/operation/
+
+      - name: 部署 Management
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan 8.208.101.199 >> ~/.ssh/known_hosts
+          scp -r ./dist-management/* root@8.208.101.199:/usr/share/nginx/management/
+
+          
