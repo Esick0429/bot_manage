@@ -155,7 +155,7 @@ const detailSchema = computed<DescriptionsSchema[]>(() => [
     slots: { default: (data) => data.in_from_address || '-' }
   },
   {
-    label: '代理接受地址',
+    label: '代理接收地址',
     field: 'in_to_address',
     span: 16,
     slots: { default: (data) => data.in_to_address || '-' }
