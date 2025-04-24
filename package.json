@@ -29,6 +29,7 @@
     "lint:lint-staged": "lint-staged -c ./.husky/lintstagedrc.cjs",
     "prepare": "husky install",
     "p": "plop",
+    "deploy": "bash deploy.sh",
     "icon": "esno ./scripts/icon.ts"
   },
   "dependencies": {
