@@ -140,7 +140,7 @@ const getTagType = (field, value) => {
 const getTagText = (field, value) => {
   if (isNaN(value)) return '未知'
   if (field === 'order_type') return orderTypeMap[value] || '未知类型'
-  if (field === 'status') return statusMap[value] || '未知状态'
+  if (field === 'status') return statusMap[value] || '-'
   return '未知'
 }
 

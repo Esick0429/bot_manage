@@ -307,7 +307,7 @@ const getStatusTextForTable = (status: number): string => {
     2: '已支付',
     3: '支付失败'
   }
-  return statusMap[status] || '未知状态'
+  return statusMap[status] || '-'
 }
 
 // 跳转到用户列表
@@ -476,7 +476,7 @@ const transactionDetailSchema = computed((): DescriptionsSchema[] => [
           return h(ElTag, { type: 'info', size: 'small' }, () => String(data.status || '未知'))
         }
         const type = statusColorMap[numericStatus] || 'info'
-        const text = statusTextMap[numericStatus] || '未知状态'
+        const text = statusTextMap[numericStatus] || '-'
         return h(ElTag, { type: type, size: 'small' }, () => text)
       }
     }

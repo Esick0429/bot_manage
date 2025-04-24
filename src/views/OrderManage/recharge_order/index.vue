@@ -369,7 +369,7 @@ const getStatusText = (status: number): string => {
     2: '待支付',
     3: '已取消'
   }
-  return statusMap[status] || '未知状态'
+  return statusMap[status] || '-'
 }
 
 // API 封装

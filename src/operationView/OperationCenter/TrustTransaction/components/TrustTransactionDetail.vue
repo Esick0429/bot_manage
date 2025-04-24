@@ -49,7 +49,7 @@ const getHandleStatusText = (status: number) => {
     case 3:
       return '已补发'
     default:
-      return '未知状态'
+      return '-'
   }
 }
 

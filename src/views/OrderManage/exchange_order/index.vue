@@ -441,7 +441,7 @@ const getStatusText = (status: number): string => {
     2: '失败',
     3: '待支付'
   }
-  return statusMap[status] || '未知状态'
+  return statusMap[status] || '-'
 }
 
 // 跳转到用户列表

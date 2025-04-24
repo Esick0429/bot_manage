@@ -36,7 +36,7 @@ const getOrderStatusText = (status: number): string => {
     2: '已支付',
     3: '支付失败'
   }
-  return statusMap[status] || '未知状态'
+  return statusMap[status] || '-'
 }
 // --- Helper Functions --- Shared or move to utils
 const getBatchStatusText = (status: number): string => {

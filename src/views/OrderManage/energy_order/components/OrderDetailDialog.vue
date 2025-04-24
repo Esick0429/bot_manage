@@ -72,7 +72,7 @@ const getStatusText = (status: number): string => {
     2: '已支付',
     3: '支付失败'
   }
-  return statusMap[status] || '未知状态'
+  return statusMap[status] || '-'
 }
 
 const navigateToUserList = (userId: string | number) => {
