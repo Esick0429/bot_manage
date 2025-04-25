@@ -11,6 +11,11 @@
         :show-add-button="false"
       />
     </ContentWrap>
+    <RechargeDialog
+      v-model:visible="rechargeDialogVisible"
+      :user="currentAccount"
+      @success="handleRechargeSuccess"
+    />
   </div>
 </template>
 
@@ -31,10 +36,12 @@ import {
 } from '@/api/agent/list'
 import { ContentWrap } from '@/components/ContentWrap'
 import { BaseButton } from '@/components/Button'
-
+import RechargeDialog from './components/RechargeDialog.vue'
 // 引用SearchTable实例
 const searchTableRef = ref()
 
+const rechargeDialogVisible = ref(false)
+const currentAccount = ref<AgentItem>()
 // --- API 调用封装 ---
 
 // 获取代理列表API封装
@@ -142,7 +149,7 @@ const columns = ref<TableColumn[]>([
   {
     field: 'action',
     label: '操作',
-    width: '100px',
+    minWidth: '100px',
     formatter: (row: AgentItem) => {
       // 检查当前状态是否为 1 (启用)
       const isEnabled = row.status === 1
@@ -156,13 +163,25 @@ const columns = ref<TableColumn[]>([
       const actionText = isEnabled ? '禁用' : '启用'
 
       return (
-        <BaseButton
-          type={buttonType}
-          // 点击时传递计算出的目标状态 (1 或 2)
-          onClick={() => handleUpdateStatus(row.id, targetStatus, actionText)}
-        >
-          {buttonText}
-        </BaseButton>
+        <>
+          <BaseButton
+            type="primary"
+            onClick={() => {
+              currentAccount.value = row
+              rechargeDialogVisible.value = true
+            }}
+          >
+            充值
+          </BaseButton>
+
+          <BaseButton
+            type={buttonType}
+            // 点击时传递计算出的目标状态 (1 或 2)
+            onClick={() => handleUpdateStatus(row.id, targetStatus, actionText)}
+          >
+            {buttonText}
+          </BaseButton>
+        </>
       )
     }
   }
@@ -188,6 +207,12 @@ const handleUpdateStatus = (id: number | string, status: number, actionText: str
     .catch(() => {
       ElMessage.info('操作已取消')
     })
+}
+
+// 处理充值成功
+const handleRechargeSuccess = (amount: number) => {
+  ElMessage.success('充值成功')
+  searchTableRef.value?.reload()
 }
 </script>
 

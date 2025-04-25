@@ -54,3 +54,7 @@ export const getAgentListApi = (
 export const updateAgentStatusApi = (data: UpdateAgentStatusPayload): Promise<IResponse> => {
   return request.post({ url: '/v2/manage/agent/update', data })
 }
+
+export const rechargeTrxApi = (data: any) => {
+  return request.post({ url: '/v2/manage/agent/change_balance', data })
+}
