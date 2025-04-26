@@ -12,7 +12,7 @@
       >
         <!-- 工具栏插槽 -->
         <template #toolbar>
-          <ElButton type="primary" @click="handleAdd">
+          <ElButton v-hasPermi="'ResourcePool.add'" type="primary" @click="handleAdd">
             <Icon icon="ep:plus" class="mr-5px" />
             新增
           </ElButton>
@@ -46,7 +46,7 @@ import {
   batchDeleteResourcePoolAccountApi,
   updateResourcePoolAccountApi
 } from '@/api/system/resource_pool_account'
-
+import { isPermission } from '@/utils/is'
 const formRef = ref()
 const searchTableRef = ref()
 
@@ -124,15 +124,14 @@ const columns = ref<TableColumn[]>([
           2: 'text-red-300 font-bold', // 禁用 - 红色
           3: 'text-orange-300 font-bold' // 备用 - 橙色
         }
-
         // 判断是否应禁用非启用选项
         const disableOthers = row.status === 1
-
         return (
           <ElSelect
             modelValue={row.status}
             onChange={(newValue) => handleStatusChangeAttempt(row, newValue)}
             placeholder="请选择"
+            disabled={!isPermission('ResourcePool:edit')}
           >
             {{
               prefix: () => {
