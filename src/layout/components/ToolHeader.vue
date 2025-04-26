@@ -35,8 +35,7 @@ const layout = computed(() => appStore.getLayout)
 // 多语言图标
 const locale = computed(() => appStore.getLocale)
 
-// 交易钩子
-const trxHook = computed(() => appStore.getTrxHook)
+const VITE_NODE_ENV = import.meta.env.VITE_NODE_ENV === 'development' ? 'dev' : 'prod'
 
 export default defineComponent({
   name: 'ToolHeader',
@@ -73,7 +72,7 @@ export default defineComponent({
           </div>
         ) : undefined}
         <div class="h-full flex items-center">
-          {trxHook.value ? (
+          {VITE_NODE_ENV === 'dev' ? (
             <div
               class="custom-hover mr-2 flex items-center cursor-pointer"
               onClick={handleOpenWebhookForm}
