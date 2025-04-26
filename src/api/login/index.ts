@@ -138,3 +138,10 @@ export const sendPhoneCodeApi = (data: PhoneCodeParams): Promise<IResponse> => {
 export const getCaptchaApi = (): Promise<IResponse<{ id: string; data: string }>> => {
   return request.get({ url: '/v1/user/captcha/captcha' })
 }
+
+/**
+ * 获取用户信息
+ */
+export const getUserInfoApi = (): Promise<IResponse<UserType>> => {
+  return request.get({ url: '/v2/manage/user/use_info' })
+}

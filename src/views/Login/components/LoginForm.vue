@@ -20,7 +20,8 @@ import {
   verifyCodeLoginApi,
   sendPhoneCodeApi,
   sendEmailCodeApi,
-  getCaptchaApi
+  getCaptchaApi,
+  getUserInfoApi
 } from '@/api/login'
 import { ElMessage } from 'element-plus'
 
@@ -383,6 +384,7 @@ const remember = ref(userStore.getRememberMe)
 
 const initLoginInfo = () => {
   const loginInfo = userStore.getLoginInfo
+  console.log('loginInfo', loginInfo)
   if (loginInfo) {
     const { username, password } = loginInfo
     setValues({ username, password })
@@ -459,7 +461,21 @@ const signIn = async () => {
 
           // 获取用户信息
           // TODO: 这里应该是从token解析或者调用获取用户信息接口
-          userStore.setUserInfo({ username: formData.username, password: formData.password })
+          if (!isManagement) {
+            const userInfo = await getUserInfoApi()
+            if (userInfo && userInfo.code === '000000') {
+              console.log(userInfo.data)
+              const { permissions, name, role_ID, role_name } = userInfo.data
+              userStore.setUserInfo({
+                permissions,
+                username: name,
+                role_ID,
+                role_name
+              })
+            }
+          } else {
+            userStore.setUserInfo({ username: formData.username, password: formData.password })
+          }
 
           console.log('登录前 dynamicRouter 状态:', appStore.getDynamicRouter)
           // 确保设置为false
