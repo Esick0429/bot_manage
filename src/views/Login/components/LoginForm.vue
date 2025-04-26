@@ -503,11 +503,18 @@ const signIn = async () => {
 
           ElMessage.success('登录成功')
         } else {
-          ElMessage.error(res?.msg || '登录失败')
+          // 登录失败，显示错误信息并刷新验证码
+          const errorMsg = res?.msg || '登录失败'
+          ElMessage.error(errorMsg)
+          fetchCaptcha() // 只要失败就刷新验证码
         }
-      } catch (error) {
+      } catch (error: any) {
+        // Keep type any for easier access in generic error message
         console.error('登录失败:', error)
-        ElMessage.error('登录失败，请检查账号密码或网络连接')
+        // API 调用本身失败 (网络等)，显示通用错误信息，也刷新验证码以防万一
+        const errorMsg = error?.response?.data?.msg || error?.message || '登录失败，请检查网络连接'
+        ElMessage.error(errorMsg)
+        fetchCaptcha() // 也刷新验证码
       } finally {
         loading.value = false
       }
