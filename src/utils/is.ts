@@ -115,3 +115,13 @@ export const isImgPath = (path: string): boolean => {
 export const isEmptyVal = (val: any): boolean => {
   return val === '' || val === null || val === undefined
 }
+
+export const isSuperAdmin = () => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}')
+  return user?.userInfo?.permissions?.includes('*')
+}
+
+export const isPermission = (value) => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}')
+  return user?.userInfo?.permissions?.includes(value)
+}
