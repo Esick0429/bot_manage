@@ -45,3 +45,6 @@ VITE_HIDE_GLOBAL_SETTING=true
 
 # 系统类型
 VITE_SYSTEM_TYPE=Management
+
+# tronscan地址
+VITE_TRONSCAN_URL=https://tronscan.org

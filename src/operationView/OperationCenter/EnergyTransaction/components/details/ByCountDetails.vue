@@ -107,7 +107,8 @@ const countOrderTableSchema = computed((): TableColumn[] => [
     width: 280,
     type: 'link',
     showOverflowTooltip: true,
-    url: (row) => `https://tronscan.org/#/transaction/${row.energy_txid}`
+    url: (row) =>
+      `${import.meta.env.VITE_TRONSCAN_URL}/#/transaction/${txid}/#/transaction/${row.energy_txid}`
   }
 ])
 

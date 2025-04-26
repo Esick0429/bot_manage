@@ -179,7 +179,7 @@ const rechargeDetailSchema = computed(() => {
           if (!row || !row.hash) return h('span', '-')
           return (
             <ElLink
-              href={`https://tronscan.org/#/transaction/${row.hash}`}
+              href={`${import.meta.env.VITE_TRONSCAN_URL}/#/transaction/${txid}/#/transaction/${row.hash}`}
               type="primary"
               target="_blank"
             >
