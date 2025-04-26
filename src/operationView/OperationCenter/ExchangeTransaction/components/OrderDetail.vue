@@ -170,7 +170,7 @@ const detailSchema = computed<DescriptionsSchema[]>(() => [
           ElLink,
           {
             type: 'primary',
-            href: `${import.meta.env.VITE_TRONSCAN_URL}/#/transaction/${txid}/#/transaction/${data.out_txid}`,
+            href: `${import.meta.env.VITE_TRONSCAN_URL}/#/transaction/${data.out_txid}`,
             target: '_blank'
           },
           () => data.out_txid || '-'
@@ -187,7 +187,7 @@ const detailSchema = computed<DescriptionsSchema[]>(() => [
           ElLink,
           {
             type: 'primary',
-            href: `${import.meta.env.VITE_TRONSCAN_URL}/#/transaction/${txid}/#/transaction/${data.in_txid}`,
+            href: `${import.meta.env.VITE_TRONSCAN_URL}/#/transaction/${data.in_txid}`,
             target: '_blank'
           },
           () => data.in_txid || '-'

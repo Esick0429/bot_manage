@@ -188,7 +188,7 @@ const transactionInSchema = computed<DescriptionsSchema[]>(() => [
         return h(
           ElLink,
           {
-            href: `${import.meta.env.VITE_TRONSCAN_URL}/#/transaction/${txid}/#/transaction/${row.in_txid}`,
+            href: `${import.meta.env.VITE_TRONSCAN_URL}/#/transaction/${row.in_txid}`,
             type: 'primary',
             target: '_blank'
           },
@@ -208,7 +208,7 @@ const transactionInSchema = computed<DescriptionsSchema[]>(() => [
   //       return h(
   //         ElLink,
   //         {
-  //           href: `${import.meta.env.VITE_TRONSCAN_URL}/#/transaction/${txid}/#/block/${row.in_number}`,
+  //           href: `${import.meta.env.VITE_TRONSCAN_URL}/#/block/${row.in_number}`,
   //           type: 'primary',
   //           target: '_blank'
   //         },
@@ -248,7 +248,7 @@ const transactionOutSchema = computed<DescriptionsSchema[]>(() => [
         return h(
           ElLink,
           {
-            href: `${import.meta.env.VITE_TRONSCAN_URL}/#/transaction/${txid}/#/transaction/${row.out_txid}`,
+            href: `${import.meta.env.VITE_TRONSCAN_URL}/#/transaction/${row.out_txid}`,
             type: 'primary',
             target: '_blank'
           },

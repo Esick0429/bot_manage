@@ -150,7 +150,7 @@ const hostedDetailSchema = computed(() => {
           return h(
             ElLink,
             {
-              href: `${import.meta.env.VITE_TRONSCAN_URL}/#/transaction/${txid}/#/transaction/${row.txid}`,
+              href: `${import.meta.env.VITE_TRONSCAN_URL}/#/transaction/${row.txid}`,
               type: 'primary',
               target: '_blank'
             },
@@ -207,7 +207,7 @@ const transactionDetailSchema = computed(() => {
           return h(
             ElLink,
             {
-              href: `${import.meta.env.VITE_TRONSCAN_URL}/#/transaction/${txid}/#/transaction/${row.txid}`,
+              href: `${import.meta.env.VITE_TRONSCAN_URL}/#/transaction/${row.txid}`,
               type: 'primary',
               target: '_blank'
             },

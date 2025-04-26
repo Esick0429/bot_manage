@@ -223,7 +223,7 @@ const batchOrderTransactionSchema = computed((): DescriptionsSchema[] => [
         return h(
           ElLink,
           {
-            href: `${import.meta.env.VITE_TRONSCAN_URL}/#/transaction/${txid}/#/transaction/${data.txid}`,
+            href: `${import.meta.env.VITE_TRONSCAN_URL}/#/transaction/${data.txid}`,
             type: 'primary',
             target: '_blank'
           },
@@ -242,7 +242,7 @@ const batchOrderTransactionSchema = computed((): DescriptionsSchema[] => [
         return h(
           ElLink,
           {
-            href: `${import.meta.env.VITE_TRONSCAN_URL}/#/transaction/${txid}/#/transaction/${data.energy_txid}`,
+            href: `${import.meta.env.VITE_TRONSCAN_URL}/#/transaction/${data.energy_txid}`,
             type: 'primary',
             target: '_blank'
           },

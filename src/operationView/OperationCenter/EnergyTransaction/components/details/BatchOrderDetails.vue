@@ -16,7 +16,7 @@ const renderTxidLink = (txid: string | null | undefined, label = '交易hash') =
   return h(
     ElLink,
     {
-      href: `${import.meta.env.VITE_TRONSCAN_URL}/#/transaction/${txid}/#/transaction/${txid}`,
+      href: `${import.meta.env.VITE_TRONSCAN_URL}/#/transaction/${txid}`,
       type: 'primary',
       target: '_blank'
     },

@@ -133,7 +133,7 @@ const detailSchema = computed<DescriptionsSchema[]>(() => [
           ElLink,
           {
             type: 'primary',
-            href: `${import.meta.env.VITE_TRONSCAN_URL}/#/transaction/${txid}/#/transaction/${data.recycle_txid}`,
+            href: `${import.meta.env.VITE_TRONSCAN_URL}/#/transaction/${data.recycle_txid}`,
             target: '_blank'
           },
           () => data.recycle_txid || '-'
@@ -151,7 +151,7 @@ const detailSchema = computed<DescriptionsSchema[]>(() => [
           ElLink,
           {
             type: 'primary',
-            href: `${import.meta.env.VITE_TRONSCAN_URL}/#/transaction/${txid}/#/transaction/${data.txid}`,
+            href: `${import.meta.env.VITE_TRONSCAN_URL}/#/transaction/${data.txid}`,
             target: '_blank'
           },
           () => data.txid || '-'

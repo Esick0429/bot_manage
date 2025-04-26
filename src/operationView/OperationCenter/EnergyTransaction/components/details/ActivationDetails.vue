@@ -282,7 +282,7 @@ const renderTxidLink = (txid: string | null | undefined) => {
   return h(
     ElLink,
     {
-      href: `${import.meta.env.VITE_TRONSCAN_URL}/#/transaction/${txid}/#/transaction/${txid}`, // Use mainnet for example
+      href: `${import.meta.env.VITE_TRONSCAN_URL}/#/transaction/${txid}`, // Use mainnet for example
       type: 'primary',
       target: '_blank'
     },
