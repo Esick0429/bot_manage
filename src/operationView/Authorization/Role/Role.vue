@@ -1,57 +1,51 @@
 <script setup lang="tsx">
-import { reactive, ref, unref } from 'vue'
-import { getRoleListApi, addRoleApi, updateRoleApi, deleteRoleApi } from '@/api/role'
-import { useTable } from '@/hooks/web/useTable'
+import { ref, computed, h, nextTick } from 'vue'
+import {
+  getRoleListApi,
+  addRoleApi,
+  updateRoleApi,
+  deleteRoleApi,
+  getRolePermissionsApi
+} from '@/api/role'
 import { useI18n } from '@/hooks/web/useI18n'
-import { Table, TableColumn } from '@/components/Table'
-import { ElTag, ElMessageBox, ElMessage } from 'element-plus'
-import { Search } from '@/components/Search'
-import { FormSchema } from '@/components/Form'
 import { ContentWrap } from '@/components/ContentWrap'
-import Write from './components/Write.vue'
-import Detail from './components/Detail.vue'
-import { Dialog } from '@/components/Dialog'
 import { BaseButton } from '@/components/Button'
+import { ElMessageBox, ElMessage, ElTag } from 'element-plus'
+import { formatToDateTime } from '@/utils/dateUtil'
+import { SearchTable } from '@/components/SearchTable'
+import Write from './components/Write.vue'
+import { FormSchema } from '@/components/Form'
+import { useSearchTable } from '@/hooks/web/useSearchTable'
 
 const { t } = useI18n()
 
-const { tableRegister, tableState, tableMethods } = useTable({
-  fetchDataApi: async (params: any = {}) => {
-    const query = {
-      ...unref(searchParams),
-      current_page: params.current_page || params.page || 1,
-      page_size: params.page_size || params.pageSize || 10
-    }
-    const res = await getRoleListApi(query)
-    return {
-      list: res.data.list || [],
-      total: res.data.total
+// 搜索表单配置
+const searchSchema = computed<FormSchema[]>(() => [
+  {
+    field: 'name',
+    label: t('role.roleName'),
+    component: 'Input',
+    componentProps: {
+      placeholder: t('role.roleName')
     }
   }
-})
+])
 
-const { dataList, loading, total } = tableState
-const { getList } = tableMethods
-
-const tableColumns = reactive<TableColumn[]>([
+// 表格列配置
+const columns = [
   {
-    field: 'index',
-    label: t('userDemo.index'),
-    type: 'index'
-  },
-  {
-    field: 'roleName',
+    field: 'name',
     label: t('role.roleName')
   },
   {
     field: 'status',
     label: t('menu.status'),
     slots: {
-      default: (data: any) => {
+      default: ({ row }: any) => {
         return (
           <>
-            <ElTag type={data.row.status === 0 ? 'danger' : 'success'}>
-              {data.row.status === 1 ? t('userDemo.enable') : t('userDemo.disable')}
+            <ElTag type={row.status === 1 ? 'success' : 'danger'}>
+              {row.status === 1 ? '启用' : '禁用'}
             </ElTag>
           </>
         )
@@ -59,151 +53,151 @@ const tableColumns = reactive<TableColumn[]>([
     }
   },
   {
-    field: 'createTime',
-    label: t('tableDemo.displayTime')
-  },
-  {
-    field: 'remark',
-    label: t('userDemo.remark')
+    field: 'create_time',
+    label: t('tableDemo.displayTime'),
+    formatter: (row: any) => (row.create_time == 0 ? '-' : formatToDateTime(row.create_time))
   },
   {
     field: 'action',
     label: t('userDemo.action'),
     width: 240,
     slots: {
-      default: (data: any) => {
-        const row = data.row
-        return (
-          <>
-            <BaseButton type="primary" onClick={() => action(row, 'edit')}>
-              {t('exampleDemo.edit')}
-            </BaseButton>
-            <BaseButton type="success" onClick={() => action(row, 'detail')}>
-              {t('exampleDemo.detail')}
-            </BaseButton>
-            <BaseButton type="danger" onClick={() => handleDelete(row)}>
-              {t('exampleDemo.del')}
-            </BaseButton>
-          </>
+      default: ({ row }: any) => [
+        h(
+          BaseButton,
+          {
+            type: 'primary',
+            onClick: () => handleAction(row, 'edit'),
+            style: { marginRight: '8px' }
+          },
+          () => t('exampleDemo.edit')
+        ),
+        h(
+          BaseButton,
+          {
+            type: 'danger',
+            onClick: () => handleDelete(row)
+          },
+          () => t('exampleDemo.del')
         )
-      }
+      ]
     }
   }
-])
+]
 
-const searchSchema = reactive<FormSchema[]>([
-  {
-    field: 'roleName',
-    label: t('role.roleName'),
-    component: 'Input'
+// 数据请求API
+const fetchRoleList = async (params: any) => {
+  try {
+    const res = await getRoleListApi(params)
+    return res.data || { list: [], total: 0 }
+  } catch (error) {
+    ElMessage.error(t('common.apiError'))
+    return { list: [], total: 0 }
   }
-])
-
-const searchParams = ref({})
-const setSearchParams = (data: any) => {
-  searchParams.value = data
-  getList()
 }
 
-const dialogVisible = ref(false)
+// 弹窗相关
 const dialogTitle = ref('')
+const actionType = ref<'add' | 'edit' | 'detail' | ''>('')
+const writeRef = ref<InstanceType<typeof Write>>()
+const formLoading = ref(false)
+const currentRow = ref<any>({})
 
-const currentRow = ref()
-const actionType = ref('')
-
-const writeRef = ref<ComponentRef<typeof Write>>()
-
-const saveLoading = ref(false)
-
-const action = (row: any, type: string) => {
+// 新增/编辑弹窗
+const handleAction = async (row: any, type: 'edit' | 'detail') => {
   dialogTitle.value = t(type === 'edit' ? 'exampleDemo.edit' : 'exampleDemo.detail')
   actionType.value = type
-  currentRow.value = row
-  dialogVisible.value = true
-}
-
-const AddAction = () => {
-  dialogTitle.value = t('exampleDemo.add')
-  currentRow.value = undefined
-  dialogVisible.value = true
-  actionType.value = ''
-}
-
-const save = async () => {
-  const write = unref(writeRef)
-  const formData = await write?.submit()
-  if (formData) {
-    saveLoading.value = true
+  if (type === 'detail') {
+    // Detail view logic if needed
+  } else {
     try {
-      if (actionType.value === 'edit') {
-        await updateRoleApi({ ...formData, id: currentRow.value.id })
-        ElMessage.success(t('common.editSuccess'))
-      } else {
-        await addRoleApi(formData)
-        ElMessage.success(t('common.addSuccess'))
-      }
-      dialogVisible.value = false
-      getList()
-    } catch (e: any) {
-      ElMessage.error(e?.message || t('common.apiError'))
+      formLoading.value = true
+      const res = await getRolePermissionsApi(row.id)
+      const data = res?.data || {}
+      currentRow.value = data
+      nextTick(() => {
+        writeRef.value?.open()
+      })
+    } catch (error) {
+      ElMessage.error('获取角色权限失败')
     } finally {
-      saveLoading.value = false
+      formLoading.value = false
     }
   }
+}
+
+const handleAdd = () => {
+  dialogTitle.value = t('exampleDemo.add')
+  actionType.value = 'add'
+  currentRow.value = {}
+  nextTick(() => writeRef.value?.open())
+}
+
+// Handle success event from Write component
+const handleSaveSuccess = () => {
+  searchTableRef.value?.reload()
 }
 
 const handleDelete = (row: any) => {
-  ElMessageBox.confirm(t('common.confirmDelete'), t('common.tip'), {
-    confirmButtonText: t('common.confirm'),
-    cancelButtonText: t('common.cancel'),
+  ElMessageBox.confirm('确定删除该角色吗？', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
     type: 'warning'
   })
     .then(async () => {
       try {
         await deleteRoleApi({ id: row.id })
         ElMessage.success(t('common.delSuccess'))
-        getList()
+        searchTableRef.value?.reload()
       } catch (e: any) {
-        ElMessage.error(e?.message || t('common.apiError'))
+        const errMsg = e?.response?.data?.message || e?.message || t('common.apiError')
+        ElMessage.error(errMsg)
       }
     })
     .catch(() => {})
 }
+
+// SearchTable Ref
+const searchTableRef = ref<any>(null)
+
+// useSearchTable 只用于类型提示和ref暴露
+useSearchTable({
+  searchSchema: searchSchema.value,
+  tableColumns: columns,
+  fetchDataApi: fetchRoleList,
+  immediate: false
+})
 </script>
 
 <template>
   <ContentWrap>
-    <Search :schema="searchSchema" @reset="setSearchParams" @search="setSearchParams" />
-    <div class="mb-10px">
-      <BaseButton type="primary" @click="AddAction">{{ t('exampleDemo.add') }}</BaseButton>
-    </div>
-    <Table
-      :columns="tableColumns"
-      default-expand-all
-      node-key="id"
-      :data="dataList"
-      :loading="loading"
-      :pagination="{
-        total
-      }"
-      @register="tableRegister"
+    <SearchTable
+      ref="searchTableRef"
+      :columns="columns"
+      :search-schema="searchSchema"
+      :fetch-data-api="fetchRoleList"
+      :showAddButton="true"
+      @add="handleAdd"
     />
   </ContentWrap>
 
-  <Dialog v-model="dialogVisible" :title="dialogTitle">
-    <Write v-if="actionType !== 'detail'" ref="writeRef" :current-row="currentRow" />
-    <Detail v-else :current-row="currentRow" />
-
+  <Write
+    ref="writeRef"
+    :current-row="currentRow"
+    :dialog-title="dialogTitle"
+    :action-type="actionType"
+    :form-loading="formLoading"
+    @success="handleSaveSuccess"
+  >
     <template #footer>
       <BaseButton
-        v-if="actionType !== 'detail'"
+        v-if="actionType === 'add' || actionType === 'edit'"
         type="primary"
-        :loading="saveLoading"
-        @click="save"
+        @click="writeRef?.submit()"
       >
         {{ t('exampleDemo.save') }}
       </BaseButton>
-      <BaseButton @click="dialogVisible = false">{{ t('dialogDemo.close') }}</BaseButton>
+      <BaseButton @click="writeRef?.close()">{{ t('dialogDemo.close') }}</BaseButton>
     </template>
-  </Dialog>
+  </Write>
 </template>

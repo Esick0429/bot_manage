@@ -2,7 +2,7 @@ import request from '@/axios'
 
 // 获取角色列表
 export const getRoleListApi = (params: any = {}) => {
-  return request.get({ url: '/v2/manage/user/permission/list', params })
+  return request.get({ url: '/v2/manage/user/permission/roles/list', params })
 }
 
 // 添加角色
@@ -23,4 +23,9 @@ export const updateRoleApi = (data: any) => {
 // 添加角色权限
 export const addRolePermissionApi = (data: any) => {
   return request.post({ url: '/v2/manage/user/permission/role_permission/add', data })
+}
+
+// 获取角色权限
+export const getRolePermissionsApi = (id: string) => {
+  return request.get({ url: `/v2/manage/user/permission/role_permission/${id}` })
 }
