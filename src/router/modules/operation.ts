@@ -12,7 +12,10 @@ if (import.meta.env.VITE_SYSTEM_TYPE === 'Operation') {
       component: Layout,
       name: 'DataStatistics',
       redirect: '/data_statistics/index',
-      meta: {},
+      meta: {
+        title: '数据统计',
+        icon: 'vi-mdi:chart-bar'
+      },
       children: [
         {
           path: 'index',
@@ -97,7 +100,8 @@ if (import.meta.env.VITE_SYSTEM_TYPE === 'Operation') {
           component: () => import('@/operationView/Marketing/AgentPrice.vue'),
           name: 'AgentPrice',
           meta: {
-            title: '代理价格配置'
+            title: '代理价格配置',
+            buttonList: ['edit']
           }
         },
         {
@@ -159,11 +163,21 @@ if (import.meta.env.VITE_SYSTEM_TYPE === 'Operation') {
       },
       children: [
         {
+          path: 'user',
+          component: () => import('@/operationView/Authorization/User/User.vue'),
+          name: 'User',
+          meta: {
+            title: '用户管理',
+            buttonList: ['add', 'edit', 'delete']
+          }
+        },
+        {
           path: 'role',
           component: () => import('@/operationView/Authorization/Role/Role.vue'),
           name: 'Role',
           meta: {
-            title: '角色管理'
+            title: '角色管理',
+            buttonList: ['add', 'edit', 'delete']
           }
         }
       ]

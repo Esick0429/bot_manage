@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
 import { constantRouterMap } from '@/router'
-import asyncCommonRoutes from '@/router/modules/asyncCommon'
 import managementRoutes from '@/router/modules/management'
 import operationRoutes from '@/router/modules/operation'
 import {
@@ -10,6 +9,7 @@ import {
 } from '@/utils/routerHelper'
 import { store } from '../index'
 import { cloneDeep } from 'lodash-es'
+import { useUserStoreWithOut } from '@/store/modules/user'
 
 export interface PermissionState {
   routers: AppRouteRecordRaw[]
@@ -43,26 +43,49 @@ export const usePermissionStore = defineStore('permission', {
     generateRoutes(
       type: 'server' | 'frontEnd' | 'static',
       routers?: AppCustomRouteRecordRaw[] | string[]
-    ): Promise<unknown> {
-      return new Promise<void>((resolve) => {
+    ): Promise<AppRouteRecordRaw[]> {
+      return new Promise<AppRouteRecordRaw[]>((resolve) => {
         const systemType = import.meta.env.VITE_SYSTEM_TYPE || 'Management'
         let baseDynamicRoutes: AppRouteRecordRaw[] = []
+
         if (systemType === 'Management') {
           baseDynamicRoutes = managementRoutes.filter((item) => item.path !== '/data_statistics')
         } else {
-          baseDynamicRoutes = operationRoutes
-        }
+          const userStore = useUserStoreWithOut()
+          const permissions = Array.isArray(userStore.getUserInfo?.permissions)
+            ? userStore.getUserInfo.permissions
+            : []
+          const filterRecursive = (
+            routes: AppRouteRecordRaw[],
+            allowedNames: string[]
+          ): AppRouteRecordRaw[] => {
+            return routes.filter((route) => {
+              const routeName = route.name as string
+              const hasRouteName = !!routeName
+              const hasAccess = !hasRouteName || allowedNames.includes(routeName)
 
+              if (hasAccess && route.children && route.children.length > 0) {
+                route.children = filterRecursive(route.children, allowedNames)
+              }
+              const shouldKeep = hasAccess && (!route.children || route.children.length > 0)
+              return shouldKeep
+            })
+          }
+
+          const clonedRoutes = cloneDeep(operationRoutes)
+          baseDynamicRoutes = filterRecursive(clonedRoutes, permissions)
+        }
+        console.log(baseDynamicRoutes, 'baseDynamicRoutes')
         let routerMap: AppRouteRecordRaw[] = []
         if (type === 'server') {
           routerMap = generateRoutesByServer(routers as AppCustomRouteRecordRaw[])
         } else if (type === 'frontEnd') {
-          routerMap = generateRoutesByFrontEnd(cloneDeep(baseDynamicRoutes), routers as string[])
+          routerMap = generateRoutesByFrontEnd(baseDynamicRoutes, routers as string[])
         } else {
-          routerMap = cloneDeep(baseDynamicRoutes)
+          routerMap = baseDynamicRoutes
         }
 
-        this.addRouters = routerMap.concat([
+        const finalAddRouters = routerMap.concat([
           {
             path: '/:path(.*)*',
             redirect: '/404',
@@ -73,8 +96,10 @@ export const usePermissionStore = defineStore('permission', {
             }
           }
         ])
+        this.addRouters = finalAddRouters
         this.routers = cloneDeep(constantRouterMap).concat(routerMap)
-        resolve()
+        this.isAddRouters = true
+        resolve(routerMap)
       })
     },
     setIsAddRouters(state: boolean): void {
