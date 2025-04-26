@@ -101,7 +101,7 @@ if (import.meta.env.VITE_SYSTEM_TYPE === 'Operation') {
           name: 'AgentPrice',
           meta: {
             title: '代理价格配置',
-            buttonList: ['edit']
+            buttonList: ['add', 'edit']
           }
         },
         {
@@ -109,7 +109,8 @@ if (import.meta.env.VITE_SYSTEM_TYPE === 'Operation') {
           component: () => import('@/operationView/Marketing/TrxAddress.vue'),
           name: 'Payment',
           meta: {
-            title: '收款配置'
+            title: '收款配置',
+            buttonList: ['add', 'edit', 'delete']
           }
         }
       ]
@@ -129,7 +130,8 @@ if (import.meta.env.VITE_SYSTEM_TYPE === 'Operation') {
           component: () => import('@/operationView/Agent/AgentList.vue'),
           name: 'AgentList',
           meta: {
-            title: '代理信息'
+            title: '代理信息',
+            buttonList: ['add', 'edit', 'delete']
           }
         },
         {
@@ -145,7 +147,8 @@ if (import.meta.env.VITE_SYSTEM_TYPE === 'Operation') {
           component: () => import('@/operationView/Agent/BotList.vue'),
           name: 'AgentBotList',
           meta: {
-            title: '机器人列表'
+            title: '机器人列表',
+            buttonList: ['edit']
           }
         }
       ]
@@ -197,7 +200,8 @@ if (import.meta.env.VITE_SYSTEM_TYPE === 'Operation') {
           component: () => import('@/operationView/SystemConfig/ResourcePool.vue'),
           name: 'ResourcePool',
           meta: {
-            title: '资源池账户'
+            title: '资源池账户',
+            buttonList: ['add', 'edit']
           }
         }
       ]
