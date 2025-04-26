@@ -553,6 +553,7 @@ export default {
     action: '操作',
     username: '用户名',
     password: '密码',
+    confirmPassword: '确认密码',
     role: '角色',
     remark: '备注',
     remarkMessage1: '后端控制路由权限',
@@ -572,7 +573,9 @@ export default {
     // 禁用
     disable: '禁用',
     // 上级部门
-    superiorDepartment: '上级部门'
+    superiorDepartment: '上级部门',
+    inputPassword: '请输入密码',
+    inputConfirmPassword: '请确认密码'
   },
   menu: {
     menuName: '菜单名称',
