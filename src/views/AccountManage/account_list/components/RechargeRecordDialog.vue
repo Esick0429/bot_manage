@@ -15,7 +15,7 @@
       :pagination="{
         total: total
       }"
-      @pagination-change="getList"
+      @register="tableRegister"
     />
 
     <template #footer>
@@ -27,13 +27,13 @@
 </template>
 
 <script setup lang="tsx">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch, unref } from 'vue'
 import { ElButton, ElTag, ElMessage } from 'element-plus'
 import { Dialog } from '@/components/Dialog'
-import { Table } from '@/components/Table'
+import { Table, TableColumn } from '@/components/Table'
 import { formatToDateTime } from '@/utils/dateUtil'
 import { getBalanceRecordApi } from '@/api/account'
-import type { TableColumn } from '@/components/Table'
+import { useTable } from '@/hooks/web/useTable'
 
 const props = defineProps({
   accountId: {
@@ -46,20 +46,52 @@ const props = defineProps({
   }
 })
 
-// 账户信息
+const dialogVisible = ref(false)
 const accountName = ref('')
 
-// 弹窗可见状态
-const dialogVisible = ref(false)
+const { tableRegister, tableState, tableMethods } = useTable({
+  immediate: false,
+  fetchDataApi: async () => {
+    if (!props.accountId) {
+      return { list: [], total: 0 }
+    }
+    try {
+      const params = {
+        current_page: currentPage.value,
+        page_size: pageSize.value,
+        change_type: 'in',
+        accountId: props.accountId
+      }
+      const res = await getBalanceRecordApi(params)
 
-// 表格数据
-const loading = ref(false)
-const dataList = ref<any[]>([])
-const total = ref(0)
-const currentPage = ref(1)
-const pageSize = ref(10)
+      if (res.data?.list && res.data.list.length > 0) {
+        const firstRecord = res.data.list[0]
+        if (
+          !accountName.value ||
+          (firstRecord.user_id && firstRecord.user_id !== props.accountId)
+        ) {
+          accountName.value = firstRecord.account_name || ''
+        }
+      } else if (res.data?.list?.length === 0) {
+        // If list is empty, maybe clear account name if it was from a previous account?
+        // Consider if accountName should be reset more reliably in `open` function when ID changes.
+      }
 
-// 表格列配置
+      return {
+        list: res.data?.list || [],
+        total: res.data?.totalCount || 0
+      }
+    } catch (error) {
+      console.error('获取充值记录失败:', error)
+      ElMessage.error('获取充值记录失败')
+      return { list: [], total: 0 }
+    }
+  }
+})
+
+const { loading, dataList, total, currentPage, pageSize } = tableState
+const { getList } = tableMethods
+
 const columns: TableColumn[] = [
   {
     field: 'user_id',
@@ -88,54 +120,34 @@ const columns: TableColumn[] = [
     label: '完成时间',
     minWidth: 160,
     formatter: (row) => (row.create_time ? formatToDateTime(row.create_time) : '-')
+  },
+  {
+    field: 'describe',
+    label: '描述',
+    minWidth: 160
   }
 ]
 
-// 获取充值记录列表
-const getList = async (params: any = {}) => {
-  loading.value = true
-  try {
-    const res = await getBalanceRecordApi({
-      ...params,
-      change_type: 'in',
-      accountId: props.accountId
-    })
+const open = (id: number) => {
+  const currentPropAccountId = props.accountId
 
-    if (res.data) {
-      dataList.value = res.data.list || []
-      total.value = res.data.totalCount || 0
+  dialogVisible.value = true
 
-      // 更新账户名称（如果记录中包含）
-      if (dataList.value.length > 0) {
-        accountName.value = dataList.value[0].account_name || ''
+  if (id !== currentPropAccountId) {
+    accountName.value = ''
+    currentPage.value = 1
+  } else {
+    const needsRefresh = unref(dataList).length === 0
+    if (needsRefresh) {
+      if (currentPage.value !== 1) {
+        currentPage.value = 1
+      } else {
+        tableMethods.getList()
       }
     }
-  } catch (error) {
-    console.error('获取充值记录失败:', error)
-    ElMessage.error('获取充值记录失败')
-  } finally {
-    loading.value = false
   }
 }
 
-// 打开弹窗
-const open = (id: number) => {
-  dialogVisible.value = true
-  // 重置分页
-  currentPage.value = 1
-
-  if (id !== props.accountId) {
-    // 清空上一次的数据
-    dataList.value = []
-    total.value = 0
-    accountName.value = ''
-  }
-
-  // 请求数据
-  getList()
-}
-
-// 暴露方法
 defineExpose({
   open
 })
