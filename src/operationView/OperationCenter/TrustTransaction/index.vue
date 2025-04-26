@@ -216,7 +216,7 @@ const searchSchema = reactive<FormSchema[]>([
     }
   },
   {
-    field: 'status',
+    field: 'manage_status',
     component: 'Select',
     label: '托管状态：',
     componentProps: {
