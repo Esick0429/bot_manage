@@ -212,12 +212,12 @@ const detailSchema = computed<DescriptionsSchema[]>(() => [
     slots: { default: (data) => formatAmount(data.agent_out_amount, data.exchange_unit) }
   },
 
-  {
-    label: '操作人',
-    field: 'username',
-    span: 8,
-    slots: { default: (data) => data.username ?? '-' }
-  },
+  // {
+  //   label: '操作人',
+  //   field: 'username',
+  //   span: 8,
+  //   slots: { default: (data) => data.username ?? '-' }
+  // },
   {
     label: '完成时间',
     field: 'finish_time',
