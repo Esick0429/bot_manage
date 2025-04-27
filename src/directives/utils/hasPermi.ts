@@ -6,14 +6,17 @@ const { t } = useI18n()
 
 const hasPermission = (value: string): boolean => {
   const userStore = useUserStoreWithOut()
+  if (userStore.isSuperAdmin) {
+    return true
+  }
   const permission = userStore.userInfo?.permissions || []
   if (!value) {
     throw new Error(t('permission.hasPermission'))
   }
   if (permission.includes(value)) {
-    return false
+    return true
   }
-  return true
+  return false
 }
 function hasPermi(el: Element, binding: DirectiveBinding) {
   const value = binding.value

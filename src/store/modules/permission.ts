@@ -48,32 +48,36 @@ export const usePermissionStore = defineStore('permission', {
         const systemType = import.meta.env.VITE_SYSTEM_TYPE || 'Management'
         let baseDynamicRoutes: AppRouteRecordRaw[] = []
 
+        const userStore = useUserStoreWithOut()
+
         if (systemType === 'Management') {
           baseDynamicRoutes = managementRoutes.filter((item) => item.path !== '/data_statistics')
         } else {
-          const userStore = useUserStoreWithOut()
-          const permissions = Array.isArray(userStore.getUserInfo?.permissions)
-            ? userStore.getUserInfo.permissions
-            : []
-          const filterRecursive = (
-            routes: AppRouteRecordRaw[],
-            allowedNames: string[]
-          ): AppRouteRecordRaw[] => {
-            return routes.filter((route) => {
-              const routeName = route.name as string
-              const hasRouteName = !!routeName
-              const hasAccess = !hasRouteName || allowedNames.includes(routeName)
+          if (userStore.isSuperAdmin) {
+            baseDynamicRoutes = cloneDeep(operationRoutes)
+          } else {
+            const permissions = Array.isArray(userStore.getUserInfo?.permissions)
+              ? userStore.getUserInfo.permissions
+              : []
+            const filterRecursive = (
+              routes: AppRouteRecordRaw[],
+              allowedNames: string[]
+            ): AppRouteRecordRaw[] => {
+              return routes.filter((route) => {
+                const routeName = route.name as string
+                const hasRouteName = !!routeName
+                const hasAccess = !hasRouteName || allowedNames.includes(routeName)
 
-              if (hasAccess && route.children && route.children.length > 0) {
-                route.children = filterRecursive(route.children, allowedNames)
-              }
-              const shouldKeep = hasAccess && (!route.children || route.children.length > 0)
-              return shouldKeep
-            })
+                if (hasAccess && route.children && route.children.length > 0) {
+                  route.children = filterRecursive(route.children, allowedNames)
+                }
+                const shouldKeep = hasAccess && (!route.children || route.children.length > 0)
+                return shouldKeep
+              })
+            }
+            const clonedRoutes = cloneDeep(operationRoutes)
+            baseDynamicRoutes = filterRecursive(clonedRoutes, permissions)
           }
-
-          const clonedRoutes = cloneDeep(operationRoutes)
-          baseDynamicRoutes = filterRecursive(clonedRoutes, permissions)
         }
         console.log(baseDynamicRoutes, 'baseDynamicRoutes')
         let routerMap: AppRouteRecordRaw[] = []

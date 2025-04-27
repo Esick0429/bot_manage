@@ -46,6 +46,9 @@ export const useUserStore = defineStore('user', {
     },
     getLoginInfo(): UserLoginType | undefined {
       return this.loginInfo
+    },
+    isSuperAdmin(): boolean {
+      return !!this.userInfo?.permissions?.includes('*')
     }
   },
   actions: {
