@@ -1,5 +1,5 @@
 <script setup lang="tsx">
-import { ref, computed, h, nextTick } from 'vue'
+import { ref, computed, h, nextTick, onMounted } from 'vue'
 import {
   getRoleListApi,
   addRoleApi,
@@ -12,27 +12,14 @@ import { ContentWrap } from '@/components/ContentWrap'
 import { BaseButton } from '@/components/Button'
 import { ElMessageBox, ElMessage, ElTag } from 'element-plus'
 import { formatToDateTime } from '@/utils/dateUtil'
-import { SearchTable } from '@/components/SearchTable'
+import { Table, TableColumn, TableExpose } from '@/components/Table'
 import Write from './components/Write.vue'
-import { FormSchema } from '@/components/Form'
-import { useSearchTable } from '@/hooks/web/useSearchTable'
+import { useTable } from '@/hooks/web/useTable'
 
 const { t } = useI18n()
 
-// 搜索表单配置
-const searchSchema = computed<FormSchema[]>(() => [
-  {
-    field: 'name',
-    label: t('role.roleName'),
-    component: 'Input',
-    componentProps: {
-      placeholder: t('role.roleName')
-    }
-  }
-])
-
 // 表格列配置
-const columns = [
+const columns: TableColumn[] = [
   {
     field: 'name',
     label: t('role.roleName')
@@ -55,7 +42,7 @@ const columns = [
   {
     field: 'create_time',
     label: t('tableDemo.displayTime'),
-    formatter: (row: any) => (row.create_time == 0 ? '-' : formatToDateTime(row.create_time))
+    formatter: (row: any) => (row.create_time ? formatToDateTime(row.create_time * 1000) : '-')
   },
   {
     field: 'action',
@@ -85,21 +72,29 @@ const columns = [
   }
 ]
 
-// 数据请求API
-const fetchRoleList = async (params: any) => {
-  try {
-    const res = await getRoleListApi(params)
-    return res.data || { list: [], total: 0 }
-  } catch (error) {
-    ElMessage.error(t('common.apiError'))
-    return { list: [], total: 0 }
-  }
-}
+// --- useTable Setup ---
+const { tableRegister, tableMethods, tableState } = useTable({
+  fetchDataApi: async () => {
+    const current_page = tableState.currentPage.value
+    const page_size = tableState.pageSize.value
+    try {
+      const res = await getRoleListApi({ current_page: current_page, page_size: page_size })
+      return res.data || { list: [], total: 0 }
+    } catch (error) {
+      ElMessage.error(t('common.apiError'))
+      return { list: [], total: 0 }
+    }
+  },
+  immediate: true
+})
+
+const { getList, setProps } = tableMethods
+const { dataList, loading, total, currentPage, pageSize } = tableState
 
 // 弹窗相关
 const dialogTitle = ref('')
 const actionType = ref<'add' | 'edit' | 'detail' | ''>('')
-const writeRef = ref<InstanceType<typeof Write>>()
+const writeRef = ref<InstanceType<typeof Write> | null>(null)
 const formLoading = ref(false)
 const currentRow = ref<any>({})
 
@@ -114,7 +109,7 @@ const handleAction = async (row: any, type: 'edit' | 'detail') => {
       formLoading.value = true
       const res = await getRolePermissionsApi(row.id)
       const data = res?.data || {}
-      currentRow.value = data
+      currentRow.value = { ...row, ...data }
       nextTick(() => {
         writeRef.value?.open()
       })
@@ -135,7 +130,7 @@ const handleAdd = () => {
 
 // Handle success event from Write component
 const handleSaveSuccess = () => {
-  searchTableRef.value?.reload()
+  getList()
 }
 
 const handleDelete = (row: any) => {
@@ -148,7 +143,7 @@ const handleDelete = (row: any) => {
       try {
         await deleteRoleApi({ id: row.id })
         ElMessage.success(t('common.delSuccess'))
-        searchTableRef.value?.reload()
+        getList()
       } catch (e: any) {
         const errMsg = e?.response?.data?.message || e?.message || t('common.apiError')
         ElMessage.error(errMsg)
@@ -157,27 +152,37 @@ const handleDelete = (row: any) => {
     .catch(() => {})
 }
 
-// SearchTable Ref
-const searchTableRef = ref<any>(null)
+// --- Pagination Handlers ---
+const handleCurrentChange = (newPage: number) => {
+  currentPage.value = newPage
+}
+const handleSizeChange = (newSize: number) => {
+  pageSize.value = newSize
+}
 
-// useSearchTable 只用于类型提示和ref暴露
-useSearchTable({
-  searchSchema: searchSchema.value,
-  tableColumns: columns,
-  fetchDataApi: fetchRoleList,
-  immediate: false
+// Set columns after mount
+onMounted(() => {
+  setProps({ columns: columns })
 })
 </script>
 
 <template>
   <ContentWrap>
-    <SearchTable
-      ref="searchTableRef"
-      :columns="columns"
-      :search-schema="searchSchema"
-      :fetch-data-api="fetchRoleList"
-      :showAddButton="true"
-      @add="handleAdd"
+    <!-- Add Button -->
+    <div class="mb-4">
+      <BaseButton type="primary" @click="handleAdd">{{ t('exampleDemo.add') }}</BaseButton>
+    </div>
+
+    <!-- Table Component -->
+    <Table
+      :data="dataList"
+      :loading="loading"
+      :selection="false"
+      :border="true"
+      stripe
+      @update:currentPage="handleCurrentChange"
+      @update:pageSize="handleSizeChange"
+      @register="tableRegister"
     />
   </ContentWrap>
 
