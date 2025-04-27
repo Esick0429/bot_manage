@@ -30,8 +30,8 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
   } else {
     env = loadEnv(mode, root)
   }
-  console.log('Current VITE_SYSTEM_TYPE:', env.VITE_SYSTEM_TYPE);
-
+  console.log('Current VITE_SYSTEM_TYPE:', env.VITE_SYSTEM_TYPE)
+  console.log('Current VITE_TRONSCAN_URL:', env.VITE_TRONSCAN_URL)
   return {
     base: env.VITE_SYSTEM_TYPE === 'Management' ? '/management' : '/operation',
     plugins: [
@@ -93,9 +93,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         : undefined,
       ViteEjsPlugin({
         title:
-          env.VITE_SYSTEM_TYPE === 'Management'
-            ? env.VITE_APP_TITLE
-            : env.VITE_APP_TITLE_OPERATION
+          env.VITE_SYSTEM_TYPE === 'Management' ? env.VITE_APP_TITLE : env.VITE_APP_TITLE_OPERATION
       }),
       UnoCSS()
     ],
