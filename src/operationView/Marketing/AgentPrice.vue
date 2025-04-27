@@ -199,7 +199,7 @@ const columns = reactive<any[]>([
     formatter: (row) => {
       return (
         <>
-          <BaseButton type="primary" onClick={() => handleEdit(row)}>
+          <BaseButton v-hasPermi="AgentPrice:edit" type="primary" onClick={() => handleEdit(row)}>
             {' '}
             修改{' '}
           </BaseButton>
