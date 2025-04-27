@@ -225,7 +225,7 @@ const submit = async () => {
     return false
   })
   if (valid) {
-    let formData = await getFormData(false)
+    const formData = await getFormData(false)
 
     console.log('formData immediately after getFormData(false):', JSON.stringify(formData))
 
