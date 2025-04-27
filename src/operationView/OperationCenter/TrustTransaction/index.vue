@@ -109,7 +109,7 @@ const columns = reactive<TableColumn[]>([
     minWidth: 100,
     formatter: (row) => (row.describe?.includes('托管') ? '托管' : '未知')
   },
-  { field: 'tg_id', label: 'TG用户ID', minWidth: 120 },
+  { field: 'tg_name', label: 'TG用户名称', minWidth: 120 },
   {
     field: 'tg_bot_id',
     label: '机器人ID',
@@ -212,7 +212,7 @@ const searchSchema = reactive<FormSchema[]>([
     component: 'Input',
     label: '关键字：',
     componentProps: {
-      placeholder: '订单ID / TG用户ID'
+      placeholder: '订单ID / TG用户名称 / 能量接收地址'
     }
   },
   {
