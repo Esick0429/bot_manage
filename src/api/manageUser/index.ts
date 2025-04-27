@@ -1,8 +1,8 @@
 import request from '@/axios'
 
 interface ListManageUserParams {
-  pageIndex: number
-  pageSize: number
+  current_page: number
+  page_size: number
   name?: string
   email?: string
 }
