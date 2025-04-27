@@ -126,6 +126,18 @@ const rechargeFormSchema = reactive<FormSchema[]>([
     }
   },
   {
+    field: 'secret',
+    component: 'Input',
+    label: '秘钥',
+    componentProps: {
+      placeholder: '请输入秘钥',
+      type: 'password'
+    },
+    formItemProps: {
+      rules: [required('秘钥不能为空')]
+    }
+  },
+  {
     field: 'describe',
     component: 'Input',
     label: '备注',
@@ -190,6 +202,7 @@ const handleRecharge = async () => {
         id: userAccount.value.id,
         amount: formData.amount,
         unit: formData.unit,
+        secret: formData.secret,
         describe: formData.describe
       }
 
