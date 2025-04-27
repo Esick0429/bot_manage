@@ -26,10 +26,9 @@ interface FormData {
   id?: number
   configType: string | number // 允许字符串或数字
   publicKey: string
-  privateKey: string
   // status: number
   amount_limit?: number // 可选
-  permission_name?: string // <--- 修改：从 permission_group 改为 permission_name，类型为 string
+  permission_name?: string
   [key: string]: any
 }
 
@@ -68,46 +67,9 @@ const baseSchema: FormSchema[] = [
   }
 ]
 
-const trxPoolSchema: FormSchema[] = [
-  {
-    field: 'privateKey',
-    component: 'Input',
-    label: '私钥：',
-    componentProps: {
-      placeholder: '请输入私钥：',
-      maxlength: 200,
-      type: 'password',
-      showPassword: true,
-      remark: () => {
-        return <span class="text-red-500 text-xs">请填写拥有者账户加密后的私钥</span>
-      }
-    },
-    formItemProps: {
-      rules: [{ required: true, message: ' ', trigger: 'blur' }]
-    }
-  }
-]
+const trxPoolSchema: FormSchema[] = []
 
 const energyPoolSchema: FormSchema[] = [
-  {
-    field: 'privateKey',
-    component: 'Input',
-    label: '授权私钥',
-    componentProps: {
-      placeholder: '请输入授权私钥',
-      maxlength: 200,
-      type: 'password',
-      showPassword: true,
-      remark: () => {
-        return (
-          <span class="text-red-500 text-xs">请填写授权活跃账户加密后的私钥，填错无法成功代理</span>
-        )
-      }
-    },
-    formItemProps: {
-      rules: [{ required: true, message: ' ', trigger: 'blur' }]
-    }
-  },
   {
     field: 'amount_limit',
     component: 'InputNumber',
@@ -239,15 +201,11 @@ const open = async (params: OpenParams) => {
     publicKey: currentData.value.publicKey || ''
   }
   // 现在可以安全地用 === 比较数字
-  if (initialConfigType === 1) {
-    // TRX
-    valuesToSet.privateKey = currentData.value.privateKey || ''
-  } else if (initialConfigType === 3) {
+  if (initialConfigType === 3) {
     // Energy
-    valuesToSet.privateKey = currentData.value.privateKey || '' // 注意字段名一致
     // 使用 ?? undefined 确保数字字段在没有值时设置为 undefined
     valuesToSet.amount_limit = currentData.value.amount_limit ?? undefined
-    valuesToSet.permission_name = currentData.value.permission_name || '' // <--- 修改：使用 permission_name，默认为空字符串
+    valuesToSet.permission_name = currentData.value.permission_name || ''
   }
   await setValues(valuesToSet)
 }
@@ -273,9 +231,7 @@ const handleSubmit = async () => {
     // 根据最终的 formData 构建提交数据
     const dataToSubmit: any = {
       resource_type: configTypeNum, // 使用数字类型
-      public_key: formData.publicKey,
-      private_key: formData.privateKey // 两个类型都需要
-      // status: statusValue
+      public_key: formData.publicKey
     }
 
     if (configTypeNum === 3) {
@@ -285,18 +241,12 @@ const handleSubmit = async () => {
     } else if (configTypeNum === 1) {
       // TRX 池子 - 确保不提交能量池字段 (如果清理逻辑未生效)
       delete dataToSubmit.amount_limit
-      delete dataToSubmit.permission_name // <--- 修改：确保清理 permission_name
+      delete dataToSubmit.permission_name
     } else {
       console.error('Unhandled configType in handleSubmit:', configTypeNum)
       ElMessage.error('未知的配置类型，无法提交')
       submitting.value = false
       return
-    }
-
-    // 再次清理确保只有需要的字段被提交
-    if (configTypeNum === 1) {
-      delete dataToSubmit.amount_limit
-      delete dataToSubmit.permission_name // <--- 修改：确保清理 permission_name
     }
 
     try {
