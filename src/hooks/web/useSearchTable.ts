@@ -1,10 +1,12 @@
 import { useTable } from './useTable'
 import { useSearch } from './useSearch'
-import { ref, unref, onMounted, watch } from 'vue'
+import { ref, unref, onMounted, watch, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { FormSchema } from '@/components/Form'
 import { TableColumn } from '@/components/Table'
 import { ElMessage } from 'element-plus'
 import { ref as vueRef } from 'vue'
+import { useUserStore } from '@/store/modules/user'
 
 export interface SearchTableState {
   loading: boolean
@@ -34,6 +36,29 @@ export const useSearchTable = (config: UseSearchTableConfig, onReady?: (instance
   // 注册追踪
   const searchRegistered = ref(false)
   const tableRegistered = ref(false)
+
+  // 获取 Pinia Store 和 Route 实例
+  const userStore = useUserStore()
+  const route = useRoute()
+
+  // 响应式地获取用户权限列表 (确保是 string[])
+  const userPermissions = computed(() => (userStore.userInfo?.permissions || []).map(String))
+
+  // 计算是否拥有当前页面的新增权限
+  const hasAddPermission = computed(() => {
+    if (userStore.isSuperAdmin) {
+      return true
+    }
+
+    const currentRouteName = route.name
+    if (!currentRouteName) {
+      console.warn('[useSearchTable] Route name is missing, cannot check add permission.')
+      return false
+    }
+    const requiredPermission = `${String(currentRouteName)}.add`
+    const hasPermission = userPermissions.value.includes(requiredPermission)
+    return hasPermission
+  })
 
   // 延迟初始化
   function tryInit() {
@@ -231,6 +256,7 @@ export const useSearchTable = (config: UseSearchTableConfig, onReady?: (instance
     loadData,
     searchTableRef,
     searchTableInstance,
-    handleReady
+    handleReady,
+    hasAddPermission
   }
 }

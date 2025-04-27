@@ -19,7 +19,9 @@
     <div class="mb-10px">
       <slot name="toolbar">
         <slot name="leftToolbar"></slot>
-        <BaseButton v-if="showAddButton" type="primary" @click="$emit('add')"> 新增 </BaseButton>
+        <BaseButton v-if="showAddButton && hasAddPermission" type="primary" @click="$emit('add')">
+          新增
+        </BaseButton>
         <slot name="rightToolbar"></slot>
       </slot>
     </div>
@@ -153,7 +155,8 @@ const {
   setSearchParams,
   loading,
   dataList,
-  total
+  total,
+  hasAddPermission
 } = useSearchTable({
   searchSchema: props.searchSchema,
   tableColumns: props.columns,
