@@ -131,7 +131,7 @@ const columns = ref<TableColumn[]>([
             modelValue={row.status}
             onChange={(newValue) => handleStatusChangeAttempt(row, newValue)}
             placeholder="请选择"
-            disabled={!isPermission('ResourcePool:edit')}
+            disabled={isPermission('ResourcePool:edit')}
           >
             {{
               prefix: () => {
