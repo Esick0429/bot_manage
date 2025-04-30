@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { constantRouterMap } from '@/router'
 import managementRoutes from '@/router/modules/management'
 import operationRoutes from '@/router/modules/operation'
+import creditRoutes from '@/router/modules/credit'
 import {
   generateRoutesByFrontEnd,
   generateRoutesByServer,
@@ -52,7 +53,7 @@ export const usePermissionStore = defineStore('permission', {
 
         if (systemType === 'Management') {
           baseDynamicRoutes = managementRoutes.filter((item) => item.path !== '/data_statistics')
-        } else {
+        } else if (systemType === 'Operation') {
           if (userStore.isSuperAdmin) {
             baseDynamicRoutes = cloneDeep(operationRoutes)
           } else {
@@ -78,6 +79,8 @@ export const usePermissionStore = defineStore('permission', {
             const clonedRoutes = cloneDeep(operationRoutes)
             baseDynamicRoutes = filterRecursive(clonedRoutes, permissions)
           }
+        } else if (systemType === 'Credit') {
+          baseDynamicRoutes = cloneDeep(creditRoutes)
         }
         console.log(baseDynamicRoutes, 'baseDynamicRoutes')
         let routerMap: AppRouteRecordRaw[] = []

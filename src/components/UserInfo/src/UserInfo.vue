@@ -9,7 +9,7 @@ import { useLockStore } from '@/store/modules/lock'
 import { useUserStore } from '@/store/modules/user'
 import { useRouter } from 'vue-router'
 import ChangePasswordDialog from './components/ChangePasswordDialog.vue'
-import { isOperationSystem } from '@/utils/system'
+import { isOperationSystem, isCreditSystem } from '@/utils/system'
 
 const { push } = useRouter()
 
@@ -24,6 +24,10 @@ const { getPrefixCls } = useDesign()
 const prefixCls = getPrefixCls('user-info')
 
 const { t } = useI18n()
+
+const isOperation = computed(() => isOperationSystem())
+
+const isCredit = computed(() => isCreditSystem())
 
 const loginOut = () => {
   userStore.logoutConfirm()
@@ -53,11 +57,12 @@ const changePassword = () => {
 <template>
   <ElDropdown class="custom-hover" :class="prefixCls" trigger="click">
     <div class="flex items-center">
-      <!-- <img
-        src="@/assets/imgs/avatar.jpg"
+      <img
+        v-if="isCredit"
+        src="@/assets/imgs/credit_avatar.jpg"
         alt=""
         class="w-[calc(var(--logo-height)-25px)] rounded-[50%]"
-      /> -->
+      />
       <span class="<lg:hidden text-14px pl-[5px] text-[var(--top-header-text-color)]">{{
         userStore.getUserInfo?.username
       }}</span>
@@ -75,7 +80,7 @@ const changePassword = () => {
         <!-- <ElDropdownItem divided>
         <div @click="lockScreen">{{ t('lock.lockScreen') }}</div>
       </ElDropdownItem> -->
-        <ElDropdownItem v-if="isOperationSystem()">
+        <ElDropdownItem v-if="isOperation">
           <div @click="changePassword">
             {{ '修改密码' }}
           </div>

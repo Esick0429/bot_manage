@@ -14,11 +14,35 @@ export function isManagementSystem(): boolean {
  * @returns {boolean}
  */
 export function isOperationSystem(): boolean {
-  // 假设非 Management 即为 Operations
-  return systemTypeFromEnv !== 'Management'
+  return systemTypeFromEnv === 'Operation'
+}
+
+export function isCreditSystem(): boolean {
+  return systemTypeFromEnv === 'Credit'
 }
 
 // 可选: 在模块加载时打印一次，方便调试
 console.log(
   `[utils/system] VITE_SYSTEM_TYPE: ${systemTypeFromEnv}, isManagement: ${isManagementSystem()}`
 )
+
+export function getHomeUrl(systemType: string) {
+  if (systemType === 'Management') return '/bot_manage/bot_list'
+  if (systemType === 'Operation') return '/exchange_rate/index'
+  if (systemType === 'Credit') return '/credit/recharge_manage/recharge_center'
+  return '/'
+}
+
+export function getSystemTitle(systemType: string) {
+  if (systemType === 'Management') return '机器人后台管理系统'
+  if (systemType === 'Operation') return '机器人后台运营系统'
+  if (systemType === 'Credit') return '话费系统'
+  return '系统'
+}
+
+export function getUserApiPrefix() {
+  if (systemTypeFromEnv === 'Management') return '/v1/user'
+  if (systemTypeFromEnv === 'Operation') return '/manage/user'
+  if (systemTypeFromEnv === 'Credit') return '/v3/user'
+  return '/user'
+}
