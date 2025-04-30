@@ -32,3 +32,11 @@ export const getUserBatchRecordDetailListApi = (params: UserBatchRecordDetailLis
     params: params // 直接传递包含 id 和分页参数的对象
   })
 }
+
+// 余额明细
+export const getBalanceDetailListApi = (params: any) => {
+  return request.get({
+    url: '/v3/user/balance_record',
+    params: params
+  })
+}
