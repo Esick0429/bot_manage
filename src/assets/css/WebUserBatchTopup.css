@@ -1,0 +1,1037 @@
+.imr-flag {
+  height: 35px;
+  display: block;
+  background: url('@/assets/imgs/all_country.png') 0 0 no-repeat;
+}
+
+.imr-flag-00 {
+  background-position: -0px -0px;
+}
+
+.imr-flag-AD {
+  background-position: -55px -0px;
+}
+
+.imr-flag-AF {
+  background-position: -110px -0px;
+}
+
+.imr-flag-AG {
+  background-position: -165px -0px;
+}
+
+.imr-flag-AI {
+  background-position: -220px -0px;
+}
+
+.imr-flag-AL {
+  background-position: -275px -0px;
+}
+
+.imr-flag-AM {
+  background-position: -330px -0px;
+}
+
+.imr-flag-AO {
+  background-position: -385px -0px;
+}
+
+.imr-flag-AQ {
+  background-position: -440px -0px;
+}
+
+.imr-flag-AR {
+  background-position: -495px -0px;
+}
+
+.imr-flag-AS {
+  background-position: -550px -0px;
+}
+
+.imr-flag-AT {
+  background-position: -605px -0px;
+}
+
+.imr-flag-ATB {
+  background-position: -660px -0px;
+}
+
+.imr-flag-AU {
+  background-position: -715px -0px;
+}
+
+.imr-flag-AZ {
+  background-position: -770px -0px;
+}
+
+.imr-flag-BA {
+  background-position: -825px -0px;
+}
+
+.imr-flag-BB {
+  background-position: -880px -0px;
+}
+
+.imr-flag-BD {
+  background-position: -935px -0px;
+}
+
+.imr-flag-BE {
+  background-position: -990px -0px;
+}
+
+.imr-flag-BF {
+  background-position: -1045px -0px;
+}
+
+.imr-flag-BG {
+  background-position: -1100px -0px;
+}
+
+.imr-flag-BI {
+  background-position: -1155px -0px;
+}
+
+.imr-flag-BL {
+  background-position: -1210px -0px;
+}
+
+.imr-flag-BM {
+  background-position: -1265px -0px;
+}
+
+.imr-flag-BN {
+  background-position: -1320px -0px;
+}
+
+.imr-flag-BO {
+  background-position: -1375px -0px;
+}
+
+.imr-flag-BR {
+  background-position: -1430px -0px;
+}
+
+.imr-flag-BT {
+  background-position: -1485px -0px;
+}
+
+.imr-flag-BW {
+  background-position: -1540px -0px;
+}
+
+.imr-flag-BZ {
+  background-position: -1595px -0px;
+}
+
+.imr-flag-CA {
+  background-position: -1650px -0px;
+}
+
+.imr-flag-CC {
+  background-position: -1705px -0px;
+}
+
+.imr-flag-CF {
+  background-position: -1760px -0px;
+}
+
+.imr-flag-CG {
+  background-position: -1815px -0px;
+}
+
+.imr-flag-CH {
+  background-position: -1870px -0px;
+}
+
+.imr-flag-CI {
+  background-position: -1925px -0px;
+}
+
+.imr-flag-CK {
+  background-position: -1980px -0px;
+}
+
+.imr-flag-CM {
+  background-position: -2035px -0px;
+}
+
+.imr-flag-CO {
+  background-position: -2090px -0px;
+}
+
+.imr-flag-CR {
+  background-position: -2145px -0px;
+}
+
+.imr-flag-CX {
+  background-position: -2200px -0px;
+}
+
+.imr-flag-CY {
+  background-position: -2255px -0px;
+}
+
+.imr-flag-DE {
+  background-position: -2310px -0px;
+}
+
+.imr-flag-DM {
+  background-position: -2365px -0px;
+}
+
+.imr-flag-DO {
+  background-position: -2420px -0px;
+}
+
+.imr-flag-DZ {
+  background-position: -2475px -0px;
+}
+
+.imr-flag-EC {
+  background-position: -2530px -0px;
+}
+
+.imr-flag-EE {
+  background-position: -2585px -0px;
+}
+
+.imr-flag-EG {
+  background-position: -2640px -0px;
+}
+
+.imr-flag-ET {
+  background-position: -2695px -0px;
+}
+
+.imr-flag-FJ {
+  background-position: -2750px -0px;
+}
+
+.imr-flag-FK {
+  background-position: -2805px -0px;
+}
+
+.imr-flag-FM {
+  background-position: -2860px -0px;
+}
+
+.imr-flag-FR {
+  background-position: -2915px -0px;
+}
+
+.imr-flag-GA {
+  background-position: -2970px -0px;
+}
+
+.imr-flag-GB {
+  background-position: -3025px -0px;
+}
+
+.imr-flag-GD {
+  background-position: -3080px -0px;
+}
+
+.imr-flag-GE {
+  background-position: -3135px -0px;
+}
+
+.imr-flag-GF {
+  background-position: -3190px -0px;
+}
+
+.imr-flag-GG {
+  background-position: -3245px -0px;
+}
+
+.imr-flag-GH {
+  background-position: -3300px -0px;
+}
+
+.imr-flag-GI {
+  background-position: -3355px -0px;
+}
+
+.imr-flag-GM {
+  background-position: -3410px -0px;
+}
+
+.imr-flag-GN {
+  background-position: -3465px -0px;
+}
+
+.imr-flag-GP {
+  background-position: -3520px -0px;
+}
+
+.imr-flag-GS {
+  background-position: -3575px -0px;
+}
+
+.imr-flag-GT {
+  background-position: -3630px -0px;
+}
+
+.imr-flag-GU {
+  background-position: -3685px -0px;
+}
+
+.imr-flag-HK {
+  background-position: -3740px -0px;
+}
+
+.imr-flag-HM {
+  background-position: -3795px -0px;
+}
+
+.imr-flag-HN {
+  background-position: -3850px -0px;
+}
+
+.imr-flag-HR {
+  background-position: -3905px -0px;
+}
+
+.imr-flag-HT {
+  background-position: -3960px -0px;
+}
+
+.imr-flag-HU {
+  background-position: -4015px -0px;
+}
+
+.imr-flag-ID {
+  background-position: -4070px -0px;
+}
+
+.imr-flag-IE {
+  background-position: -4125px -0px;
+}
+
+.imr-flag-IL {
+  background-position: -4180px -0px;
+}
+
+.imr-flag-IM {
+  background-position: -4235px -0px;
+}
+
+.imr-flag-IN {
+  background-position: -4290px -0px;
+}
+
+.imr-flag-IO {
+  background-position: -4345px -0px;
+}
+
+.imr-flag-IQ {
+  background-position: -4400px -0px;
+}
+
+.imr-flag-IR {
+  background-position: -4455px -0px;
+}
+
+.imr-flag-IT {
+  background-position: -4510px -0px;
+}
+
+.imr-flag-JE {
+  background-position: -4565px -0px;
+}
+
+.imr-flag-JM {
+  background-position: -4620px -0px;
+}
+
+.imr-flag-JP {
+  background-position: -4675px -0px;
+}
+
+.imr-flag-KE {
+  background-position: -4730px -0px;
+}
+
+.imr-flag-KG {
+  background-position: -4785px -0px;
+}
+
+.imr-flag-KH {
+  background-position: -4840px -0px;
+}
+
+.imr-flag-KI {
+  background-position: -4895px -0px;
+}
+
+.imr-flag-KN {
+  background-position: -4950px -0px;
+}
+
+.imr-flag-KP {
+  background-position: -5005px -0px;
+}
+
+.imr-flag-KR {
+  background-position: -5060px -0px;
+}
+
+.imr-flag-KY {
+  background-position: -5115px -0px;
+}
+
+.imr-flag-KZ {
+  background-position: -5170px -0px;
+}
+
+.imr-flag-LA {
+  background-position: -5225px -0px;
+}
+
+.imr-flag-LB {
+  background-position: -5280px -0px;
+}
+
+.imr-flag-LC {
+  background-position: -5335px -0px;
+}
+
+.imr-flag-LK {
+  background-position: -5390px -0px;
+}
+
+.imr-flag-LS {
+  background-position: -5445px -0px;
+}
+
+.imr-flag-LT {
+  background-position: -5500px -0px;
+}
+
+.imr-flag-LU {
+  background-position: -5555px -0px;
+}
+
+.imr-flag-LV {
+  background-position: -5610px -0px;
+}
+
+.imr-flag-LY {
+  background-position: -5665px -0px;
+}
+
+.imr-flag-MA {
+  background-position: -5720px -0px;
+}
+
+.imr-flag-MC {
+  background-position: -5775px -0px;
+}
+
+.imr-flag-MD {
+  background-position: -5830px -0px;
+}
+
+.imr-flag-ME {
+  background-position: -5885px -0px;
+}
+
+.imr-flag-MK {
+  background-position: -5940px -0px;
+}
+
+.imr-flag-ML {
+  background-position: -5995px -0px;
+}
+
+.imr-flag-MM {
+  background-position: -6050px -0px;
+}
+
+.imr-flag-MN {
+  background-position: -6105px -0px;
+}
+
+.imr-flag-MO {
+  background-position: -6160px -0px;
+}
+
+.imr-flag-MP {
+  background-position: -6215px -0px;
+}
+
+.imr-flag-MQ {
+  background-position: -6270px -0px;
+}
+
+.imr-flag-MR {
+  background-position: -6325px -0px;
+}
+
+.imr-flag-MS {
+  background-position: -6380px -0px;
+}
+
+.imr-flag-MT {
+  background-position: -6435px -0px;
+}
+
+.imr-flag-MU {
+  background-position: -6490px -0px;
+}
+
+.imr-flag-MV {
+  background-position: -6545px -0px;
+}
+
+.imr-flag-MW {
+  background-position: -6600px -0px;
+}
+
+.imr-flag-MX {
+  background-position: -6655px -0px;
+}
+
+.imr-flag-MY {
+  background-position: -6710px -0px;
+}
+
+.imr-flag-NE {
+  background-position: -6765px -0px;
+}
+
+.imr-flag-NF {
+  background-position: -6820px -0px;
+}
+
+.imr-flag-NG {
+  background-position: -6875px -0px;
+}
+
+.imr-flag-NI {
+  background-position: -6930px -0px;
+}
+
+.imr-flag-NL {
+  background-position: -6985px -0px;
+}
+
+.imr-flag-NP {
+  background-position: -7040px -0px;
+}
+
+.imr-flag-NZ {
+  background-position: -7095px -0px;
+}
+
+.imr-flag-PA {
+  background-position: -7150px -0px;
+}
+
+.imr-flag-PE {
+  background-position: -7205px -0px;
+}
+
+.imr-flag-PF {
+  background-position: -7260px -0px;
+}
+
+.imr-flag-PG {
+  background-position: -7315px -0px;
+}
+
+.imr-flag-PK {
+  background-position: -7370px -0px;
+}
+
+.imr-flag-PL {
+  background-position: -7425px -0px;
+}
+
+.imr-flag-PN {
+  background-position: -7480px -0px;
+}
+
+.imr-flag-PY {
+  background-position: -7535px -0px;
+}
+
+.imr-flag-RE {
+  background-position: -7590px -0px;
+}
+
+.imr-flag-RO {
+  background-position: -7645px -0px;
+}
+
+.imr-flag-RU {
+  background-position: -7700px -0px;
+}
+
+.imr-flag-RW {
+  background-position: -7755px -0px;
+}
+
+.imr-flag-SA {
+  background-position: -7810px -0px;
+}
+
+.imr-flag-SH {
+  background-position: -7865px -0px;
+}
+
+.imr-flag-SL {
+  background-position: -7920px -0px;
+}
+
+.imr-flag-SM {
+  background-position: -7975px -0px;
+}
+
+.imr-flag-SN {
+  background-position: -8030px -0px;
+}
+
+.imr-flag-SO {
+  background-position: -8085px -0px;
+}
+
+.imr-flag-SR {
+  background-position: -8140px -0px;
+}
+
+.imr-flag-SV {
+  background-position: -8195px -0px;
+}
+
+.imr-flag-SY {
+  background-position: -8250px -0px;
+}
+
+.imr-flag-SZ {
+  background-position: -8305px -0px;
+}
+
+.imr-flag-TC {
+  background-position: -8360px -0px;
+}
+
+.imr-flag-TD {
+  background-position: -8415px -0px;
+}
+
+.imr-flag-TF {
+  background-position: -8470px -0px;
+}
+
+.imr-flag-TH {
+  background-position: -8525px -0px;
+}
+
+.imr-flag-TJ {
+  background-position: -8580px -0px;
+}
+
+.imr-flag-TK {
+  background-position: -8635px -0px;
+}
+
+.imr-flag-TN {
+  background-position: -8690px -0px;
+}
+
+.imr-flag-TT {
+  background-position: -8745px -0px;
+}
+
+.imr-flag-TV {
+  background-position: -8800px -0px;
+}
+
+.imr-flag-TZ {
+  background-position: -8855px -0px;
+}
+
+.imr-flag-UA {
+  background-position: -8910px -0px;
+}
+
+.imr-flag-UG {
+  background-position: -8965px -0px;
+}
+
+.imr-flag-US {
+  background-position: -9020px -0px;
+}
+
+.imr-flag-UZ {
+  background-position: -9075px -0px;
+}
+
+.imr-flag-VA {
+  background-position: -9130px -0px;
+}
+
+.imr-flag-VC {
+  background-position: -9185px -0px;
+}
+
+.imr-flag-VE {
+  background-position: -9240px -0px;
+}
+
+.imr-flag-VG {
+  background-position: -9295px -0px;
+}
+
+.imr-flag-VI {
+  background-position: -9350px -0px;
+}
+
+.imr-flag-VN {
+  background-position: -9405px -0px;
+}
+
+.imr-flag-WF {
+  background-position: -9460px -0px;
+}
+
+.imr-flag-WS {
+  background-position: -9515px -0px;
+}
+
+.imr-flag-XA {
+  background-position: -9570px -0px;
+}
+
+.imr-flag-XK {
+  background-position: -9625px -0px;
+}
+
+.imr-flag-YE {
+  background-position: -9680px -0px;
+}
+
+.imr-flag-YT {
+  background-position: -9735px -0px;
+}
+
+.imr-flag-ZM {
+  background-position: -9790px -0px;
+}
+
+.imr-flag-AE {
+  background-position: -9845px -0px;
+}
+
+.imr-flag-AN {
+  background-position: -9900px -0px;
+}
+
+.imr-flag-AW {
+  background-position: -9955px -0px;
+}
+
+.imr-flag-AX {
+  background-position: -10010px -0px;
+}
+
+.imr-flag-BH {
+  background-position: -10065px -0px;
+}
+
+.imr-flag-BJ {
+  background-position: -10120px -0px;
+}
+
+.imr-flag-BQ {
+  background-position: -10175px -0px;
+}
+
+.imr-flag-BS {
+  background-position: -10230px -0px;
+}
+
+.imr-flag-BV {
+  background-position: -10285px -0px;
+}
+
+.imr-flag-BY {
+  background-position: -10340px -0px;
+}
+
+.imr-flag-CD {
+  background-position: -10395px -0px;
+}
+
+.imr-flag-CL {
+  background-position: -10450px -0px;
+}
+
+.imr-flag-CN {
+  background-position: -10505px -0px;
+}
+
+.imr-flag-CU {
+  background-position: -10560px -0px;
+}
+
+.imr-flag-CV {
+  background-position: -10615px -0px;
+}
+
+.imr-flag-CW {
+  background-position: -10670px -0px;
+}
+
+.imr-flag-CZ {
+  background-position: -10725px -0px;
+}
+
+.imr-flag-DJ {
+  background-position: -10780px -0px;
+}
+
+.imr-flag-DK {
+  background-position: -10835px -0px;
+}
+
+.imr-flag-EH {
+  background-position: -10890px -0px;
+}
+
+.imr-flag-ER {
+  background-position: -10945px -0px;
+}
+
+.imr-flag-ES {
+  background-position: -11000px -0px;
+}
+
+.imr-flag-FI {
+  background-position: -11055px -0px;
+}
+
+.imr-flag-FO {
+  background-position: -11110px -0px;
+}
+
+.imr-flag-GL {
+  background-position: -11165px -0px;
+}
+
+.imr-flag-GQ {
+  background-position: -11220px -0px;
+}
+
+.imr-flag-GR {
+  background-position: -11275px -0px;
+}
+
+.imr-flag-GW {
+  background-position: -11330px -0px;
+}
+
+.imr-flag-GY {
+  background-position: -11385px -0px;
+}
+
+.imr-flag-IS {
+  background-position: -11440px -0px;
+}
+
+.imr-flag-JO {
+  background-position: -11495px -0px;
+}
+
+.imr-flag-KM {
+  background-position: -11550px -0px;
+}
+
+.imr-flag-KW {
+  background-position: -11605px -0px;
+}
+
+.imr-flag-LI {
+  background-position: -11660px -0px;
+}
+
+.imr-flag-LR {
+  background-position: -11715px -0px;
+}
+
+.imr-flag-MF {
+  background-position: -11770px -0px;
+}
+
+.imr-flag-MG {
+  background-position: -11825px -0px;
+}
+
+.imr-flag-MH {
+  background-position: -11880px -0px;
+}
+
+.imr-flag-MZ {
+  background-position: -11935px -0px;
+}
+
+.imr-flag-NA {
+  background-position: -11990px -0px;
+}
+
+.imr-flag-NC {
+  background-position: -12045px -0px;
+}
+
+.imr-flag-NO {
+  background-position: -12100px -0px;
+}
+
+.imr-flag-NR {
+  background-position: -12155px -0px;
+}
+
+.imr-flag-NU {
+  background-position: -12210px -0px;
+}
+
+.imr-flag-OM {
+  background-position: -12265px -0px;
+}
+
+.imr-flag-PH {
+  background-position: -12320px -0px;
+}
+
+.imr-flag-PM {
+  background-position: -12375px -0px;
+}
+
+.imr-flag-PR {
+  background-position: -12430px -0px;
+}
+
+.imr-flag-PS {
+  background-position: -12485px -0px;
+}
+
+.imr-flag-PT {
+  background-position: -12540px -0px;
+}
+
+.imr-flag-PW {
+  background-position: -12595px -0px;
+}
+
+.imr-flag-QA {
+  background-position: -12650px -0px;
+}
+
+.imr-flag-RS {
+  background-position: -12705px -0px;
+}
+
+.imr-flag-SB {
+  background-position: -12760px -0px;
+}
+
+.imr-flag-SC {
+  background-position: -12815px -0px;
+}
+
+.imr-flag-SD {
+  background-position: -12870px -0px;
+}
+
+.imr-flag-SE {
+  background-position: -12925px -0px;
+}
+
+.imr-flag-SG {
+  background-position: -12980px -0px;
+}
+
+.imr-flag-SI {
+  background-position: -13035px -0px;
+}
+
+.imr-flag-SJ {
+  background-position: -13090px -0px;
+}
+
+.imr-flag-SK {
+  background-position: -13145px -0px;
+}
+
+.imr-flag-SS {
+  background-position: -13200px -0px;
+}
+
+.imr-flag-ST {
+  background-position: -13255px -0px;
+}
+
+.imr-flag-SX {
+  background-position: -13310px -0px;
+}
+
+.imr-flag-TG {
+  background-position: -13365px -0px;
+}
+
+.imr-flag-TL {
+  background-position: -13420px -0px;
+}
+
+.imr-flag-TM {
+  background-position: -13475px -0px;
+}
+
+.imr-flag-TO {
+  background-position: -13530px -0px;
+}
+
+.imr-flag-TR {
+  background-position: -13585px -0px;
+}
+
+.imr-flag-TW {
+  background-position: -13640px -0px;
+}
+
+.imr-flag-UY {
+  background-position: -13695px -0px;
+}
+
+.imr-flag-VU {
+  background-position: -13750px -0px;
+}
+
+.imr-flag-ZA {
+  background-position: -13805px -0px;
+}
+
+.imr-flag-ZW {
+  background-position: -13860px -0px;
+}
+
+.box {
+  position: absolute;
+  width: 300px;
+  left: 200px;
+  top: 0;
+  border: black solid 1px;
+  box-shadow:
+    -1px -1px 29px #d9d9d9,
+    1px 5px 10px #d9d9d9;
+}
+
+.cardStyle {
+  background-color: #409eff;
+  color: #fff;
+}
+
+.cardStyle2 {
+  color: #00000073;
+}
