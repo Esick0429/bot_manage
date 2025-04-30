@@ -26,7 +26,7 @@ const rootRoute: AppRouteRecordRaw = {
       ? '/bot_manage/bot_list'
       : systemType === 'Operation'
         ? '/exchange_rate/index'
-        : '/credit/recharge_manage/recharge_center',
+        : '/home/index',
   name: 'Root',
   meta: {
     hidden: true

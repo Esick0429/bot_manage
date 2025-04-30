@@ -3,6 +3,15 @@ import { defaultRequestInterceptors, defaultResponseInterceptors } from './confi
 import { AxiosInstance, InternalAxiosRequestConfig, RequestConfig, AxiosResponse } from './types'
 import { ElMessage } from 'element-plus'
 import { REQUEST_TIMEOUT } from '@/constants'
+import {
+  getSystemConfig,
+  SystemType,
+  getCurrentSystemType,
+  hasVersionPrefix,
+  getUrlVersionPrefix,
+  removeVersionPrefix,
+  isUrlPrefixMatchingSystem
+} from '@/constants/system'
 // Remove system store import
 // import { useAppStore } from '@/store/modules/app' // Keep app store if used elsewhere, remove if not
 // import { useSystemStore } from '@/store/modules/system'
@@ -30,27 +39,30 @@ axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     config.url = '/mock' + originalUrl
     config.baseURL = ''
   } else {
-    // --- 非 Mock 请求: 添加 API 版本前缀 ---
-    const systemType = import.meta.env.VITE_SYSTEM_TYPE
-    // 根据环境变量 VITE_SYSTEM_TYPE 决定前缀
-    const prefix = systemType === 'Management' ? '/v1' : '/v2'
-    const currentUrl = config.url || '' // 获取当前 config 中的 url
+    // --- 非 Mock 请求: 处理 API 版本前缀 ---
+    const { prefix } = getSystemConfig()
+    const currentUrl = config.url || ''
 
-    // 如果当前 url 没有 /v1 或 /v2 前缀, 则添加
-
-    if (
-      !currentUrl.includes('/public') &&
-      !currentUrl.startsWith('/v1') &&
-      !currentUrl.startsWith('/v2')
-    ) {
-      config.url = `${prefix}${currentUrl}`
+    // 如果是公共接口，不添加前缀
+    if (currentUrl.includes('/public')) {
+      // 不做任何处理
     }
-    // 可选: 如果已有 *错误* 的前缀, 可以加日志警告
-    else if (
-      (systemType === 'Management' && currentUrl.startsWith('/v2')) ||
-      (systemType !== 'Management' && currentUrl.startsWith('/v1'))
-    ) {
-      console.warn(`请求 URL [${currentUrl}] 可能包含错误的版本前缀 (当前系统: ${systemType})`)
+    // 如果URL已经有版本前缀
+    else if (hasVersionPrefix(currentUrl)) {
+      // 检查前缀是否与当前系统类型匹配
+      if (!isUrlPrefixMatchingSystem(currentUrl)) {
+        console.warn(
+          `请求 URL [${currentUrl}] 与当前系统类型不匹配 (当前系统: ${getCurrentSystemType()})`
+        )
+
+        // 如果需要强制使用当前系统的前缀，可以取消下面的注释
+        // const urlWithoutPrefix = removeVersionPrefix(currentUrl)
+        // config.url = `${prefix}${urlWithoutPrefix}`
+      }
+    }
+    // 如果URL没有版本前缀，添加当前系统的前缀
+    else {
+      config.url = `${prefix}${currentUrl}`
     }
   }
 

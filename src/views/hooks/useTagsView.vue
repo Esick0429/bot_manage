@@ -9,7 +9,7 @@ const homeUrl =
     ? '/bot_manage/bot_list'
     : systemType === 'Operation'
       ? '/exchange_rate/index'
-      : '/credit/recharge_manage/recharge_center'
+      : '/home/index'
 
 const { push } = useRouter()
 

@@ -29,7 +29,7 @@ console.log(
 export function getHomeUrl(systemType: string) {
   if (systemType === 'Management') return '/bot_manage/bot_list'
   if (systemType === 'Operation') return '/exchange_rate/index'
-  if (systemType === 'Credit') return '/credit/recharge_manage/recharge_center'
+  if (systemType === 'Credit') return '/home/index'
   return '/'
 }
 
