@@ -7,7 +7,7 @@ import { TableColumn } from '@/components/Table'
 import { ElMessage } from 'element-plus'
 import { ref as vueRef } from 'vue'
 import { useUserStore } from '@/store/modules/user'
-
+import { isOperationSystem } from '@/utils/system'
 export interface SearchTableState {
   loading: boolean
   dataList: any[]
@@ -27,6 +27,7 @@ interface UseSearchTableConfig {
   actionColumn?: TableColumn // 操作列配置
 }
 
+const isOperation = computed(() => isOperationSystem())
 export const useSearchTable = (config: UseSearchTableConfig, onReady?: (instance: any) => void) => {
   const searchParams = ref<Recordable>(config.defaultParams || {})
   const currentRow = ref<Recordable | null>(null)
@@ -46,6 +47,9 @@ export const useSearchTable = (config: UseSearchTableConfig, onReady?: (instance
 
   // 计算是否拥有当前页面的新增权限
   const hasAddPermission = computed(() => {
+    if (!isOperation.value) {
+      return true
+    }
     if (userStore.isSuperAdmin) {
       return true
     }
@@ -74,7 +78,7 @@ export const useSearchTable = (config: UseSearchTableConfig, onReady?: (instance
     tableMethods,
     tableState
   } = useTable({
-    immediate: false,
+    immediate: config.immediate,
     fetchDataApi: async () => {
       try {
         const apiParams = buildApiParams()
