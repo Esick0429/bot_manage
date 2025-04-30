@@ -6,9 +6,11 @@ import { useI18n } from '@/hooks/web/useI18n'
 import { underlineToHump } from '@/utils'
 import { useAppStore } from '@/store/modules/app'
 import { useDesign } from '@/hooks/web/useDesign'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { ElScrollbar } from 'element-plus'
+import { isCreditSystem } from '@/utils/system'
 
+const isCredit = computed(() => isCreditSystem())
 const { getPrefixCls } = useDesign()
 
 const prefixCls = getPrefixCls('login')
@@ -36,6 +38,7 @@ const toLogin = () => {
     <ElScrollbar class="h-full">
       <div class="relative flex mx-auto min-h-100vh">
         <div
+          v-if="!isCredit"
           :class="`${prefixCls}__left flex-1 bg-gray-500 bg-opacity-20 relative p-30px lt-xl:hidden`"
         >
           <div class="flex items-center relative text-white">

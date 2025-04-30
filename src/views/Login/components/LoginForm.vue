@@ -14,7 +14,7 @@ import { useValidator } from '@/hooks/web/useValidator'
 import { Icon } from '@/components/Icon'
 import { useUserStore } from '@/store/modules/user'
 import { BaseButton } from '@/components/Button'
-import { isManagementSystem } from '@/utils/system' // <-- 导入
+import { isManagementSystem, isOperationSystem, isCreditSystem } from '@/utils/system'
 import {
   passwordLoginApi,
   verifyCodeLoginApi,
@@ -39,7 +39,9 @@ const { currentRoute, addRoute, push, replace } = useRouter()
 
 const { t } = useI18n()
 
-const isManagement = isManagementSystem()
+const isManagement = computed(() => isManagementSystem())
+const isOperation = computed(() => isOperationSystem())
+const isCredit = computed(() => isCreditSystem())
 // 添加登录类型切换
 const loginType = ref('account') // 'account' 或 'phone'
 
@@ -224,7 +226,7 @@ const accountSchema = reactive<FormSchema[]>([
             <>
               <div class="flex justify-between items-center w-[100%]">
                 <ElCheckbox v-model={remember.value} label={t('login.remember')} size="small" />
-                {isManagement && (
+                {!isOperation.value && (
                   <ElLink type="primary" underline={false} onClick={toResetPassword}>
                     {t('login.forgetPassword')}
                   </ElLink>
@@ -255,7 +257,7 @@ const accountSchema = reactive<FormSchema[]>([
                 </BaseButton>
               </div>
               <div class="w-[100%] mt-15px">
-                {isManagement && (
+                {!isOperation.value && (
                   <BaseButton class="w-[100%]" onClick={toRegister}>
                     {t('login.register')}
                   </BaseButton>
@@ -461,7 +463,7 @@ const signIn = async () => {
 
           // 获取用户信息
           // TODO: 这里应该是从token解析或者调用获取用户信息接口
-          if (!isManagement) {
+          if (isOperation.value) {
             const userInfo = await getUserInfoApi()
             if (userInfo && userInfo.code === '000000') {
               console.log(userInfo.data)
