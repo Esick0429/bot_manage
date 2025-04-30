@@ -33,7 +33,12 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
   console.log('Current VITE_SYSTEM_TYPE:', env.VITE_SYSTEM_TYPE)
   console.log('Current VITE_TRONSCAN_URL:', env.VITE_TRONSCAN_URL)
   return {
-    base: env.VITE_SYSTEM_TYPE === 'Management' ? '/management' : '/operation',
+    base:
+      env.VITE_SYSTEM_TYPE === 'Management'
+        ? '/management'
+        : env.VITE_SYSTEM_TYPE === 'Credit'
+          ? '/credit'
+          : '/operation',
     plugins: [
       Vue({
         script: {
@@ -93,7 +98,11 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         : undefined,
       ViteEjsPlugin({
         title:
-          env.VITE_SYSTEM_TYPE === 'Management' ? env.VITE_APP_TITLE : env.VITE_APP_TITLE_OPERATION
+          env.VITE_SYSTEM_TYPE === 'Management'
+            ? '机器人后台管理系统'
+            : env.VITE_SYSTEM_TYPE === 'Credit'
+              ? '话费系统'
+              : '机器人后台运营系统'
       }),
       UnoCSS()
     ],
@@ -125,7 +134,12 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
     },
     build: {
       target: 'es2015',
-      outDir: env.VITE_SYSTEM_TYPE === 'Management' ? 'dist-management' : 'dist-operation',
+      outDir:
+        env.VITE_SYSTEM_TYPE === 'Management'
+          ? 'dist-management'
+          : env.VITE_SYSTEM_TYPE === 'Credit'
+            ? 'dist-credit'
+            : 'dist-operation',
       sourcemap: env.VITE_SOURCEMAP === 'true',
       // brotliSize: false,
       rollupOptions: {
@@ -144,15 +158,37 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       cssTarget: ['chrome31']
     },
     server: {
-      port: 4000,
+      port:
+        env.VITE_SYSTEM_TYPE === 'Management'
+          ? 4000
+          : env.VITE_SYSTEM_TYPE === 'Operation'
+            ? 4001
+            : env.VITE_SYSTEM_TYPE === 'Credit'
+              ? 4002
+              : 4000, // 默认
       proxy: {
-        // 选项写法
-        '/api': {
-          target: 'http://127.0.0.1:8000',
+        // v1 代理
+        '/v1': {
+          target: 'http://192.168.31.250:2404',
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, '')
+          rewrite: (path) => path // 不去掉前缀
         },
-        // 为/mock请求配置代理，确保它们不会发送到外部服务器
+        // v2 代理
+        '/v2': {
+          target: 'http://192.168.31.250:2404',
+          changeOrigin: true,
+          rewrite: (path) => path
+        },
+        // v3 代理
+        '/v3': {
+          target:
+            env.VITE_SYSTEM_TYPE === 'Credit'
+              ? 'http://192.168.31.250:2504'
+              : 'http://192.168.31.250:2404',
+          changeOrigin: true,
+          rewrite: (path) => path
+        },
+        // mock 代理
         '/mock': {
           target: 'http://localhost:4000',
           changeOrigin: true,
