@@ -10,14 +10,17 @@ import type {
   PhoneCodeParams,
   LoginResponse
 } from './types'
-import { isManagementSystem } from '@/utils/system'
+import { isManagementSystem, getUserApiPrefix, isOperationSystem } from '@/utils/system'
 import { encryptAESCTR } from '@/utils/encrypt'
+import { computed } from 'vue'
+
+console.log('getUserApiPrefix', getUserApiPrefix())
 
 interface RoleParams {
   roleName: string
 }
 
-const isManagement = isManagementSystem()
+const isManagement = computed(() => isManagementSystem())
 // 旧的API接口，保留供兼容
 export const loginApi = (data: UserType): Promise<IResponse<UserType>> => {
   // TODO：需要修改为后端接口
@@ -63,8 +66,9 @@ export const phoneRegisterApi = (data: PhoneRegisterParams): Promise<IResponse> 
  * 邮箱注册
  * @param data 注册参数
  */
-export const emailRegisterApi = (data: EmailRegisterParams): Promise<IResponse> => {
-  return request.post({ url: '/v1/user/email/register', data })
+export const emailRegisterApi = (data: EmailRegisterParams): Promise<IResponse<LoginResponse>> => {
+  const url = `${getUserApiPrefix()}/email/register`
+  return request.post({ url, data })
 }
 
 // 登录相关API
@@ -75,12 +79,7 @@ export const emailRegisterApi = (data: EmailRegisterParams): Promise<IResponse> 
 export const passwordLoginApi = (
   data: PasswordLoginParams & { verify_code?: string; code_id?: string }
 ): Promise<IResponse<LoginResponse>> => {
-  let url = '/v1/user/login'
-  if (!isManagement) {
-    url = '/manage/user/login'
-  }
-  // 整体序列化加密，iv 拼接在密文前16位
-  console.log('data', JSON.stringify(data))
+  const url = `${getUserApiPrefix()}/login`
   const encrypted = encryptAESCTR(JSON.stringify(data))
   return request.post({ url, data: { data: encrypted } })
 }
@@ -99,11 +98,11 @@ export const verifyCodeLoginApi = (
  * 退出登录
  */
 export const logoutApi = (): Promise<IResponse> => {
-  let url = '/v1/user/logout'
-  if (!isManagement) {
-    url = '/manage/user/logout'
+  const isOperation = computed(() => isOperationSystem())
+  if (isOperation.value) {
+    url = '/v2/user/logout'
   }
-  return request.post({ url })
+  return request.post({ url: `${getUserApiPrefix()}/logout` })
 }
 
 // 修改密码相关API
@@ -112,7 +111,8 @@ export const logoutApi = (): Promise<IResponse> => {
  * @param data 修改密码参数
  */
 export const changePasswordApi = (data: ChangePasswordParams): Promise<IResponse> => {
-  return request.post({ url: '/v1/user/changepasswd', data })
+  const url = `${getUserApiPrefix()}/changepasswd`
+  return request.post({ url, data })
 }
 
 // 验证码相关API
@@ -120,8 +120,9 @@ export const changePasswordApi = (data: ChangePasswordParams): Promise<IResponse
  * 发送邮箱验证码
  * @param data 发送验证码参数
  */
-export const sendEmailCodeApi = (data: EmailCodeParams): Promise<IResponse> => {
-  return request.post({ url: '/v1/user/email/code', data })
+export const sendEmailCodeApi = (data: EmailCodeParams): Promise<IResponse<any>> => {
+  const url = `${getUserApiPrefix()}/email/code`
+  return request.post({ url, data })
 }
 
 /**
@@ -135,8 +136,12 @@ export const sendPhoneCodeApi = (data: PhoneCodeParams): Promise<IResponse> => {
 /**
  * 获取图形验证码
  */
-export const getCaptchaApi = (): Promise<IResponse<{ id: string; data: string }>> => {
-  return request.get({ url: '/v1/user/captcha/captcha' })
+export const getCaptchaApi = () => {
+  const isOperation = computed(() => isOperationSystem())
+  if (isOperation.value) {
+    return request.get({ url: '/v2/user/captcha/captcha' })
+  }
+  return request.get({ url: `${getUserApiPrefix()}/captcha/captcha` })
 }
 
 /**
@@ -144,4 +149,16 @@ export const getCaptchaApi = (): Promise<IResponse<{ id: string; data: string }>
  */
 export const getUserInfoApi = (): Promise<IResponse<UserType>> => {
   return request.get({ url: '/v2/manage/user/use_info' })
+}
+
+// 获取用户详情
+export const getUserDetailApi = (): Promise<IResponse<UserType>> => {
+  const url = `${getUserApiPrefix()}/get_detail`
+  return request.get({ url })
+}
+
+// 获取余额明细
+export const getBalanceRecordApi = (params: any): Promise<IResponse<any>> => {
+  const url = `${getUserApiPrefix()}/balance_record`
+  return request.get({ url, params })
 }
