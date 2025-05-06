@@ -100,6 +100,15 @@ if (import.meta.env.VITE_SYSTEM_TYPE === 'Credit') {
           }
         },
         {
+          path: 'bot-list/price-config/:botId',
+          component: () => import('@/clientView/Bot_manage/bot_list/components/BotPriceConfig.vue'),
+          name: 'BotPriceConfig',
+          meta: {
+            title: '机器人价格配置',
+            hidden: true
+          }
+        },
+        {
           path: 'menu_list',
           component: () => import('@/clientView/Bot_manage/menu_list/index.vue'),
           name: 'MenuList',
