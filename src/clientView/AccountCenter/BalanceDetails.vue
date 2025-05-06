@@ -10,8 +10,8 @@
       >
         <!-- Slot for Type column rendering -->
         <template #type="{ row }">
-          <ElTag :type="getRecordTypeTagType(row.describe)">
-            {{ row.describe }}
+          <ElTag :type="getRecordTypeTagType(row.status)">
+            {{ getRecordTypeText(row.status) }}
           </ElTag>
         </template>
 
@@ -37,23 +37,25 @@ import { useSearchTable } from '@/hooks/web/useSearchTable'
 // import { formatTime } from '@/utils/time'; // TODO: 确认 formatTime 函数路径和用法, 暂时移除
 
 // --- Status/Type Options ---
-// These options are for the search filter, map them to your actual data types
+// TODO: Updated type options based on status field and provided mapping
 const recordTypeOptions = ref([
   { label: '全部', value: '' },
-  { label: '系统退款', value: 'refund' }, // TODO: 根据后端实际接受的查询值调整 value
-  { label: '充值消费', value: 'expense' }, // TODO: 根据后端实际接受的查询值调整 value
-  { label: '充值', value: 'recharge' } // TODO: 根据后端实际接受的查询值调整 value
-  // Add other types as needed
+  { label: '代理充值', value: 1 },
+  { label: '套餐消费', value: 2 },
+  { label: '退款', value: 3 },
+  { label: '新增/续费机器人', value: 4 },
+  { label: '后台手动变更', value: 5 }
 ])
 
 // --- Search Schema ---
 const searchSchema = ref([
+  // TODO: Changed field to 'status' and updated options
   {
-    field: 'describe', // TODO: 确认搜索字段是否为 describe
-    label: '状态查询:',
+    field: 'status',
+    label: '类型查询:',
     component: 'Select' as const,
     componentProps: {
-      placeholder: '请选择状态',
+      placeholder: '请选择类型',
       options: recordTypeOptions.value,
       style: { width: '150px' }
     }
@@ -74,9 +76,11 @@ const searchSchema = ref([
 // --- Table Columns ---
 const tableColumns = ref([
   { field: 'order_num', label: '订单号' },
+  // TODO: Re-added type column based on status field
   {
-    field: 'describe', // 对应 describe
-    label: '类型'
+    field: 'status',
+    label: '类型',
+    formatter: (row: any) => getRecordTypeText(row.status)
   },
   { field: 'product_name', label: '产品' }, // TODO: 确认接口是否返回 product 字段
   { field: 'username', label: '用户名' },
@@ -111,17 +115,42 @@ const tableColumns = ref([
 ])
 
 // --- Helper function for Tag Type ---
-// TODO: 确认 describe 字段的所有可能值
-function getRecordTypeTagType(type: string): 'success' | 'warning' | 'danger' | 'info' {
-  switch (type) {
-    case '系统退款': // TODO: 确认值
-      return 'danger'
-    case '充值消费': // 确认值
-      return 'warning'
-    case '充值': // TODO: 确认值
+// TODO: Re-added and updated function to use numeric status
+function getRecordTypeTagType(
+  status: number
+): 'success' | 'warning' | 'danger' | 'info' | 'primary' {
+  switch (status) {
+    case 1: // 代理充值
       return 'success'
+    case 2: // 套餐消费
+      return 'warning'
+    case 3: // 退款
+      return 'danger'
+    case 4: // 新增/续费机器人
+      return 'info'
+    case 5: // 后台手动变更
+      return 'primary'
     default:
       return 'info'
+  }
+}
+
+// --- Helper function for Type Text ---
+// TODO: Added helper to get text description from status
+function getRecordTypeText(status: number): string {
+  switch (status) {
+    case 1:
+      return '代理充值'
+    case 2:
+      return '套餐消费'
+    case 3:
+      return '退款'
+    case 4:
+      return '新增/续费机器人'
+    case 5:
+      return '后台手动变更'
+    default:
+      return '未知类型' // Fallback for unknown status
   }
 }
 
